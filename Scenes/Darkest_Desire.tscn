@@ -1,0 +1,93 @@
+[gd_scene load_steps=3 format=3 uid="uid://bnbnuqgsahmxf"]
+
+[ext_resource type="FontFile" uid="uid://dic7gv6lwabbn" path="res://Font/RomanAntique.ttf" id="1_xa3yt"]
+[ext_resource type="FontFile" uid="uid://dawf50upxndt7" path="res://Font/RomanAntique-Italic.ttf" id="2_uc6mk"]
+
+[node name="Control" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ColorRect" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.0862745, 0.0862745, 0.0862745, 1)
+metadata/_edit_use_anchors_ = true
+
+[node name="ColorRect_base" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.00694444
+anchor_top = 0.0123457
+anchor_right = 0.993056
+anchor_bottom = 0.987654
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.0313726, 0.0313726, 0.0313726, 1)
+metadata/_edit_use_anchors_ = true
+
+[node name="right_side_container" type="VBoxContainer" parent="ColorRect_base"]
+layout_mode = 2
+anchor_left = 0.84507
+anchor_right = 1.00264
+anchor_bottom = 0.10443
+offset_right = -5.0
+offset_bottom = 566.0
+metadata/_edit_use_anchors_ = true
+
+[node name="VBoxContainer" type="VBoxContainer" parent="ColorRect_base"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.00176056
+anchor_right = 0.15493
+anchor_bottom = 1.0
+offset_right = 1.52588e-05
+metadata/_edit_use_anchors_ = true
+
+[node name="ColorRect_dungeon" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.166667
+anchor_top = 0.0123457
+anchor_right = 0.833333
+anchor_bottom = 0.987654
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.0901961, 0.0901961, 0.0901961, 1)
+metadata/_edit_use_anchors_ = true
+
+[node name="ScrollContainer" type="ScrollContainer" parent="."]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.166667
+anchor_top = 0.0246914
+anchor_right = 0.833333
+anchor_bottom = 1.0
+follow_focus = true
+horizontal_scroll_mode = 0
+metadata/_edit_use_anchors_ = true
+
+[node name="main_text" type="RichTextLabel" parent="ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_constants/line_separation = 7
+theme_override_fonts/normal_font = ExtResource("1_xa3yt")
+theme_override_fonts/bold_font = ExtResource("1_xa3yt")
+theme_override_fonts/italics_font = ExtResource("2_uc6mk")
+theme_override_fonts/bold_italics_font = ExtResource("2_uc6mk")
+theme_override_font_sizes/normal_font_size = 22
+theme_override_font_sizes/bold_font_size = 24
+theme_override_font_sizes/italics_font_size = 0
+theme_override_font_sizes/bold_italics_font_size = 0
+bbcode_enabled = true
+text = "hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh"
+tab_size = 9
+shortcut_keys_enabled = false

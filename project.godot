@@ -1,0 +1,28 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=5
+
+[application]
+
+config/name="Darkest Desires"
+run/main_scene="res://Scenes/Darkest_Desire.tscn"
+config/features=PackedStringArray("4.1", "Mobile")
+config/icon="res://art/icon.svg"
+
+[autoload]
+
+global="*res://Scripts/control.gd"
+pp="*res://Scripts/Pleasure_Paradise.gd"
+goblinbattle="*res://Scripts/goblin_battle.gd"
+combat_func="*res://Scripts/combat_func.gd"
+SkillData="*res://Scripts/skill_data2.gd"
+
+[rendering]
+
+renderer/rendering_method="mobile"
