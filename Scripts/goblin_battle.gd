@@ -105,7 +105,7 @@ func process_turns():
 		print(active_seekers)
 		var participant = in_combat[current_turn]
 		if show_intia == true:
-			global.main_text.text += "------------------------\n\n"
+			global.main_text.text = "------------------------\n\n"
 			global.main_text.text += "Turn Order\n"
 			for i in in_combat:
 				global.main_text.text += str(i.title) + "\n"
