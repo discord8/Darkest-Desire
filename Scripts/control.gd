@@ -72,7 +72,7 @@ var ass_fetish = []
 var oral_fetish = []
 var breasts_fetish = []
 var paras
-var names = ["Lilica", "Yera", "Triena", "Aath", "Sage", "Evelyn", "Lucy", "Emma", "Terial", "Lyra", "Titiana", "Nip", "Sarah", "Sara", "Mimi", "Octavia", "Corin", "Gigi", "Mandy", "Rose", "Liv", "Rhea", "Jasmine", "Piper", "Dove", "Jade", "Ingrid", "Umi", "Tori", "Cindy", "Velvet", "Mariah", "Tessa", "Tess", "Daphney", "Dora", "Zelda", "Hitomi", "Seras", "Ava", "Olivia", "Sophie", "Amelia", "Mary", "Isabella", "Victoria", "Charlotte", "Luna", "Mia", "Kalifa", "Lana", "Amber", "Gianna", "Annie", "Nora", "Layla", "Liliy", "Mami", "Hazel", "Madi", "Isla", "Willow", "Zoe", "Grace", "Ivy", "Naomi", "Maya", "Alice", "Sadie", "Hailey", "Aubrey", "Skye", "Vivian", "Eve", "Freya", "Amara", "Chel", "Catalina", "Ashley", "Chloe", "Faith", "Kimberly", "Taylor", "Sutton", "Vera", "Kaia", "Lilly", "Selena", "Aubrey", "Nyla", "Lia", "Kiara", "Elise", "Hope", "Lola", "Lilith", "Ophelia", "Dahlia", "Blair", "Celeste", "Rebecca", "Nina", "Trinity", "Vanessa", "Camilla", "Adrianna", "Celine", "Lucianna", "Reign", "Cali", "Viviana", "Serena", "Destiny", "Elle", "Veronica", "Azaela", "Raya", "Raven", "Scarlet", "Sylvie", "Lexi", "Ryn", "Carmen", "Alison", "Felicity", "Katalina", "Zariah", "Mira", "Jolene", "Emelia", "Bonnie", "Briar", "Leona", "Lina", "Remy", "Mina", "Mili", "Selene", "Angie", "Flora", "Violet", "Aya", "Ramona", "Bridget", "Mercy", "Paula", "Baylor", "Marianna", "Loretta", "Gwen", "Robin", "Katelyn", "Tiffany", "Lexie", "Kahlani"]
+var names = ["Lilica", "Yera", "Triena", "Aath", "Sage", "Evelyn", "Lucy", "Emma", "Terial", "Lyra", "Titiana", "Nip", "Sarah", "Sara", "Mimi", "Octavia", "Corin", "Gigi", "Mandy", "Rose", "Liv", "Rhea", "Jasmine", "Piper", "Dove", "Jade", "Ingrid", "Umi", "Tori", "Cindy", "Velvet", "Mariah", "Tessa", "Tess", "Daphney", "Dora", "Zelda", "Hitomi", "Seras", "Ava", "Olivia", "Sophie", "Amelia", "Mary", "Isabella", "Victoria", "Charlotte", "Luna", "Mia", "Kalifa", "Lana", "Amber", "Gianna", "Annie", "Nora", "Layla", "Lilly", "Nikki", "Aoi", "Lulu", "Mami", "Hazel", "Madi", "Isla", "Willow", "Zoe", "Grace", "Ivy", "Naomi", "Maya", "Alice", "Sadie", "Hailey", "Aubrey", "Skye", "Vivian", "Eve", "Freya", "Amara", "Chel", "Catalina", "Ashley", "Chloe", "Faith", "Kimberly", "Taylor", "Sutton", "Vera", "Kaia", "Lilly", "Selena", "Aubrey", "Nyla", "Lia", "Kiara", "Elise", "Hope", "Lola", "Lilith", "Ophelia", "Dahlia", "Blair", "Celeste", "Rebecca", "Nina", "Trinity", "Vanessa", "Camilla", "Adrianna", "Celine", "Lucianna", "Reign", "Cali", "Viviana", "Serena", "Destiny", "Elle", "Veronica", "Azaela", "Raya", "Raven", "Scarlet", "Sylvie", "Lexi", "Ryn", "Carmen", "Alison", "Felicity", "Katalina", "Zariah", "Mira", "Jolene", "Emelia", "Bonnie", "Briar", "Leona", "Lina", "Remy", "Mina", "Mili", "Selene", "Angie", "Flora", "Violet", "Aya", "Ramona", "Bridget", "Mercy", "Paula", "Baylor", "Marianna", "Loretta", "Gwen", "Robin", "Katelyn", "Tiffany", "Lexie", "Kahlani"]
 var starter_weapons = ["Twin Daggers", "Crossbow", "Flintlock", "Arcane Wand", "Animated Spellbook", "Broad Sword", "Battle Axes", "Great Club"]
 var starter_armors = ["Graceful Robes", "Bikini Armor", "Dancer's Silk", "Holy Garb", "Fantasy Fullplate", "Skimpy Streetrat"]
 # uprgrade vars
@@ -306,8 +306,8 @@ func apply_equipment(seeker):
 	_unequip_item_skills(seeker)
 	match seeker.weapon:
 		"Twin Daggers": #agility, will power weapon, low threat
-			seeker.skill_objects.append(Skill.new("Dual Slice",true, true, false, false, 3 + seeker.strength * 0.2 + seeker.agility * 0.2, 0, 0,[""], "Slashing", false, false, 2, "Swing with both daggers hitting twice, uses equal amount agility and strength for damage.", 5 + seeker.intelligence * 0.3, 1.5, 0, false, false, false, false, false )) #double attack, agility for damage
-			seeker.skills.append("Dual Slice")
+			seeker.skill_objects.append(Skill.new("Multi Slash",true, true, false, false, 3 + seeker.strength * 0.2 + seeker.agility * 0.2, 0, 0,[""], "Slashing", false, false, 2, "Swing with both daggers hitting twice, uses equal amount agility and strength for damage.", 5 + seeker.intelligence * 0.3, 1.5, 0, false, false, false, false, false )) #double attack, agility for damage
+			seeker.skills.append("Multi Slash")
 			seeker.skills.append("Lightfoot") #lower threat based on agility
 			seeker.skill_objects.append(Skill.new("Vital Cut",true, true, false, false, 32 - seeker.threat, 0, 0,[""], "Slashing", false, false, 1, "A sneak attack that does damage based on how low your threat is.", 10 + seeker.intelligence * 0.3, 2.0, 0, false, false, false, false, false ))
 			seeker.skills.append("Vital Cut") #add flat value minus threat, low hit (20 then - current threat)
@@ -408,8 +408,8 @@ func _unequip_item_skills(seeker):
 			seeker.skills.erase("Hideaway")
 	match seeker.weapon:
 		"Twin Daggers": #agility, will power weapon, low threat
-			seeker.skill_objects.erase(Skill.new("Dual Slice",true, true, false, false, 3 + seeker.strength * 0.2 + seeker.agility * 0.2, 0, 0,[""], "Slashing", false, false, 2, "Swing with both daggers hitting twice, uses equal amount agility and strength for damage.", 5 + seeker.intelligence * 0.3, 1.5, 0, false, false, false, false, false )) #double attack, agility for damage
-			seeker.skills.erase("Dual Slice")
+			seeker.skill_objects.erase(Skill.new("Multi Slash",true, true, false, false, 3 + seeker.strength * 0.2 + seeker.agility * 0.2, 0, 0,[""], "Slashing", false, false, 2, "Swing with both daggers hitting twice, uses equal amount agility and strength for damage.", 5 + seeker.intelligence * 0.3, 1.5, 0, false, false, false, false, false )) #double attack, agility for damage
+			seeker.skills.erase("Multi Slash")
 			seeker.skills.erase("Lightfoot") #lower threat based on agility
 			seeker.skill_objects.erase(Skill.new("Vital Cut",true, true, false, false, 32 - seeker.threat, 0, 0,[""], "Slashing", false, false, 1, "A sneak attack that does damage based on how low your threat is.", 10 + seeker.intelligence * 0.3, 2.0, 0, false, false, false, false, false ))
 			seeker.skills.erase("Vital Cut") #add flat value minus threat, low hit (20 then - current threat)
@@ -591,12 +591,17 @@ func _remove_from_departing(seeker):
 	departing_screen()
 
 func clear_seeker_buttons():
-# Remove all dynamically created buttons from the container
 	for button in left_buttons:
 		button_container.remove_child(button)
 		button.queue_free()  # Free the button memory
 	left_buttons.clear()  # Clear the list of buttons
 	
+
+func clear_enemy_buttons():
+	for button in right_buttons:
+		right_button_container.remove_child(button)
+		button.queue_free()  # Free the button memory
+	right_buttons.clear()  # Clear the list of buttons
 
 #to do
 #add the roster with buttons

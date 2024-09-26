@@ -14,6 +14,7 @@ var status: Array
 #var swarm: String #strength check or be tipped over
 # Called when the node enters the scene tree for the first time.
 var active_seekers = []
+var active_enemies = []
 var swarm_stats
 var goblin_bucket = []
 var in_combat = []
@@ -34,6 +35,7 @@ func _init():
 
 
 var did_crit = false
+var total_damage
 var small_threat = []
 var vault_buff
 var minor_buff = 5
@@ -145,6 +147,11 @@ func player_turn(participant):
 	global.button_container.add_child(next_turn)
 	next_turn.pressed.connect(Callable(self, "process_turns"))
 	global.left_buttons.append(next_turn)
+	var skill_info = Button.new() #change main text to a description of all current skills by doing for and describing them
+	skill_info.text = "Do Nothing"
+	global.button_container.add_child(skill_info)
+	skill_info.pressed.connect(Callable(self, "skill_info"))
+	global.left_buttons.append(skill_info)
 	for ability in participant.skill_objects:
 		var skill_button = Button.new()
 		skill_button.text = ability.title  # 'ability' is a string representing the skill name
@@ -153,51 +160,24 @@ func player_turn(participant):
 		global.left_buttons.append(skill_button)
 
 func _perform_skill(ability, seeker):
-	var multihit_amount = ability.multihit
 	var damage_done
-	global.main_text.text = str(seeker.title) +  " uses " + str(ability)
+	global.main_text.text = str(seeker.title) +  " uses " + str(ability.title)
 	if ability.target_enemy == true:
-		if "Burn" in ability.status:
-			swarm_stats.status.append("Burn")
-		for hits in multihit_amount:
-			if ability.does_damage == true:
-				check_for_crit(ability)
-				swarm_stats.heat -= randi_range(1,3)
-				if did_crit == true:
-					if ability.aoe == true:
-						damage_done = randi_range(0,5) + (ability.base_damage * ability.crit_value) * 1.2
-						swarm_stats.hp -= damage_done
-					elif ability.damage_type == "Fire":
-						damage_done = randi_range(0,5) + (ability.base_damage * ability.crit_value) * 1.2
-						swarm_stats.hp -= damage_done
-					elif ability.damage_type == "Bludgeoning":
-						damage_done = randi_range(0,5) + (ability.base_damage * ability.crit_value) * 0.8
-						swarm_stats.hp -= damage_done
-					else:
-						damage_done = randi_range(0,5) + (ability.base_damage * ability.crit_value) * 0.8
-						swarm_stats.hp -= damage_done
-					did_crit = false
-				elif did_crit == false:
-					if ability.aoe == true:
-						damage_done = randi_range(0,5) + ability.base_damage * 1.2
-						swarm_stats.hp -= damage_done
-					elif ability.damage_type == "Fire":
-						damage_done = randi_range(0,5) + ability.base_damage * 1.2
-						swarm_stats.hp -= damage_done
-					elif ability.damage_type == "Bludgeoning":
-						damage_done = randi_range(0,5) + ability.base_damage * 0.8
-						swarm_stats.hp -= damage_done
-					else:
-						damage_done = randi_range(0,5) + ability.base_damage * 0.8
-						swarm_stats.hp -= damage_done
-				print("Damage done: " + str(damage_done))
+		if global.right_buttons.size() >= 2:
+			global.clear_enemy_buttons()
+			for target in active_enemies:
+				var seeker_target = Button.new()
+				seeker_target.text = target.title
+				global.right_button_container.add_child(seeker_target)
+				seeker_target.pressed.connect(Callable(self, "skill_logic").bind(ability,seeker,target))
+				global.right_buttons.append(seeker_target)
 	if ability.target_ally == true:
 		global.clear_seeker_buttons()
-		for targets in active_seekers:
+		for target in active_seekers:
 			var seeker_target = Button.new()
-			seeker_target.text = seeker.title
+			seeker_target.text = target.title
 			global.button_container.add_child(seeker_target)
-			seeker_target.pressed.connect(Callable(self, "_target_ally").bind(ability,seeker,multihit_amount))
+			seeker_target.pressed.connect(Callable(self, "skill_logic").bind(ability,seeker,target))
 			global.left_buttons.append(seeker_target)
 	if ability.cooldown == 1:
 		seeker.skill_objects.erase(ability)
@@ -214,35 +194,33 @@ func check_for_crit(ability):
 		did_crit = true
 		
 
-func _target_ally(ability,seeker,multihit_amount):
+func _target_ally(ability,seeker, target):
 	#if "Burn" in ability.status:
-	for hits in multihit_amount:
-		if ability.healing == true:
-			check_for_crit(ability)
-			swarm_stats.heat += randi_range(1,1)
-			if did_crit == true:
-				seeker.stamina -= ability.base_damage * ability.crit_value
-				if seeker.stamina >= seeker.stamina_max:
-					seeker.stamina = seeker.stamina_max
-				did_crit = false
-			elif did_crit == false:
-				swarm_stats.hp -= ability.base_damage
-				if seeker.stamina >= seeker.stamina_max:
-					seeker.stamina = seeker.stamina_max
-		elif ability.lust_gain == true:
-			check_for_crit(ability)
-			swarm_stats.heat += randi_range(1,3)
-			if did_crit == true:
-				seeker.stamina -= ability.base_damage * ability.crit_value
-				if seeker.stamina >= seeker.stamina_max:
-					seeker.stamina = seeker.stamina_max
-				did_crit = false
-			elif did_crit == false:
-				swarm_stats.hp -= ability.base_damage
-				if seeker.stamina >= seeker.stamina_max:
-					seeker.stamina = seeker.stamina_max
-	if ability.special == true:
-		_ally_special(ability, seeker)
+
+	if ability.healing == true:
+		check_for_crit(ability)
+		swarm_stats.heat += randi_range(1,1)
+		if did_crit == true:
+			seeker.stamina -= ability.base_damage * ability.crit_value
+			if seeker.stamina >= seeker.stamina_max:
+				seeker.stamina = seeker.stamina_max
+			did_crit = false
+		elif did_crit == false:
+			swarm_stats.hp -= ability.base_damage
+			if seeker.stamina >= seeker.stamina_max:
+				seeker.stamina = seeker.stamina_max
+	elif ability.lust_gain == true:
+		check_for_crit(ability)
+		swarm_stats.heat += randi_range(1,3)
+		if did_crit == true:
+			seeker.stamina -= ability.base_damage * ability.crit_value
+			if seeker.stamina >= seeker.stamina_max:
+				seeker.stamina = seeker.stamina_max
+			did_crit = false
+		elif did_crit == false:
+			swarm_stats.hp -= ability.base_damage
+			if seeker.stamina >= seeker.stamina_max:
+				seeker.stamina = seeker.stamina_max
 
 
 func _ally_special(ability, seeker):
@@ -255,6 +233,62 @@ func _ally_special(ability, seeker):
 		else: 
 			small_threat.append(seeker.threat)
 			seeker.threat -= seeker.threat
+			
 
+
+func skill_logic(ability, seeker, target):
+	var damage_done = 0
+	#maybe move damage and effects here so that its more modular
+	check_for_crit(ability)
+	swarm_stats.heat += randi_range(1,3) #if high heat they do scarier actions
+	if ability.title == "Multi Slash":
+		for i in ability.multihit:
+			if did_crit == false:
+				damage_done = int(randi_range(0,5) + ability.base_damage)
+			else:
+				damage_done = int(randi_range(0,5) + ability.base_damage * ability.crit_value)
+			swarm_stats.hp -= damage_done
+			total_damage += damage_done
+		global.main_text.text += "\n------------------------\n" + str(seeker.title) + " flies into the Goblin swarm swiftly slicing down their ranks before diving free from any counter attacks. Dealing [color=crimson]" + str(total_damage) + " [/color]total damage."
+		total_damage = 0
+	if ability.title == "Vital Cut":
+		if did_crit == false:
+			damage_done = int(randi_range(0,5) + ability.base_damage * 0.8)
+		else:
+			damage_done = int(randi_range(0,5) + ability.base_damage * 0.8 * ability.crit_value)
+		swarm_stats.hp -= damage_done
+		global.main_text.text += "\n------------------------\n" + str(seeker.title) + " With precision strikes at a goblins vitals slaying them instantly. Dealing [color=crimson]" + str(damage_done) + " [/color]damage to the horde"
+	if ability.title == "Distracting Strike":
+		if did_crit == false:
+			damage_done = int(randi_range(0,5) + ability.base_damage * 0.8)
+		else:
+			damage_done = int(randi_range(0,5) + ability.base_damage * 0.8 * ability.crit_value)
+		swarm_stats.hp -= damage_done
+		global.main_text.text += "\n------------------------\n" + str(seeker.title) + " With an intentionally violent slash a fountain of blood erupts from a slain goblin coating his brothers in crimson. Dealing [color=crimson]" + str(damage_done) + " [/color]damage and distracting the group."
+	if ability.title == "Singular Strike":
+		if did_crit == false:
+			damage_done = int(randi_range(0,5) + ability.base_damage * 0.8)
+		else:
+			damage_done = int(randi_range(0,5) + ability.base_damage * 0.8 * ability.crit_value)
+		swarm_stats.hp -= damage_done
+		global.main_text.text += "\n------------------------\n" + str(seeker.title) + " loads a heavy bolt and aims for the central mass of the Goblins penetrating and skewering multiple enemies from the violent impact. Dealing [color=crimson]" + str(damage_done) + " [/color]damage."
+	if ability.title == "Napalm Bolt":
+		swarm_stats.status.append("Burn")
+		if did_crit == false:
+			damage_done = int(randi_range(0,5) + ability.base_damage * 1.4)
+		else:
+			damage_done = int(randi_range(0,5) + ability.base_damage * 1.4 * ability.crit_value)
+		swarm_stats.hp -= damage_done
+		global.main_text.text += "\n------------------------\n" + str(seeker.title) + " Swiftly modifies her ammo as the goblins lecherously aproaches her, kicking one back after her preperations she dives back while shooting the monster causing a detonation of dire heat and frightining fire, the goblins caught in the blast scream and run about flesh melting away. Dealing [color=crimson]" + str(damage_done) + " [/color]damage."
+	if ability.title == "Napalm Bolt":
+		swarm_stats.heat -= randi_range(3,6)
+		if did_crit == false:
+			damage_done = int(randi_range(0,5) + ability.base_damage)
+		else:
+			damage_done = int(randi_range(0,5) + ability.base_damage * ability.crit_value)
+		seeker.stamina += damage_done
+		if seeker.stamina >= seeker.stamina_max:
+			seeker.stamina = seeker.stamina_max
+		global.main_text.text += "\n------------------------\n" + str(seeker.title) + " Swiftly modifies her ammo as the goblins lecherously aproaches her, kicking one back after her preperations she dives back while shooting the monster causing a detonation of dire heat and frightining fire, the goblins caught in the blast scream and run about flesh melting away. Dealing [color=crimson]" + str(damage_done) + " [/color]damage."
 #figure out buffs and debuffs, maybe add them to quirks and have a skill check that they disappear
 # - 5 off base damage in global and add in randi_randge 1,5 on dage to see some different damage numbers
