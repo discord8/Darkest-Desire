@@ -102,7 +102,12 @@ func _sort_by_initiative(a,b):
 func process_turns():
 	if current_turn >= in_combat.size():  # Reset turns if all turns are completed
 		current_turn = 0
-		roll_initiative()
+		global.clear_seeker_buttons()
+		var next_turn = Button.new()
+		next_turn.text = "End Round"
+		global.button_container.add_child(next_turn)
+		next_turn.pressed.connect(Callable(self, "end_round"))
+		global.left_buttons.append(next_turn)
 	else:
 		print(active_seekers)
 		var participant = in_combat[current_turn]
@@ -133,34 +138,33 @@ func goblin_turn(participant):
 	current_turn += 1
 	if current_turn < in_combat.size():
 		process_turns()
+		#gobling logic
 	else:
-		current_turn = 0
-		roll_initiative()
+		process_turns()
 	
 
 func player_turn(participant):
 	global.clear_seeker_buttons()
 	current_turn += 1
 	#if sex in status do that instead of regular turn
-	var next_turn = Button.new()
-	next_turn.text = "Do Nothing"
-	global.button_container.add_child(next_turn)
-	next_turn.pressed.connect(Callable(self, "process_turns"))
-	global.left_buttons.append(next_turn)
-	var skill_info = Button.new() #change main text to a description of all current skills by doing for and describing them
-	skill_info.text = "Do Nothing"
-	global.button_container.add_child(skill_info)
-	skill_info.pressed.connect(Callable(self, "skill_info"))
-	global.left_buttons.append(skill_info)
 	for ability in participant.skill_objects:
 		var skill_button = Button.new()
 		skill_button.text = ability.title  # 'ability' is a string representing the skill name
 		global.button_container.add_child(skill_button)
 		skill_button.pressed.connect(Callable(self, "_perform_skill").bind(ability, participant))
 		global.left_buttons.append(skill_button)
+	var next_turn = Button.new()
+	next_turn.text = "Do Nothing"
+	global.button_container.add_child(next_turn)
+	next_turn.pressed.connect(Callable(self, "process_turns"))
+	global.left_buttons.append(next_turn)
+	var skill_info_button = Button.new() #change main text to a description of all current skills by doing for and describing them
+	skill_info_button.text = "Skill Info"
+	global.button_container.add_child(skill_info_button)
+	skill_info_button.pressed.connect(Callable(self, "skill_info").bind(participant,skill_info_button))
+	global.left_buttons.append(skill_info_button)
 
 func _perform_skill(ability, seeker):
-	var damage_done
 	global.main_text.text = str(seeker.title) +  " uses " + str(ability.title)
 	if ability.target_enemy == true:
 		if global.right_buttons.size() >= 2:
@@ -171,14 +175,22 @@ func _perform_skill(ability, seeker):
 				global.right_button_container.add_child(seeker_target)
 				seeker_target.pressed.connect(Callable(self, "skill_logic").bind(ability,seeker,target))
 				global.right_buttons.append(seeker_target)
+		else:
+			skill_logic(ability,seeker,swarm_stats)
 	if ability.target_ally == true:
 		global.clear_seeker_buttons()
+		if ability.target_self == false:
+			active_seekers.erase(seeker)
 		for target in active_seekers:
 			var seeker_target = Button.new()
 			seeker_target.text = target.title
 			global.button_container.add_child(seeker_target)
 			seeker_target.pressed.connect(Callable(self, "skill_logic").bind(ability,seeker,target))
 			global.left_buttons.append(seeker_target)
+		if ability.target_self == false:
+			active_seekers.append(seeker)
+	elif ability.target_self == true:
+		skill_logic(ability, seeker, seeker)
 	if ability.cooldown == 1:
 		seeker.skill_objects.erase(ability)
 		seeker.cooldown_2.append(ability)
@@ -186,6 +198,7 @@ func _perform_skill(ability, seeker):
 		seeker.skill_objects.erase(ability)
 		seeker.cooldown_3.append(ability)
 	did_crit = false
+	process_turns()
 ##so the method to add skills isn't working, i think i fixed them showing up but can't find node, sent the message to the ai so should be fixable
 
 func check_for_crit(ability):
@@ -193,35 +206,6 @@ func check_for_crit(ability):
 	if d100 <= ability.crit_range:
 		did_crit = true
 		
-
-func _target_ally(ability,seeker, target):
-	#if "Burn" in ability.status:
-
-	if ability.healing == true:
-		check_for_crit(ability)
-		swarm_stats.heat += randi_range(1,1)
-		if did_crit == true:
-			seeker.stamina -= ability.base_damage * ability.crit_value
-			if seeker.stamina >= seeker.stamina_max:
-				seeker.stamina = seeker.stamina_max
-			did_crit = false
-		elif did_crit == false:
-			swarm_stats.hp -= ability.base_damage
-			if seeker.stamina >= seeker.stamina_max:
-				seeker.stamina = seeker.stamina_max
-	elif ability.lust_gain == true:
-		check_for_crit(ability)
-		swarm_stats.heat += randi_range(1,3)
-		if did_crit == true:
-			seeker.stamina -= ability.base_damage * ability.crit_value
-			if seeker.stamina >= seeker.stamina_max:
-				seeker.stamina = seeker.stamina_max
-			did_crit = false
-		elif did_crit == false:
-			swarm_stats.hp -= ability.base_damage
-			if seeker.stamina >= seeker.stamina_max:
-				seeker.stamina = seeker.stamina_max
-
 
 func _ally_special(ability, seeker):
 	if ability.title == "Vault":
@@ -242,6 +226,7 @@ func skill_logic(ability, seeker, target):
 	check_for_crit(ability)
 	swarm_stats.heat += randi_range(1,3) #if high heat they do scarier actions
 	if ability.title == "Multi Slash":
+		total_damage = 0
 		for i in ability.multihit:
 			if did_crit == false:
 				damage_done = int(randi_range(0,5) + ability.base_damage)
@@ -280,7 +265,7 @@ func skill_logic(ability, seeker, target):
 			damage_done = int(randi_range(0,5) + ability.base_damage * 1.4 * ability.crit_value)
 		swarm_stats.hp -= damage_done
 		global.main_text.text += "\n------------------------\n" + str(seeker.title) + " Swiftly modifies her ammo as the goblins lecherously aproaches her, kicking one back after her preperations she dives back while shooting the monster causing a detonation of dire heat and frightining fire, the goblins caught in the blast scream and run about flesh melting away. Dealing [color=crimson]" + str(damage_done) + " [/color]damage."
-	if ability.title == "Napalm Bolt":
+	if ability.title == "Inspire":
 		swarm_stats.heat -= randi_range(3,6)
 		if did_crit == false:
 			damage_done = int(randi_range(0,5) + ability.base_damage)
@@ -289,6 +274,95 @@ func skill_logic(ability, seeker, target):
 		seeker.stamina += damage_done
 		if seeker.stamina >= seeker.stamina_max:
 			seeker.stamina = seeker.stamina_max
-		global.main_text.text += "\n------------------------\n" + str(seeker.title) + " Swiftly modifies her ammo as the goblins lecherously aproaches her, kicking one back after her preperations she dives back while shooting the monster causing a detonation of dire heat and frightining fire, the goblins caught in the blast scream and run about flesh melting away. Dealing [color=crimson]" + str(damage_done) + " [/color]damage."
-#figure out buffs and debuffs, maybe add them to quirks and have a skill check that they disappear
-# - 5 off base damage in global and add in randi_randge 1,5 on dage to see some different damage numbers
+		global.main_text.text += "\n------------------------\n" + str(seeker.title) + " encourages " + str(target.title) + " to keep pushing forward. Some of the Goblins snicker at her optimism. Healing [color=crimson]" + str(damage_done) + " [/color]stamina."
+	if ability.title == "Vault":
+		var seeker_threat_change = seeker.threat #- the value off this, then add back 10 after the buff runs out
+		swarm_stats.heat -= randi_range(3,6)
+		seeker.status.append("Moderate agility buff")
+		seeker.agility += 10
+		seeker.status.append("Backline")
+		seeker.threat = 10
+		global.apply_equipment(seeker)
+		global.main_text.text += "\n------------------------\n" + str(seeker.title) + " nimbly kicks off a nearby goblin to disengage, she then surveys the battle field while skirting along its rim."
+	global.main_text.text += "\n------------------------\n"
+
+
+func end_round():
+	global.main_text.text += "\n------------------------\n"
+	for seeker in active_seekers:
+		var current_seeker = seeker
+		for status in seeker.status:
+			var status_keep = 0
+			if status_keep <= 0:
+				seeker.status.erase(status)
+				global.main_text.text += str(current_seeker.title) + " has lost " + str(status) + "\n\n"
+	for status in swarm_stats.status:
+		if status == "Burn":
+			swarm_stats.hp -= randi_range(10,20)
+			var status_keep = 0
+			if status_keep <= 0:
+				swarm_stats.status.erase("Burn")
+				global.main_text.text += " The Goblins that were on fire have either died or put it out.\n\n" 
+	if swarm_stats.hp <= 0:
+		global.main_text.text += "The battle has been won!"
+	else:
+		roll_initiative()
+		
+
+
+func skill_info(seeker, skill_info_button):
+	var current_text = global.main_text.text
+	global.button_container.remove_child(skill_info_button)
+	var back_button = Button.new()
+	back_button.text = "Back"
+	global.button_container.add_child(back_button)
+	back_button.pressed.connect(Callable(self, "undo_skill_info").bind(seeker,current_text, back_button))
+	global.left_buttons.append(back_button)
+	global.main_text.text = "------------------------\n"
+	for skill in seeker.skills:
+		match skill:
+			"Multi Slash":
+				global.main_text.text += "Multi Slash:\n place holder text."
+				global.main_text.text += "\n------------------------\n"
+			"Lightfoot":
+				global.main_text.text += "Lightfoot:\n place holder text."
+				global.main_text.text += "\n------------------------\n"
+			"Vital Cut":
+				global.main_text.text += "Vital Cut:\n place holder text."
+				global.main_text.text += "\n------------------------\n"
+			"Distracting Strike":
+				global.main_text.text += "Distracting Strike:\n place holder text."
+				global.main_text.text += "\n------------------------\n"
+			"Singular Strike":
+				global.main_text.text += "Singular Strike:\n place holder text."
+				global.main_text.text += "\n------------------------\n"
+			"Vault":
+				global.main_text.text += "Vault:\n place holder text."
+				global.main_text.text += "\n------------------------\n"
+			"Heavy Impact": #maybe change to focus something to describe the will adding skill sounds like it adds strength
+				global.main_text.text += "Heavy Impact:\n place holder text."
+				global.main_text.text += "\n------------------------\n"
+			"Napalm Bolt":
+				global.main_text.text += "Napalm Bolt:\n place holder text."
+				global.main_text.text += "\n------------------------\n"
+			"Inspire":
+				global.main_text.text += "Inspire:\n place holder text."
+				global.main_text.text += "\n------------------------\n"
+				
+				
+
+
+func undo_skill_info(seeker,current_text, back_button):
+	global.main_text.text = current_text
+	global.button_container.remove_child(back_button)
+	var skill_info_button = Button.new() #change main text to a description of all current skills by doing for and describing them
+	skill_info_button.text = "Skill Info"
+	global.button_container.add_child(skill_info_button)
+	skill_info_button.pressed.connect(Callable(self, "skill_info").bind(seeker,skill_info_button))
+	global.left_buttons.append(skill_info_button)
+	
+# add crit identifiers for damage maybe lust reduction?
+# keep adding skills including armor
+# add goblin actions and display
+# add goblin minions, alpha, loot goblins, brood mothers?
+# look into button errors, it works for now but output is not liking it

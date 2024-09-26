@@ -21,7 +21,7 @@ var desires: Array
 var description: String
 var threat: int # higher the threat more likely to be targeted
 var initiative_roll: int
-var condition: Array #prone, being fucked, blowjob etc
+var status: Array #prone, being fucked, blowjob etc
 var weapon: String
 var allows_weapon_strip: bool
 var armor: String
@@ -43,6 +43,12 @@ var cooldown_1: Array
 var cooldown_2: Array
 var cooldown_3: Array
 var cooldown_battle: Array
+var intelligence_change: int
+var will_change: int
+var agility_change: int
+var durability_change: int
+var strength_change: int
+var threat_change: int
 
 	
 
@@ -96,7 +102,12 @@ func _init():
 	self.durability = randi_range(12,durability_cap)
 	self.strength = randi_range(12,strength_cap)
 	self.threat = 20 #AT 0 NOT TARGETABLE, gather up party threat each round and roll
-	self.initiative_roll = 0
+	self.intelligence_change = 0
+	self.will_change = 0
+	self.agility_change = 0
+	self.durability_change = 0
+	self.strength_change = 0
+	self.threat_change = 0 #AT 0 NOT TARGETABLE, gather up party threat each round and roll
 	self.desires = [] #they will remember what happend to them and when they reflect they will choose one for an event. example if this girl was stripped she might remember she was bashful but it actually wasn't as bad as she thought it was and so she doesn't gain as must lust from being stripped. then she gains the new memory: heart oppening to exhibition, activates each round based on lust
 	self.fetishes = []
 	self.quirks = ["Overconfident"]
@@ -106,7 +117,7 @@ func _init():
 	self.stamina = max_stamina
 	self.lust = 0
 	self.max_lust = 10 + will * 2
-	self.condition = []
+	self.status = []
 	self.weapon = weapon_level[randi_range(0,weapon_level.size() - 1)]
 	self.allows_weapon_strip = false
 	self.armor = armor_level[randi_range(0,armor_level.size() - 1)]
@@ -157,7 +168,7 @@ func generate_description(seeker):
 	#var negative_posture = ["She looks down upon you with disgust", "Her movements are arousingly feminine and erotic","She seems unaware of how erotic she is even in simple things like her stride", "She has a strong pheromone smell to her", "She sweats even from eye contact, she seems really pent up and held back.", "She sweats often and has a feminine musk about her", "She makes sure to highlight herself in a sexual way", "she seems shy and averts eye contact", "She seems quick to anger", "She acts like her intellect is greater than yours", "She's disciplined and calm", "She looks tired and yawns reguraly", "She has a deviant glint in her eyes when she isn't averting eye contact", "She seems serious and intense", "She's making herself look small with her stance by folding inwards", "She's got milf aura with an erotic body that demands to be dominated", "She seems jumpy and unsure of herself", "She seems depressed and constantly looks at the floor",]
 	var boob_type = ["petite", "small", "average", "large", "massive", "fabric Stretching", "gigantic", "unbelievably massive"]
 	var posture = ["She has an air of elegance about her", "she's deranged with a long creepy smile", "Shes easily distracted, staring off into space", "She acts cute and reserved", "She likes getting close and personal batting her eyes and making people uncomfortable", "She looks down upon you with disgust", "She outwardly projects as quite normal", "She seems incredibly friendly", "She has a strong pheromone smell to her", "She sweats even from eye contact, she seems really pent up and held back.", "She sweats often and has a feminine musk about her", "She seems unaware of how erotic she is even with simple things like her stride", "She's very clumsy always tripping over herself", "she's talks and walks like a bimbo", "Shes very curious, always leaning forward to get a better look", "She keeps to herself mumbling something under her breath", "She's creepy, shes always watches from the shadows", "She loves to party, being right at home around the castle grounds", "Her movements are arousingly feminine and erotic","She seems unaware of how erotic she is even in simple things like her stride", "She has a strong pheromone smell to her", "She makes sure to highlight herself in a sexual way","She has a deviant glint in her eyes when she isn't averting eye contact", "she seems shy and averts eye contact", "she pumps out her chest and moves with confidence", "She seems quick to anger", "She's a ball of energy hardly able to stay still", "She's disciplined and calm", "She looks tired and yawns reguraly", "She has a deviant glint in her eyes", "She stays in a combat stance, ready to go at a moments notice", "She seems serious and intense", "She struts and poses like a supermodel", "She stands tall, making herself look heroic", "She's making herself look small with her stance", "She gives off childhood friend energy", "She gives off girl next door energy", "She's got milf aura that begs to be fucked", "She seems jumpy and unsure of herself", "She seems depressed and constantly looks at the floor", "She walks around knowing how hot she is", "She's entitled, asking for only the highest quality emenities"]
-	var body_type_list = ["of average build", "obscene and nasty", "short and slim", "amazonian in build", "tall and slender", "tall and voluptuous", "short and stacked", "proportioned like a walking fucktoy", "beautiful like a goddess", "bottom heavy", "curvy, with an hourglass figure", "chubby", "athletic", "thin and petite", "well proportioned" ]
+	var body_type_list = ["of average build", "fit and ripped", "obscenely thick", "short and slim", "amazonian in build", "tall and slender", "tall and voluptuous", "short and stacked", "proportioned like a walking fucktoy", "beautiful like a goddess", "bottom heavy", "curvy, with an hourglass figure", "chubby", "athletic", "thin and petite", "well proportioned" ]
 	var eye_color_list = ["[color=aqua]sky blue[/color]", "[color=darkgreen]emerald green[/color]", "[color=blue]navy blue[/color]", "[color=peru]light brown[/color]", "[color=saddlebrown]dark brown[/color]", "[color=plum]lavender[/color]", "[color=magenta]dark purple[/color]", "[color=crimson]agressive red[/color]", "[color=gold]golden[/color]", "[color=hotpink]lustful pink[/color]"]
 	var hair_type_list = ["wild and free", "That hides her eyes", "layered and beautiful", "that is short and cute", "pulled into a long ponytail", "pulled into a short ponytail", "short", "long and covering up one eye", "long and straight", "long and wavey", "long and messy", "stylised into pigtails", "partially shaven", "done up in a bun"]
 	var hair_color_list = ["[color=crimson]crimson[/color]", "[color=orangered]fiery orange[/color]", "jet black", "[color=gray]soft black[/color]", "[color=silver]Silver[/color]", "snow white", "[color=peru]hazel[/color]", "[color=saddlebrown]dark brown[/color]", "[color=hotpink]light pink[/color]", "[color=magenta]magenta[/color]", "[color=chartreuse]spring green[/color]", "[color=darkgreen]dark green[/color]", "[color=aqua]light blue[/color]", "[color=yellow]bimbo blonde[/color]", "[color=navajowhite]platinum blonde[/color]", "[color=deepskyblue]vibrant blue[/color]"]
@@ -170,7 +181,7 @@ func generate_description(seeker):
 	seeker.eye_color = str(eye_color_list[randi_range(0,eye_color_list.size() - 1)])
 	seeker.hair_color = str(hair_color_list[randi_range(0,hair_color_list.size() - 1)])
 	seeker.hair_type = str(hair_type_list[randi_range(0,hair_type_list.size() - 1)])
-	if seeker.body_type == "short and slim" or seeker.body_type == "tall and slender" or seeker.body_type == "short and stacked" or seeker.body_type == "athletic" or seeker.body_type == "amazonian in build" and seeker.breast_size >= 1:
+	if seeker.body_type == "short and slim" or seeker.body_type == "fit and ripped" or seeker.body_type == "tall and slender" or seeker.body_type == "short and stacked" or seeker.body_type == "athletic" or seeker.body_type == "amazonian in build" and seeker.breast_size >= 1:
 		seeker.breast_size -= 1
 		if seeker.breast_size == 6:
 			seeker.breast_size -= 1
@@ -193,19 +204,25 @@ func generate_description(seeker):
 			seeker.agility += 4
 			seeker.strength += 2
 			seeker.durability += 2
+		if seeker.body_type == "fit and ripped":
+			seeker.intelligence -= 6
+			seeker.will -= 6
+			seeker.agility += 4
+			seeker.strength += 4
+			seeker.durability += 4
 		if seeker.body_type == "amazonian in build":
-			seeker.intelligence -= 4
+			seeker.intelligence -= 6
 			seeker.agility -= 4
-			seeker.will -= 4
+			seeker.will -= 2
 			seeker.strength += 6
 			seeker.durability += 6
-	if seeker.body_type == "obscene and nasty" or seeker.body_type == "short and stacked" or seeker.body_type == "tall and voluptuous" or seeker.body_type == "beautiful like a goddess" or seeker.body_type == "proportioned like a walking fucktoy" or seeker.body_type == "curvy, with an hourglass figure" or seeker.body_type == "chubby" and seeker.breast_size <= 6:
+	if seeker.body_type == "obscenely thick" or seeker.body_type == "short and stacked" or seeker.body_type == "tall and voluptuous" or seeker.body_type == "beautiful like a goddess" or seeker.body_type == "proportioned like a walking fucktoy" or seeker.body_type == "curvy, with an hourglass figure" or seeker.body_type == "chubby" and seeker.breast_size <= 6:
 		seeker.breast_size += 1
 		if seeker.breast_size >= 8:
 			seeker.breast_size -= 1
 		if seeker.breast_size == 1:
 			seeker.breast_size += 2
-		if seeker.body_type == "obscene and nasty":
+		if seeker.body_type == "obscenely thick":
 			seeker.strength -= 4
 			seeker.agility -= 4
 			seeker.durability += 6
@@ -309,7 +326,7 @@ func apply_equipment(seeker):
 			seeker.skill_objects.append(Skill.new("Multi Slash",true, true, false, false, 3 + seeker.strength * 0.2 + seeker.agility * 0.2, 0, 0,[""], "Slashing", false, false, 2, "Swing with both daggers hitting twice, uses equal amount agility and strength for damage.", 5 + seeker.intelligence * 0.3, 1.5, 0, false, false, false, false, false )) #double attack, agility for damage
 			seeker.skills.append("Multi Slash")
 			seeker.skills.append("Lightfoot") #lower threat based on agility
-			seeker.skill_objects.append(Skill.new("Vital Cut",true, true, false, false, 32 - seeker.threat, 0, 0,[""], "Slashing", false, false, 1, "A sneak attack that does damage based on how low your threat is.", 10 + seeker.intelligence * 0.3, 2.0, 0, false, false, false, false, false ))
+			seeker.skill_objects.append(Skill.new("Vital Cut",true, true, false, false, 37 - seeker.threat, 0, 0,[""], "Slashing", false, false, 1, "A sneak attack that does damage based on how low your threat is.", 10 + seeker.intelligence * 0.3, 2.0, 0, false, false, false, false, false ))
 			seeker.skills.append("Vital Cut") #add flat value minus threat, low hit (20 then - current threat)
 			seeker.skill_objects.append(Skill.new("Distracting Strike",true, true, false, false, 2 + seeker.agility * 0.3 + seeker.strength * 0.2, 0, 0,[""], "Slashing", false, false, 1, "A light attack that allows you to quickly hide after the strike.", 5 + seeker.intelligence * 0.4, 1.5, 2, false, false, false, false, true ))
 			seeker.skills.append("Distracting Strike") #damage based on intelligence)
@@ -377,15 +394,14 @@ func apply_equipment(seeker):
 	for i in seeker.skills:
 		match i:
 			"Lightfoot":
-				seeker.threat -= 6
-				seeker.strength -= 3
+				seeker.threat -= 3
 			"Excellence of Execution":
 				seeker.strength += 3
 				seeker.intelligence += 3
 			"Colossal weapon":
 				seeker.threat += 6
-				seeker.strength += 5
-				seeker.agility -= 5
+				seeker.strength += 3
+				seeker.agility -= 3
 			_:
 				pass
 
@@ -464,15 +480,14 @@ func _unequip_item_skills(seeker):
 	for i in seeker.skills:
 		match i:
 			"Lightfoot":
-				seeker.threat += 6
-				seeker.strength += 3
+				seeker.threat += 3
 			"Excellence of Execution":
 				seeker.strength -= 3
 				seeker.intelligence -= 3
 			"Colossal weapon":
 				seeker.threat -= 6
-				seeker.agility += 5
-				seeker.strength -= 5
+				seeker.agility += 3
+				seeker.strength -= 3
 			_:
 				pass
 

@@ -20,7 +20,6 @@ config/icon="res://art/icon.svg"
 global="*res://Scripts/control.gd"
 pp="*res://Scripts/Pleasure_Paradise.gd"
 goblinbattle="*res://Scripts/goblin_battle.gd"
-combat_func="*res://Scripts/combat_func.gd"
 SkillData="*res://Scripts/skill_data.gd"
 
 [filesystem]
