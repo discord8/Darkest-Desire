@@ -402,8 +402,10 @@ func back_to_skill_select(seeker,current_text, back_button):
 	player_turn(seeker)
 	
 
-# add crit identifiers for damage maybe lust reduction?
 # keep adding skills including armor
-# add goblin actions and display
+# add goblin actions and display like hp
+# add sexskills when lust is half full based on desires
+# add goblin gangbang
+# add memories, ideas: seeing masturbation, seeing sex, seeing brutality from goblins, seeing a seeker engage sex, seeing two seekers have sex, see a goblin get angry, kill a goblin with aoe, perform: blowjob, handjob, footjob, titjob, vaginal, anal, rimjob, gangbang, bukkake, used while unconscious, sex toy insertion, rough sex, ryona, pissed on
 # add goblin minions, alpha, loot goblins, brood mothers?
 # look into button errors, it works for now but output is not liking it
