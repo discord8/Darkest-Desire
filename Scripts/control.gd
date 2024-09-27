@@ -331,12 +331,12 @@ func apply_equipment(seeker):
 			seeker.skill_objects.append(Skill.new("Distracting Strike",true, true, false, false, 2 + seeker.agility * 0.3 + seeker.strength * 0.2, 0, 0,[""], "Slashing", false, false, 1, "A light attack that allows you to quickly hide after the strike.", 5 + seeker.intelligence * 0.4, 1.5, 2, false, false, false, false, true ))
 			seeker.skills.append("Distracting Strike") #damage based on intelligence)
 		"Crossbow": #agility will power, average stats, extra skill
-			seeker.skill_objects.append(Skill.new("Singular Strike",true, true, false, false, 6 + seeker.agility * 0.4 + seeker.will * 0.4, 0, 0,[""], "Piercing", true, false, 1, "A powerful bolt that takes a moment to fire again.", 1 + seeker.intelligence * 0.2, 1.5, 1, false, false, false, false, false ))
-			seeker.skills.append("Singular Strike") #strong bolt, 1 turn cooldown
+			seeker.skill_objects.append(Skill.new("Singular Shot",true, true, false, false, 6 + seeker.agility * 0.4 + seeker.will * 0.4, 0, 0,[""], "Piercing", true, false, 1, "A powerful bolt that takes a moment to fire again.", 1 + seeker.intelligence * 0.2, 1.5, 1, false, false, false, false, false ))
+			seeker.skills.append("Singular Shot") #strong bolt, 1 turn cooldown
 			seeker.skill_objects.append(Skill.new("Vault",false, false, false, true, 15, 0, 0,["Vault"], "", false, false, 1, "Increases agility and lowers threat.", 0, 0, 1, false, false, false, false, true ))
 			seeker.skills.append("Vault") #lower threat increase speed and agility, reloads
-			seeker.skill_objects.append(Skill.new("Napalm Bolt",true, false, false, false, 1 + seeker.agility * 0.1 + seeker.will * 0.2, 0, 0,["Burn"], "Fire", true, true, 1, "Shot a mortar like bolt that rains fire down onto the battlefield", 1 + seeker.intelligence, 1.2, 0, true, false, true, false, false))
-			seeker.skills.append("Heavy Impact") #increases dasmage by will, add to each Crossbow attack
+			seeker.skill_objects.append(Skill.new("Napalm Bolt",true, true, false, false, 1 + seeker.agility * 0.1 + seeker.will * 0.2, 0, 0,["Burn"], "Fire", true, true, 1, "Shot a mortar like bolt that rains fire down onto the battlefield", 1 + seeker.intelligence, 1.2, 0, true, false, true, false, false))
+			seeker.skills.append("Focus Impact") #increases dasmage by will, add to each Crossbow attack
 			seeker.skills.append("Napalm Bolt") #aoe burn
 			seeker.skill_objects.append(Skill.new("Inspire",false, false, true, false, 1 + seeker.will * 0.6, 0, 0,[""], "", true, false, 1, "Inspire allies using your will to regain stamina and keep pushing forward.", 1 + seeker.intelligence, 1.5, 1, false, false, false, false, false))
 			seeker.skills.append("Inspire") #will heal once per battle
@@ -395,12 +395,13 @@ func apply_equipment(seeker):
 		match i:
 			"Lightfoot":
 				seeker.threat -= 3
+				seeker.agility += 5
 			"Excellence of Execution":
 				seeker.strength += 3
 				seeker.intelligence += 3
 			"Colossal weapon":
 				seeker.threat += 6
-				seeker.strength += 3
+				seeker.strength += 6
 				seeker.agility -= 3
 			_:
 				pass
@@ -432,12 +433,12 @@ func _unequip_item_skills(seeker):
 			seeker.skill_objects.erase(Skill.new("Distracting Strike",true, true, false, false, 2 + seeker.agility * 0.3 + seeker.strength * 0.2, 0, 0,[""], "Slashing", false, false, 1, "A light attack that allows you to quickly hide after the strike.", 5 + seeker.intelligence * 0.4, 1.5, 2, false, false, false, false, true ))
 			seeker.skills.erase("Distracting Strike") #damage based on intelligence)
 		"Crossbow": #agility will power, average stats, extra skill
-			seeker.skill_objects.erase(Skill.new("Singular Strike",true, true, false, false, 6 + seeker.agility * 0.4 + seeker.will * 0.4, 0, 0,[""], "Piercing", true, false, 1, "A powerful bolt that takes a moment to fire again.", 1 + seeker.intelligence * 0.2, 1.5, 1, false, false, false, false, false ))
-			seeker.skills.erase("Singular Strike") #strong bolt, 1 turn cooldown
+			seeker.skill_objects.erase(Skill.new("Singular Shot",true, true, false, false, 6 + seeker.agility * 0.4 + seeker.will * 0.4, 0, 0,[""], "Piercing", true, false, 1, "A powerful bolt that takes a moment to fire again.", 1 + seeker.intelligence * 0.2, 1.5, 1, false, false, false, false, false ))
+			seeker.skills.erase("Singular Shot") #strong bolt, 1 turn cooldown
 			seeker.skill_objects.erase(Skill.new("Vault",false, false, false, true, 15, 0, 0,["Vault"], "", false, false, 1, "Increases agility and lowers threat while removing cooldown.", 0, 0, 1, false, false, false, false, true ))
 			seeker.skills.erase("Vault") #lower threat increase speed and agility, reloads
 			seeker.skill_objects.erase(Skill.new("Napalm Bolt",true, false, false, false, 1 + seeker.agility * 0.1 + seeker.will * 0.2, 0, 0,["Burn"], "Fire", true, true, 1, "Shot a mortar like bolt that rains fire down onto the battlefield", 1 + seeker.intelligence, 1.2, 0, true, false, true, false, false))
-			seeker.skills.erase("Heavy Impact") #increases dasmage by will, add to each Crossbow attack
+			seeker.skills.erase("Focus Impact") #increases dasmage by will, add to each Crossbow attack
 			seeker.skills.erase("Napalm Bolt") #aoe burn
 			seeker.skill_objects.erase(Skill.new("Inspire",false, false, true, false, 1 + seeker.will * 0.6, 0, 0,[""], "", true, false, 1, "Inspire allies using your will to regain stamina and keep pushing forward.", 1 + seeker.intelligence, 1.5, 1, false, false, false, false, false))
 			seeker.skills.erase("Inspire") #will heal once per battle
@@ -481,13 +482,14 @@ func _unequip_item_skills(seeker):
 		match i:
 			"Lightfoot":
 				seeker.threat += 3
+				seeker.agility -= 5
 			"Excellence of Execution":
 				seeker.strength -= 3
 				seeker.intelligence -= 3
 			"Colossal weapon":
 				seeker.threat -= 6
 				seeker.agility += 3
-				seeker.strength -= 3
+				seeker.strength -= 6
 			_:
 				pass
 

@@ -144,7 +144,6 @@ func goblin_turn(participant):
 
 func player_turn(participant):
 	global.clear_seeker_buttons()
-	current_turn += 1
 	#if sex in status do that instead of regular turn
 	for ability in participant.skill_objects:
 		var skill_button = Button.new()
@@ -155,7 +154,7 @@ func player_turn(participant):
 	var next_turn = Button.new()
 	next_turn.text = "Do Nothing"
 	global.button_container.add_child(next_turn)
-	next_turn.pressed.connect(Callable(self, "process_turns"))
+	next_turn.pressed.connect(Callable(self, "skip_turn").bind(participant))
 	global.left_buttons.append(next_turn)
 	var skill_info_button = Button.new() #change main text to a description of all current skills by doing for and describing them
 	skill_info_button.text = "Skill Info"
@@ -164,7 +163,11 @@ func player_turn(participant):
 	global.left_buttons.append(skill_info_button)
 
 func _perform_skill(ability, seeker):
+	var current_text = global.main_text.text
 	global.main_text.text = str(seeker.title) +  " uses " + str(ability.title)
+	print(ability.target_enemy)
+	print(ability.target_ally)
+	print(ability.target_self)
 	if ability.target_enemy == true:
 		global.clear_seeker_buttons()
 		if global.right_buttons.size() >= 2:
@@ -187,19 +190,18 @@ func _perform_skill(ability, seeker):
 			global.button_container.add_child(seeker_target)
 			seeker_target.pressed.connect(Callable(self, "skill_logic").bind(ability,seeker,target))
 			global.left_buttons.append(seeker_target)
+		var back_button = Button.new()
+		back_button.text = "Back"
+		global.button_container.add_child(back_button)
+		back_button.pressed.connect(Callable(self, "back_to_skill_select").bind(seeker,current_text,back_button))
+		global.left_buttons.append(back_button)
 		if ability.target_self == false:
 			active_seekers.append(seeker)
 	elif ability.target_self == true:
 		global.clear_seeker_buttons()
 		skill_logic(ability, seeker, seeker)
-	if ability.cooldown == 1:
-		seeker.skill_objects.erase(ability)
-		seeker.cooldown_2.append(ability)
-	if ability.cooldown == 2:
-		seeker.skill_objects.erase(ability)
-		seeker.cooldown_3.append(ability)
 	did_crit = false
-	process_turns()
+
 ##so the method to add skills isn't working, i think i fixed them showing up but can't find node, sent the message to the ai so should be fixable
 
 func check_for_crit(ability):
@@ -210,90 +212,107 @@ func check_for_crit(ability):
 
 
 func skill_logic(ability, seeker, target):
+	print(ability.title)
 	var damage_done = 0
 	#maybe move damage and effects here so that its more modular
 	check_for_crit(ability)
 	swarm_stats.heat += randi_range(1,3) #if high heat they do scarier actions
-	if ability.title == "Multi Slash":
-		total_damage = 0
-		var critical_hits = 0
-		for i in ability.multihit:
+	match ability.title:
+		"Multi Slash":
+			if "opportunity" in seeker.status:
+				did_crit = true
+				seeker.status.erase("opportunity")
+			total_damage = 0
+			var critical_hits = 0
+			for i in ability.multihit:
+				if did_crit == false:
+					damage_done = int(randi_range(0,5) + ability.base_damage)
+				else:
+					damage_done = int(randi_range(0,5) + ability.base_damage * ability.crit_value)
+					critical_hits += 1
+				swarm_stats.hp -= damage_done
+				total_damage += damage_done
+			global.main_text.text += "\n------------------------\n" + str(seeker.title) + " flies into the Goblin swarm swiftly slicing down their ranks before diving free from any counter attacks. Dealing [color=crimson]" + str(total_damage) + " [/color]total damage."
+			if critical_hits >= 1:
+				global.main_text.text += "\n\nThe attacks crit " + str(critical_hits) + " times."
+			total_damage = 0
+		"Vital Cut":
+			if "opportunity" in seeker.status:
+				did_crit = true
+				seeker.status.erase("opportunity")
+			if did_crit == false:
+				damage_done = int(randi_range(0,5) + ability.base_damage * 0.8)
+				global.main_text.text += "\n------------------------\n" + str(seeker.title) + " With precision strikes at a goblins vitals slaying them instantly. Dealing [color=crimson]" + str(damage_done) + " [/color]damage to the horde"
+			else:
+				damage_done = int(randi_range(0,5) + ability.base_damage * 0.8 * ability.crit_value)
+				global.main_text.text += "\n------------------------\n" + str(seeker.title) + " With precision strikes at a goblins vitals slaying them instantly. Criting and dealing [color=crimson]" + str(damage_done) + " [/color]damage to the horde"
+			swarm_stats.hp -= damage_done
+		"Distracting Strike":
+			if "opportunity" in seeker.status:
+				did_crit = true
+				seeker.status.erase("opportunity")
+			if did_crit == false:
+				damage_done = int(randi_range(0,5) + ability.base_damage * 0.8)
+				global.main_text.text += "\n------------------------\n" + str(seeker.title) + " With an intentionally violent slash a fountain of blood erupts from a slain goblin coating his brothers in crimson. Dealing [color=crimson]" + str(damage_done) + " [/color]damage and distracting the group."
+			else:
+				damage_done = int(randi_range(0,5) + ability.base_damage * 0.8 * ability.crit_value)
+				global.main_text.text += "\n------------------------\n" + str(seeker.title) + " With an intentionally violent slash a fountain of blood erupts from a slain goblin coating his brothers in crimson. Criting and dealing [color=crimson]" + str(damage_done) + " [/color]damage and distracting the group."
+			swarm_stats.hp -= damage_done
+			seeker.status.append("Opportunity") #
+		"Singular Shot":
+			if did_crit == false:
+				damage_done = int(randi_range(0,5) + ability.base_damage * 0.8)
+				global.main_text.text += "\n------------------------\n" + str(seeker.title) + " loads a heavy bolt and aims for the central mass of the Goblins penetrating and skewering multiple enemies from the violent impact. Dealing [color=crimson]" + str(damage_done) + " [/color]damage."
+			else:
+				damage_done = int(randi_range(0,5) + ability.base_damage * 0.8 * ability.crit_value)
+				global.main_text.text += "\n------------------------\n" + str(seeker.title) + " loads a heavy bolt and aims for the central mass of the Goblins penetrating and skewering multiple enemies from the violent impact. Criting and dealing [color=crimson]" + str(damage_done) + " [/color]damage."
+			swarm_stats.hp -= damage_done
+		"Napalm Bolt":
+			print("napal")
+			swarm_stats.status.append("Burn")
+			if did_crit == false:
+				damage_done = int(randi_range(0,5) + ability.base_damage * 1.4)
+				global.main_text.text += "\n------------------------\n" + str(seeker.title) + " Swiftly modifies her ammo as the goblins lecherously aproaches her, kicking one back after her preperations she dives back while shooting the monster causing a detonation of dire heat and frightining fire, the goblins caught in the blast scream and run about flesh melting away. Dealing [color=crimson]" + str(damage_done) + " [/color]damage."
+			else:
+				damage_done = int(randi_range(0,5) + ability.base_damage * 1.4 * ability.crit_value)
+				global.main_text.text += "\n------------------------\n" + str(seeker.title) + " Swiftly modifies her ammo as the goblins lecherously aproaches her, kicking one back after her preperations she dives back while shooting the monster causing a detonation of dire heat and frightining fire, the goblins caught in the blast scream and run about flesh melting away. Criting and dealing [color=crimson]" + str(damage_done) + " [/color]damage."
+			swarm_stats.hp -= damage_done
+		"Inspire":
+			swarm_stats.heat -= randi_range(3,6)
 			if did_crit == false:
 				damage_done = int(randi_range(0,5) + ability.base_damage)
+				global.main_text.text += "\n------------------------\n" + str(seeker.title) + " encourages " + str(target.title) + " to keep pushing forward. Some of the Goblins snicker at her optimism. Healing [color=crimson]" + str(damage_done) + " [/color]stamina."
 			else:
 				damage_done = int(randi_range(0,5) + ability.base_damage * ability.crit_value)
-				critical_hits += 1
-			swarm_stats.hp -= damage_done
-			total_damage += damage_done
-		global.main_text.text += "\n------------------------\n" + str(seeker.title) + " flies into the Goblin swarm swiftly slicing down their ranks before diving free from any counter attacks. Dealing [color=crimson]" + str(total_damage) + " [/color]total damage."
-		if critical_hits >= 1:
-			global.main_text.text += "\n\nThe attacks crit " + str(critical_hits) + " times."
-		total_damage = 0
-	if ability.title == "Vital Cut":
-		if did_crit == false:
-			damage_done = int(randi_range(0,5) + ability.base_damage * 0.8)
-			global.main_text.text += "\n------------------------\n" + str(seeker.title) + " With precision strikes at a goblins vitals slaying them instantly. Dealing [color=crimson]" + str(damage_done) + " [/color]damage to the horde"
-		else:
-			damage_done = int(randi_range(0,5) + ability.base_damage * 0.8 * ability.crit_value)
-			global.main_text.text += "\n------------------------\n" + str(seeker.title) + " With precision strikes at a goblins vitals slaying them instantly. Criting and dealing [color=crimson]" + str(damage_done) + " [/color]damage to the horde"
-		swarm_stats.hp -= damage_done
-	if ability.title == "Distracting Strike":
-		if did_crit == false:
-			damage_done = int(randi_range(0,5) + ability.base_damage * 0.8)
-			global.main_text.text += "\n------------------------\n" + str(seeker.title) + " With an intentionally violent slash a fountain of blood erupts from a slain goblin coating his brothers in crimson. Dealing [color=crimson]" + str(damage_done) + " [/color]damage and distracting the group."
-		else:
-			damage_done = int(randi_range(0,5) + ability.base_damage * 0.8 * ability.crit_value)
-			global.main_text.text += "\n------------------------\n" + str(seeker.title) + " With an intentionally violent slash a fountain of blood erupts from a slain goblin coating his brothers in crimson. Criting and dealing [color=crimson]" + str(damage_done) + " [/color]damage and distracting the group."
-		swarm_stats.hp -= damage_done
-	if ability.title == "Singular Strike":
-		if did_crit == false:
-			damage_done = int(randi_range(0,5) + ability.base_damage * 0.8)
-			global.main_text.text += "\n------------------------\n" + str(seeker.title) + " loads a heavy bolt and aims for the central mass of the Goblins penetrating and skewering multiple enemies from the violent impact. Dealing [color=crimson]" + str(damage_done) + " [/color]damage."
-		else:
-			damage_done = int(randi_range(0,5) + ability.base_damage * 0.8 * ability.crit_value)
-			global.main_text.text += "\n------------------------\n" + str(seeker.title) + " loads a heavy bolt and aims for the central mass of the Goblins penetrating and skewering multiple enemies from the violent impact. Criting and dealing [color=crimson]" + str(damage_done) + " [/color]damage."
-		swarm_stats.hp -= damage_done
-	if ability.title == "Napalm Bolt":
-		print("napal")
-		swarm_stats.status.append("Burn")
-		if did_crit == false:
-			damage_done = int(randi_range(0,5) + ability.base_damage * 1.4)
-			global.main_text.text += "\n------------------------\n" + str(seeker.title) + " Swiftly modifies her ammo as the goblins lecherously aproaches her, kicking one back after her preperations she dives back while shooting the monster causing a detonation of dire heat and frightining fire, the goblins caught in the blast scream and run about flesh melting away. Dealing [color=crimson]" + str(damage_done) + " [/color]damage."
-		else:
-			damage_done = int(randi_range(0,5) + ability.base_damage * 1.4 * ability.crit_value)
-			global.main_text.text += "\n------------------------\n" + str(seeker.title) + " Swiftly modifies her ammo as the goblins lecherously aproaches her, kicking one back after her preperations she dives back while shooting the monster causing a detonation of dire heat and frightining fire, the goblins caught in the blast scream and run about flesh melting away. Criting and dealing [color=crimson]" + str(damage_done) + " [/color]damage."
-		swarm_stats.hp -= damage_done
-		seeker.cooldown_battle.append(ability)
-		seeker.skill_objects.erase(ability)
-		print(seeker.cooldown_battle)
-	if ability.title == "Inspire":
-		swarm_stats.heat -= randi_range(3,6)
-		if did_crit == false:
-			damage_done = int(randi_range(0,5) + ability.base_damage)
-			global.main_text.text += "\n------------------------\n" + str(seeker.title) + " encourages " + str(target.title) + " to keep pushing forward. Some of the Goblins snicker at her optimism. Healing [color=crimson]" + str(damage_done) + " [/color]stamina."
-		else:
-			damage_done = int(randi_range(0,5) + ability.base_damage * ability.crit_value)
-			global.main_text.text += "\n------------------------\n" + str(seeker.title) + " encourages " + str(target.title) + " to keep pushing forward. Some of the Goblins snicker at her optimism. Criting and healing [color=green]" + str(damage_done) + " [/color]stamina."
-		seeker.stamina += damage_done
-		if seeker.stamina >= seeker.stamina_max:
-			seeker.stamina = seeker.stamina_max
-	if ability.title == "Vault":
-		var seeker_threat_change = seeker.threat #- the value off this, then add back 10 after the buff runs out
-		swarm_stats.heat -= randi_range(3,6)
-		seeker.status.append("Moderate agility buff")
-		seeker.agility += 10
-		seeker.status.append("Backline")
-		seeker.threat = 10
-		for i in seeker.skills:
-			match i:
-				"Lightfoot":
-					seeker.threat -= 3
-				"Colossal weapon":
-					seeker.threat += 6
-				_:
-					pass
-		global.main_text.text += "\n------------------------\n" + str(seeker.title) + " nimbly kicks off a nearby goblin to disengage, she then surveys the battle field while skirting along its rim."
+				global.main_text.text += "\n------------------------\n" + str(seeker.title) + " encourages " + str(target.title) + " to keep pushing forward. Some of the Goblins snicker at her optimism. Criting and healing [color=green]" + str(damage_done) + " [/color]stamina."
+			seeker.stamina += damage_done
+			if seeker.stamina >= seeker.max_stamina:
+				seeker.stamina = seeker.max_stamina
+		"Vault":
+			var seeker_threat_change = seeker.threat #- the value off this, then add back 10 after the buff runs out
+			swarm_stats.heat -= randi_range(3,6)
+			seeker.status.append("Moderate agility buff")
+			seeker.agility += 10
+			seeker.status.append("Backline")
+			seeker.threat = 10
+			for i in seeker.skills:
+				match i:
+					"Lightfoot":
+						seeker.threat -= 3
+					"Colossal weapon":
+						seeker.threat += 6
+					_:
+						pass
+			global.main_text.text += "\n------------------------\n" + str(seeker.title) + " nimbly kicks off a nearby goblin to disengage, she then surveys the battle field while skirting along its rim."
 	global.main_text.text += "\n------------------------\n"
+	current_turn += 1
+	if ability.cooldown == 1:
+		seeker.skill_objects.erase(ability)
+		seeker.cooldown_2.append(ability)
+	if ability.cooldown == 2:
+		seeker.skill_objects.erase(ability)
+		seeker.cooldown_3.append(ability)
+	process_turns()
 
 
 func end_round():
@@ -334,51 +353,55 @@ func skill_info(seeker, skill_info_button):
 	var back_button = Button.new()
 	back_button.text = "Back"
 	global.button_container.add_child(back_button)
-	back_button.pressed.connect(Callable(self, "undo_skill_info").bind(seeker,current_text, back_button))
+	back_button.pressed.connect(Callable(self, "back_to_skill_select").bind(seeker,current_text,back_button))
 	global.left_buttons.append(back_button)
 	global.main_text.text = "------------------------\n"
 	for skill in seeker.skills:
 		match skill:
 			"Multi Slash":
-				global.main_text.text += "Multi Slash:\n place holder text."
+				global.main_text.text += "Multi Slash:\n Strike twice dealing damage with agility and strength."
 				global.main_text.text += "\n------------------------\n"
 			"Lightfoot":
-				global.main_text.text += "Lightfoot:\n place holder text."
+				global.main_text.text += "Lightfoot:\n Passive: Lowers threat by 3 and raises agility by 5."
 				global.main_text.text += "\n------------------------\n"
 			"Vital Cut":
-				global.main_text.text += "Vital Cut:\n place holder text."
+				global.main_text.text += "Vital Cut:\n Does high flat damage that is subtracted by your current Threat."
 				global.main_text.text += "\n------------------------\n"
 			"Distracting Strike":
-				global.main_text.text += "Distracting Strike:\n place holder text."
+				global.main_text.text += "Distracting Strike:\n Low damage attack that creats an Opportunity for yourself.\n Your next Twin Dagger attack is a guranteed crit."
 				global.main_text.text += "\n------------------------\n"
-			"Singular Strike":
-				global.main_text.text += "Singular Strike:\n place holder text."
+			"Singular Shot":
+				global.main_text.text += "Singular Shot:\n A powerful bolt is fired using agility. \n Though powerful it does take a moment to reload."
 				global.main_text.text += "\n------------------------\n"
 			"Vault":
-				global.main_text.text += "Vault:\n place holder text."
+				global.main_text.text += "Vault:\n Take aggro off yourself while increasing your agility."
 				global.main_text.text += "\n------------------------\n"
-			"Heavy Impact": #maybe change to focus something to describe the will adding skill sounds like it adds strength
-				global.main_text.text += "Heavy Impact:\n place holder text."
+			"Focus Impact": #maybe change to focus something to describe the will adding skill sounds like it adds strength
+				global.main_text.text += "Focus Impact:\n Passive: Add the seeker's will to all crossbow weapon skills."
 				global.main_text.text += "\n------------------------\n"
 			"Napalm Bolt":
-				global.main_text.text += "Napalm Bolt:\n place holder text."
+				global.main_text.text += "Napalm Bolt:\n Rain down an area merciless fire, takes a moment to load.\n Be careful of allies."
 				global.main_text.text += "\n------------------------\n"
 			"Inspire":
-				global.main_text.text += "Inspire:\n place holder text."
+				global.main_text.text += "Inspire:\n Heal another seeker's stamina with your will. You will have to focus on battle though, so the\n skill has a cooldown."
 				global.main_text.text += "\n------------------------\n"
 				
 				
 
+func skip_turn(seeker):
+	global.main_text.text += "\n------------------------\n"
+	current_turn += 1
+	seeker.lust += randi_range(6,10)
+	if seeker.lust >= seeker.max_lust:
+		seeker.lust = seeker.max_lust
+	process_turns()
 
-func undo_skill_info(seeker,current_text, back_button):
+func back_to_skill_select(seeker,current_text, back_button):
 	global.main_text.text = current_text
 	global.button_container.remove_child(back_button)
-	var skill_info_button = Button.new() #change main text to a description of all current skills by doing for and describing them
-	skill_info_button.text = "Skill Info"
-	global.button_container.add_child(skill_info_button)
-	skill_info_button.pressed.connect(Callable(self, "skill_info").bind(seeker,skill_info_button))
-	global.left_buttons.append(skill_info_button)
+	player_turn(seeker)
 	
+
 # add crit identifiers for damage maybe lust reduction?
 # keep adding skills including armor
 # add goblin actions and display
