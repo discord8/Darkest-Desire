@@ -18,6 +18,7 @@ var fetishes: Array
 var skills: Array
 var skill_objects: Array
 var desires: Array
+var memories: Array
 var description: String
 var threat: int # higher the threat more likely to be targeted
 var initiative_roll: int
@@ -109,6 +110,7 @@ func _init():
 	self.strength_change = 0
 	self.threat_change = 0 #AT 0 NOT TARGETABLE, gather up party threat each round and roll
 	self.desires = [] #they will remember what happend to them and when they reflect they will choose one for an event. example if this girl was stripped she might remember she was bashful but it actually wasn't as bad as she thought it was and so she doesn't gain as must lust from being stripped. then she gains the new memory: heart oppening to exhibition, activates each round based on lust
+	self.memories = []
 	self.fetishes = []
 	self.quirks = ["Overconfident"]
 	self.skills = [] #names of skills for display

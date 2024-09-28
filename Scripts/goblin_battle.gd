@@ -15,6 +15,9 @@ var status: Array
 # Called when the node enters the scene tree for the first time.
 var active_seekers = []
 var active_enemies = []
+var knocked_down_seekers = []
+var ridden_seekers = []
+var unconscious_seekers = []
 var swarm_stats
 var goblin_bucket = []
 var in_combat = []
@@ -25,7 +28,7 @@ var available_skills = []
 func _init():
 	self.title = ""
 	self.hp = randi_range(400,600)
-	self.heat = randi_range(1,5)
+	self.heat = randi_range(5,10)
 	self.attacks = ["Swarm", "Taunt", "Throw Rock", "Hump", "Club", "Pull hair", "Masturbate", "Bite"]
 	self.opportunity_attacks = ["Ride Mount", "Ejaculate"]
 	self.sex_attacks = ["Blowjob", "Cullingus", "Anilingus", "Breast pull", "Vaginal", "Anal" ]
@@ -44,10 +47,19 @@ var major_buff = 15
 var minor_debuff = 5
 var moderate_debuff = 10
 var major_debuff = 15
+var main_enemy_container
+var main_enemy_health
+var main_enemy_heat
+var main_enemy_hp_label
+var main_enemy_heat_label
 
 func _ready():
-	pass
-
+	var current_scene = get_tree().current_scene
+	main_enemy_container = current_scene.get_node("ColorRect_base/right_side_container/main_enemy_container")
+	main_enemy_health = current_scene.get_node("ColorRect_base/right_side_container/main_enemy_container/Main_enemy/main_enemy_health")
+	main_enemy_heat = current_scene.get_node("ColorRect_base/right_side_container/main_enemy_container/Main_enemy/main_enemy_heat")
+	main_enemy_hp_label = current_scene.get_node("ColorRect_base/right_side_container/main_enemy_container/Main_enemy/main_enemy_health_label")
+	main_enemy_heat_label = current_scene.get_node("ColorRect_base/right_side_container/main_enemy_container/Main_enemy/main_enemy_heat_label")
 
 
 func Goblin_battle():
@@ -61,12 +73,8 @@ func Goblin_battle():
 		global.left_buttons.append(seeker_inspect)
 		active_seekers.append(seeker)
 	global.departing.clear()
-	var goblin_button = Button.new()
-	goblin_button.text = "Goblin Patrol"
-	global.right_button_container.add_child(goblin_button)
-	goblin_button.pressed.connect(Callable(global, "_inspect_goblin"))
-	global.right_buttons.append(goblin_button)
 	swarm_stats = goblins.new()
+	create_swarm(swarm_stats)
 	var alive_goblins = swarm_stats.hp/50
 	for i in alive_goblins:
 		var current_goblin = goblins.new()
@@ -131,8 +139,134 @@ func process_turns():
 			
 
 func goblin_turn(participant):
-	global.main_text.text += str(participant.title) + " goblin takes a turn."
+	var action_choice = randi_range(1,10)
+	global.main_text.text += str(participant.title) + " takes a turn.\n\n"
+	if action_choice >= 3 and swarm_stats.heat >= 20 and knocked_down_seekers.size >= 1:
+		var index = randi_range(0,knocked_down_seekers.size() - 1)
+		var target = knocked_down_seekers[index]
+		var skill_check = randi_range(0,75) #change
+		swarm_stats.heat -= 20
+		#make sure to have a general method to free captives, also a loss condition if all seekers are captured, maybe with a special sex scene where the goblins ride there mounts back to their village
+		if "Pony Fetish" in target.fetishes or "Submissive Slave" in target.fetishes or "Spanked Fetish" in target.fetishes:
+			var potential_memory = randi_range(1,2) #1/4?
+			knocked_down_seekers.erase(target)
+			ridden_seekers.append(target)
+			var gained_lust = randi_range(15,25)
+			target.lust += gained_lust
+			global.main_text.text += str(participant.title) + " turns " + str(target.title) + " onto all fours, realising where this is going " + str(target.title) + " and shakes her ripe ass back and forth begging the goblin to discipline her. A series of rough spanks causes her arousal to spike and claim her total obedience. The goblin then claws his way up onto her back and whips a bar gag into her mouth that is connected by reigns controling her like a mount in battle. Her heart flutters and her pussy wettens unable to disobey with every spank and excited jerk of the gag she bends to her master's whim gaining [color=hotpink]" + str(gained_lust) + " Lust [/color]."
+			if "Spanked Fetish" not in target.fetishes and potential_memory == 1 and "Spanked" not in target.memories:
+				target.memories.append("Spanked")
+				global.main_text.text += "[color=orchid]" + str(target.title) + " dwells on her reddened sore cheeks, feeling the numbing pain radiate through her body, she starts unpacking her opinions. " + str(target.title) + " gained the memory \"Spanked\".[/color]"
+			elif "Pony Fetish" not in target.fetishes and potential_memory == 2 and "Ridden like a pony" not in target.memories:
+				target.memories.append("Ridden like a pony")
+				global.main_text.text += "\n\n[color=orchid]" + str(target.title) + " through her embarrasment she can't believe shes letting a goblin ride her like an inferior animal. " + str(target.title) + " gained the memory \"Ridden like a pony\".[/color]"
+		if target.will <= skill_check:
+			knocked_down_seekers.erase(target)
+			ridden_seekers.append(target)
+			var gained_lust = randi_range(5,15)
+			target.lust += gained_lust
+			var potential_memory = randi_range(1,2)
+			global.main_text.text += str(participant.title) + " turns " + str(target.title) + " onto all fours and thunderously spanks her thick ass causing a shrill shriek followed by lustful recovery breaths. The goblin claws his way up onto her back while shes subdued and whips a bar gag into her mouth that is connected by reigns to control her like a mount in battle. Her heart flutters and her pussy wettens unable to disobey with every spank and excited jerk of the gag she bends to her master's whim gaining [color=hotpink]" + str(gained_lust) + " Lust [/color]."
+			if "Spanked Fetish" not in target.fetishes and potential_memory == 1 and "Spanked" not in target.memories:
+				target.memories.append("Spanked")
+				global.main_text.text += "\n\n[color=orchid]" + str(target.title) + " dwells on her reddened sore cheeks, feeling the numbing pain radiate through her body, she starts unpacking her opinions. " + str(target.title) + " gained the memory \"Spanked\".[/color]"
+			elif "Pony Fetish" not in target.fetishes and potential_memory == 2 and "Ridden like a pony" not in target.memories:
+				target.memories.append("Ridden like a pony")
+				global.main_text.text += "\n\n[color=orchid]" + str(target.title) + " through her embarrasment she can't believe shes letting a goblin ride her like an inferior animal. " + str(target.title) + " gained the memory \"Ridden like a pony\".[/color]"
+		if target.will >= skill_check:
+			var gained_lust = randi_range(5,10)
+			target.lust += gained_lust
+			global.main_text.text += str(participant.title) + " turns " + str(target.title) + " onto all fours and thunderously spanks her thick ass causing a shrill shriek followed by lustful recovery breaths. The goblin claws his way up onto her back while shes subdued and whips a bar gag into her mouth that is connected by reigns to control her like a mount in battle. Still defiant " + str(target.title) + " bucks wildly sending the goblin soaring back into the crowd with a comical yodel, spitting out the gag she can't help but feel flustered from the experience gaining [color=hotpink]" + str(gained_lust) + " Lust [/color]."
+	else: 
+		var index = randi_range(0,active_seekers.size() - 1)
+		var target = active_seekers[index]
+		if action_choice >= 7 and swarm_stats.heat >= 10:
+			var skill_check = randi_range(1,55)
+			var location_list = ["left breast", "right breast", "left ass cheek", "right ass cheek", "left ankle", "right ankle", "neck"]
+			var location_index = randi_range(0,location_list.size() - 1)
+			var random_location = location_list[location_index]
+			if random_location == "left ankle" or random_location == "right ankle":
+				global.main_text.text += str(participant.title) + " furiously bites " + str(target.title) + " targeting her " + str(random_location) +  " as he attempts to pull her down to his size."
+				if target.durability >= skill_check:
+					var damage = randi_range(3,8)
+					if target.armor == "Fantasy Fullplate":
+						damage = randi_range(1,5)
+					target.stamina -= damage
+					swarm_stats.heat -= 5
+					global.main_text.text += " Gritting through the pain " + str(target.title) + " shakes her leg harshly sending the gobling bouncing across the ground upon his ejection."
+				else: 
+					var damage = randi_range(6,11)
+					if target.armor == "Fantasy Fullplate":
+						damage = randi_range(3,8)
+					target.stamina -= damage
+					swarm_stats.heat -= 10
+					knocked_down_seekers.append(target)
+					active_seekers.erase(target)
+					global.main_text.text += " Unable to contest the sharp pain " + str(target.title) + " falls to her knees as the surrounding goblins start to surround her."
+			elif random_location == "neck":
+				global.main_text.text += str(participant.title) + " goes straight for the neck, leaping up, razor sharp teeth brandished."
+				var dodge_roll = randi_range(1,70)
+				if target.agility >= dodge_roll or target.strength >= dodge_roll:
+					swarm_stats.heat -= 5
+					if target.agility >= target.strength: #add masochist who can't dodge effect? maybe sadist who throws it back
+						global.main_text.text += str(target.title) + " Swiftly side steps as the goblin flies past her and bounces roughly on the ground."
+					else:
+						global.main_text.text += str(target.title) + " catches her assailant by the throat before slamming him onto the ground with causing instantaneous unconsciousness."
+				else:
+					swarm_stats.heat -= 10
+					var damage = randi_range(20,25)
+					if target.armor == "Fantasy Fullplate":
+						damage = randi_range(17,22)
+					target.stamina -= damage
+					global.main_text.text += str(target.title) + " is unable to react fast enough as the Goblin fangs sinks violently into her neck causing an eruption of blood."
+			else:
+				global.main_text.text += str(participant.title) + " jumps and clings onto " + str(target.title) + " cheekily biting into her " + str(random_location)
+				var potential_memory = randi_range(1,3)
+				var pain_memory = randi_range(1,20)
+				var damage = randi_range(3,6)
+				if "Sensitive Breasts" in target.fetishes and random_location == "left breast" or random_location == "right breast":
+					var lust_gain = randi_range(15,20)
+					target.lust += lust_gain
+					global.main_text.text += " because of her sensitive breasts " + str(target.title) + " moans with pleasure even through the pain, gaining " + str(lust_gain) + " lust."
+				elif "Sensitive Ass" in target.fetishes and random_location == "left ass cheek" or random_location == "right ass cheek":
+					var lust_gain = randi_range(15,20)
+					target.lust += lust_gain
+					global.main_text.text += " because of her sensitive ass " + str(target.title) + " coos with pleasure even through the pain, gaining " + str(lust_gain) + " lust."
+				else:
+					var lust_gain = randi_range(1,6)
+					target.lust += lust_gain
+					global.main_text.text += " a mixture of pain and pleasure stimulates her mind, causing her to gain " + str(lust_gain) + " lust."
+				if target.armor == "Fantasy Fullplate":
+					damage = randi_range(1,3)
+				target.stamina -= damage
+				if "Bitten Fetish" not in target.fetishes and potential_memory == 1 and "Bite Mark" not in target.memories:
+					target.memories.append("Bite Mark")
+					global.main_text.text += "\n\n[color=orchid] As the goblin is flung off " + str(target.title) + "can't help but to feel the not entirely unpleasant sensation of the stinging mark. " + str(target.title) + " gained the memory \"Bite Mark\".[/color]"
+				if "Pain Slut" not in target.fetishes and "Fuck Meat" not in target.fetishes and "Sadistic Stimulator" not in target.fetishes and pain_memory == 1 and "Erotic Injury" not in target.memories: #maybe add not true if sadist
+					global.main_text.text += "\n\n[color=orchid]" + str(target.title) + " focuses on the pain mixed with the buzzing lust within her heart and she thinks to herself, that wasn't that bad. " + str(target.title) + " gained the memory \"Erotic injury\".[/color]"
+		elif action_choice <= 5:
+			print(target.stamina)
+			var damage = randi_range(5,10)
+			if target.armor == "Fantasy Fullplate":
+				damage = randi_range(2,7)
+			target.stamina -= damage
+			print(target.stamina)
+			global.main_text.text += str(participant.title) + " bonks " + str(target.title) + " with his club. Dealing [color=red]" + str(damage) + " damage [/color]."
+		elif action_choice <= 10:
+			var dodge_roll = randi_range(1,60)
+			var damage = randi_range(10,15)
+			if target.armor == "Fantasy Fullplate":
+				damage = randi_range(7,12)
+			if target.agility >= dodge_roll or target.strength >= dodge_roll:
+				if target.agility >= target.strength: #add masochist who can't dodge effect? maybe sadist who throws it back
+					global.main_text.text += "With a triumphant Goblin battle cry " + str(participant.title) + " hurls a stone at " + str(target.title) + ". Which she easily bobs her head dodging the projectile entirely."
+				else:
+					global.main_text.text += "With a triumphant Goblin squeak " + str(participant.title) + " hurls a stone at " + str(target.title) + ". Which she nonchantly bats it off the trajectory with her weapon."
+			else:
+				target.stamina -= damage
+				global.main_text.text += str(participant.title) + " throws a rock " + str(target.title) + " with his club. Dealing [color=red]" + str(damage) + " damage [/color]."
 	global.main_text.text += "\n------------------------\n"
+	update_ui()
 	#put goblin logic here
 	current_turn += 1
 	if current_turn < in_combat.size():
@@ -312,6 +446,9 @@ func skill_logic(ability, seeker, target):
 	if ability.cooldown == 2:
 		seeker.skill_objects.erase(ability)
 		seeker.cooldown_3.append(ability)
+	if swarm_stats.hp <= 0:
+		victory()
+	update_ui()
 	process_turns()
 
 
@@ -341,6 +478,7 @@ func end_round():
 				swarm_stats.status.erase("Burn")
 				global.main_text.text += " The Goblins that were on fire have either died or put it out.\n\n" 
 	if swarm_stats.hp <= 0:
+		victory()
 		global.main_text.text += "The battle has been won!"
 	else:
 		roll_initiative()
@@ -402,6 +540,34 @@ func back_to_skill_select(seeker,current_text, back_button):
 	player_turn(seeker)
 	
 
+func create_swarm(swarm_stats):
+	main_enemy_container.show()
+	main_enemy_health.max_value = swarm_stats.hp
+	main_enemy_health.value = swarm_stats.hp
+	main_enemy_hp_label.text = "HP: " + str(swarm_stats.hp)
+	main_enemy_heat.max_value = 50
+	main_enemy_heat.value = swarm_stats.heat
+	main_enemy_heat_label.text = "Heat: " + str(swarm_stats.heat)
+	
+
+
+func update_ui():
+	main_enemy_health.value = swarm_stats.hp
+	main_enemy_hp_label.text = "HP: " + str(swarm_stats.hp)
+	main_enemy_heat.value = swarm_stats.heat
+	main_enemy_heat_label.text = "Heat: " + str(swarm_stats.heat)
+	
+
+func victory():
+	# do not restore unless the end of the dungeon, put that logic in dungeon crawling. but for testing have it here
+	#move all seekers in other lists like orgy and ridden to active
+	global.main_text.text += "\n------------------------\nThe goblins have been defeated! only a couple stragglers remain as they run back home.\n\n"
+	for seeker in active_seekers:
+		var memory_goblin_superiority = randi_range(1,10)
+		if "Overconfident" in seeker.quirks and memory_goblin_superiority >= 5: #make like one, high for testing purpose
+			seeker.memories.append("Superior to Goblins")
+			global.main_text.text += "\n\n[color=orchid]" + str(seeker.title) + " savors this triumph and considers herself truly greater then goblins. She has gained the \"Superior to Goblins\" memory. [/color] " #have a memory if losing to goblins and has this memory something like "lost to inferior goblins!"
+	
 # keep adding skills including armor
 # add goblin actions and display like hp
 # add sexskills when lust is half full based on desires
@@ -409,3 +575,6 @@ func back_to_skill_select(seeker,current_text, back_button):
 # add memories, ideas: seeing masturbation, seeing sex, seeing brutality from goblins, seeing a seeker engage sex, seeing two seekers have sex, see a goblin get angry, kill a goblin with aoe, perform: blowjob, handjob, footjob, titjob, vaginal, anal, rimjob, gangbang, bukkake, used while unconscious, sex toy insertion, rough sex, ryona, pissed on
 # add goblin minions, alpha, loot goblins, brood mothers?
 # look into button errors, it works for now but output is not liking it
+#have unlocks behind fetishes like anal slut being after likes anal or something
+# memory list: "Superior to Goblins", "Bite Mark", "Spanked", "Erotic Injury", "Breasts toyed with", "Climax", "Ass Gropped"
+# Fetish list: "Pony Fetish", "Submissive Slave", "Spanked Fetish", "Bitten Fetish", "Fuck Meat", "Sadistic Stimulator", "Pain Slut", "Sensitive Ass", "Sensitive Breasts", "Sensitive Pussy", "Sensitive Mouth"
