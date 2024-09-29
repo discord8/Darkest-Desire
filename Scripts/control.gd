@@ -50,8 +50,10 @@ var agility_change: int
 var durability_change: int
 var strength_change: int
 var threat_change: int
+var cum_milked: int #partially converted to PP
+var PP: int #perversion points, used to determine rank
+var has_cock: bool
 
-	
 
 #system vars
 #viewing vars
@@ -142,6 +144,9 @@ func _init():
 	self.cooldown_2 = [] #at end of round add these skills to cooldown_1
 	self.cooldown_3 = [] #add to cooldown 2
 	self.cooldown_battle = [] #one use skills go here add back at the end of battle
+	self.cum_milked = 0 #partially converted to PP
+	self.PP = 0 #perversion points, used to determine rank
+	self.has_cock = false
 	generate_quirks()
 	generate_desires()
 	
@@ -168,7 +173,7 @@ func generate_description(seeker):
 	#var mental_posture
 	#var confident_posture = ["She outwardly projects as quite normal", "She seems incredibly friendly", "She has an air of elegance about her", "Her movements are arousingly feminine and erotic", "She makes sure to highlight herself in a sexual way", "she pumps out her chest and moves with confidence", "She seems quick to anger", "She's a ball of energy hardly able to stay still", "She's disciplined and calm", "She has a deviant glint in her eyes", "She stays in a combat stance, ready to go at a moments notice", "She seems serious and intense", "She stands tall, making herself look heroic", "She gives off childhood friend energy", "She gives off girl next door energy", "She's got milf aura with a dangerous look in her eyes, like she wants to eat me up.", "She struts around knowing how hot she really is", "She's entitled, asking for only the highest quality emenities"]
 	#var negative_posture = ["She looks down upon you with disgust", "Her movements are arousingly feminine and erotic","She seems unaware of how erotic she is even in simple things like her stride", "She has a strong pheromone smell to her", "She sweats even from eye contact, she seems really pent up and held back.", "She sweats often and has a feminine musk about her", "She makes sure to highlight herself in a sexual way", "she seems shy and averts eye contact", "She seems quick to anger", "She acts like her intellect is greater than yours", "She's disciplined and calm", "She looks tired and yawns reguraly", "She has a deviant glint in her eyes when she isn't averting eye contact", "She seems serious and intense", "She's making herself look small with her stance by folding inwards", "She's got milf aura with an erotic body that demands to be dominated", "She seems jumpy and unsure of herself", "She seems depressed and constantly looks at the floor",]
-	var boob_type = ["petite", "small", "average", "large", "massive", "fabric Stretching", "gigantic", "unbelievably massive"]
+	var boob_type = ["petite", "small", "ample", "large", "massive", "fabric Stretching", "gigantic", "unbelievably massive"]
 	var posture = ["She has an air of elegance about her", "she's deranged with a long creepy smile", "Shes easily distracted, staring off into space", "She acts cute and reserved", "She likes getting close and personal batting her eyes and making people uncomfortable", "She looks down upon you with disgust", "She outwardly projects as quite normal", "She seems incredibly friendly", "She has a strong pheromone smell to her", "She sweats even from eye contact, she seems really pent up and held back.", "She sweats often and has a feminine musk about her", "She seems unaware of how erotic she is even with simple things like her stride", "She's very clumsy always tripping over herself", "she's talks and walks like a bimbo", "Shes very curious, always leaning forward to get a better look", "She keeps to herself mumbling something under her breath", "She's creepy, shes always watches from the shadows", "She loves to party, being right at home around the castle grounds", "Her movements are arousingly feminine and erotic","She seems unaware of how erotic she is even in simple things like her stride", "She has a strong pheromone smell to her", "She makes sure to highlight herself in a sexual way","She has a deviant glint in her eyes when she isn't averting eye contact", "she seems shy and averts eye contact", "she pumps out her chest and moves with confidence", "She seems quick to anger", "She's a ball of energy hardly able to stay still", "She's disciplined and calm", "She looks tired and yawns reguraly", "She has a deviant glint in her eyes", "She stays in a combat stance, ready to go at a moments notice", "She seems serious and intense", "She struts and poses like a supermodel", "She stands tall, making herself look heroic", "She's making herself look small with her stance", "She gives off childhood friend energy", "She gives off girl next door energy", "She's got milf aura that begs to be fucked", "She seems jumpy and unsure of herself", "She seems depressed and constantly looks at the floor", "She walks around knowing how hot she is", "She's entitled, asking for only the highest quality emenities"]
 	var body_type_list = ["of average build", "fit and ripped", "obscenely thick", "short and slim", "amazonian in build", "tall and slender", "tall and voluptuous", "short and stacked", "proportioned like a walking fucktoy", "beautiful like a goddess", "bottom heavy", "curvy, with an hourglass figure", "chubby", "athletic", "thin and petite", "well proportioned" ]
 	var eye_color_list = ["[color=aqua]sky blue[/color]", "[color=darkgreen]emerald green[/color]", "[color=blue]navy blue[/color]", "[color=peru]light brown[/color]", "[color=saddlebrown]dark brown[/color]", "[color=plum]lavender[/color]", "[color=magenta]dark purple[/color]", "[color=crimson]agressive red[/color]", "[color=gold]golden[/color]", "[color=hotpink]lustful pink[/color]"]
