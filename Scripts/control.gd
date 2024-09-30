@@ -342,7 +342,7 @@ func apply_equipment(seeker):
 			seeker.skills.append("Singular Shot") #strong bolt, 1 turn cooldown
 			seeker.skill_objects.append(Skill.new("Vault",false, false, false, true, 15, 0, 0,["Vault"], "", false, false, 1, "Increases agility and lowers threat.", 0, 0, 1, false, false, false, false, true ))
 			seeker.skills.append("Vault") #lower threat increase speed and agility, reloads
-			seeker.skill_objects.append(Skill.new("Napalm Bolt",true, true, false, false, 1 + seeker.agility * 0.1 + seeker.will * 0.2, 0, 0,["Burn"], "Fire", true, true, 1, "Shot a mortar like bolt that rains fire down onto the battlefield", 1 + seeker.intelligence, 1.2, 0, true, false, true, false, false))
+			seeker.skill_objects.append(Skill.new("Napalm Bolt",true, true, false, false, 2 + seeker.agility * 0.2 + seeker.will * 0.3, 0, 0,["Burn"], "Fire", true, true, 1, "Shot a mortar like bolt that rains fire down onto the battlefield", 1 + seeker.intelligence, 1.2, 0, true, false, true, false, false))
 			seeker.skills.append("Focus Impact") #increases dasmage by will, add to each Crossbow attack
 			seeker.skills.append("Napalm Bolt") #aoe burn
 			seeker.skill_objects.append(Skill.new("Inspire",false, false, true, false, 1 + seeker.will * 0.6, 0, 0,[""], "", true, false, 1, "Inspire allies using your will to regain stamina and keep pushing forward.", 1 + seeker.intelligence, 1.5, 1, false, false, false, false, false))
@@ -444,7 +444,7 @@ func _unequip_item_skills(seeker):
 			seeker.skills.erase("Singular Shot") #strong bolt, 1 turn cooldown
 			seeker.skill_objects.erase(Skill.new("Vault",false, false, false, true, 15, 0, 0,["Vault"], "", false, false, 1, "Increases agility and lowers threat while removing cooldown.", 0, 0, 1, false, false, false, false, true ))
 			seeker.skills.erase("Vault") #lower threat increase speed and agility, reloads
-			seeker.skill_objects.erase(Skill.new("Napalm Bolt",true, false, false, false, 1 + seeker.agility * 0.1 + seeker.will * 0.2, 0, 0,["Burn"], "Fire", true, true, 1, "Shot a mortar like bolt that rains fire down onto the battlefield", 1 + seeker.intelligence, 1.2, 0, true, false, true, false, false))
+			seeker.skill_objects.erase(Skill.new("Napalm Bolt",true, false, false, false, 2 + seeker.agility * 0.2 + seeker.will * 0.3, 0, 0,["Burn"], "Fire", true, true, 1, "Shot a mortar like bolt that rains fire down onto the battlefield", 1 + seeker.intelligence, 1.2, 0, true, false, true, false, false))
 			seeker.skills.erase("Focus Impact") #increases dasmage by will, add to each Crossbow attack
 			seeker.skills.erase("Napalm Bolt") #aoe burn
 			seeker.skill_objects.erase(Skill.new("Inspire",false, false, true, false, 1 + seeker.will * 0.6, 0, 0,[""], "", true, false, 1, "Inspire allies using your will to regain stamina and keep pushing forward.", 1 + seeker.intelligence, 1.5, 1, false, false, false, false, false))
