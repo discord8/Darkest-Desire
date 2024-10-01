@@ -81,9 +81,11 @@ var ass_fetish = []
 var oral_fetish = []
 var breasts_fetish = []
 var paras
-var names = ["Lilica", "Yera", "Triena", "Aath", "Sage", "Evelyn", "Lucy", "Emma", "Terial", "Lyra", "Titiana", "Nip", "Sarah", "Sara", "Mimi", "Octavia", "Corin", "Gigi", "Mandy", "Rose", "Liv", "Rhea", "Jasmine", "Piper", "Dove", "Jade", "Ingrid", "Umi", "Tori", "Cindy", "Velvet", "Mariah", "Tessa", "Tess", "Daphney", "Dora", "Zelda", "Hitomi", "Seras", "Ava", "Olivia", "Sophie", "Amelia", "Mary", "Isabella", "Victoria", "Charlotte", "Luna", "Mia", "Kalifa", "Lana", "Amber", "Gianna", "Annie", "Nora", "Layla", "Lilly", "Nikki", "Aoi", "Lulu", "Mami", "Hazel", "Madi", "Isla", "Willow", "Zoe", "Grace", "Ivy", "Naomi", "Maya", "Alice", "Sadie", "Hailey", "Aubrey", "Skye", "Vivian", "Eve", "Freya", "Amara", "Chel", "Catalina", "Ashley", "Chloe", "Faith", "Kimberly", "Taylor", "Sutton", "Vera", "Kaia", "Lilly", "Selena", "Aubrey", "Nyla", "Lia", "Kiara", "Elise", "Hope", "Lola", "Lilith", "Ophelia", "Dahlia", "Blair", "Celeste", "Rebecca", "Nina", "Trinity", "Vanessa", "Camilla", "Adrianna", "Celine", "Lucianna", "Reign", "Cali", "Viviana", "Serena", "Destiny", "Elle", "Veronica", "Azaela", "Raya", "Raven", "Scarlet", "Sylvie", "Lexi", "Ryn", "Carmen", "Alison", "Felicity", "Katalina", "Zariah", "Mira", "Jolene", "Emelia", "Bonnie", "Briar", "Leona", "Lina", "Remy", "Mina", "Mili", "Selene", "Angie", "Flora", "Violet", "Aya", "Ramona", "Bridget", "Mercy", "Paula", "Baylor", "Marianna", "Loretta", "Gwen", "Robin", "Katelyn", "Tiffany", "Lexie", "Kahlani"]
-var starter_weapons = ["Twin Daggers", "Crossbow", "Flintlock", "Arcane Wand", "Animated Spellbook", "Broad Sword", "Battle Axes", "Great Club"]
-var starter_armors = ["Graceful Robes", "Bikini Armor", "Dancer's Silk", "Holy Garb", "Fantasy Fullplate", "Skimpy Streetrat"]
+var names = ["Lilica", "Yera", "Triena", "Aath", "Miu", "Mikan", "Tsumiki", "Miku", "Fili", "Sage", "Evelyn", "Lucy", "Emma", "Terial", "Lyra", "Titiana", "Nip", "Sarah", "Sara", "Mimi", "Octavia", "Corin", "Gigi", "Mandy", "Rose", "Liv", "Rhea", "Jasmine", "Piper", "Dove", "Jade", "Ingrid", "Umi", "Tori", "Cindy", "Velvet", "Mariah", "Tessa", "Tess", "Daphney", "Dora", "Zelda", "Hitomi", "Seras", "Ava", "Olivia", "Sophie", "Amelia", "Mary", "Isabella", "Victoria", "Charlotte", "Luna", "Mia", "Kalifa", "Lana", "Amber", "Gianna", "Annie", "Nora", "Layla", "Lilly", "Nikki", "Aoi", "Lulu", "Mami", "Hazel", "Madi", "Isla", "Willow", "Zoe", "Grace", "Ivy", "Naomi", "Maya", "Alice", "Sadie", "Hailey", "Aubrey", "Skye", "Vivian", "Eve", "Freya", "Amara", "Chel", "Catalina", "Ashley", "Chloe", "Faith", "Kimberly", "Taylor", "Sutton", "Vera", "Kaia", "Lilly", "Selena", "Aubrey", "Nyla", "Lia", "Kiara", "Elise", "Hope", "Lola", "Lilith", "Ophelia", "Dahlia", "Blair", "Celeste", "Rebecca", "Nina", "Trinity", "Vanessa", "Camilla", "Adrianna", "Celine", "Lucianna", "Reign", "Cali", "Viviana", "Serena", "Destiny", "Elle", "Veronica", "Azaela", "Raya", "Raven", "Scarlet", "Sylvie", "Lexi", "Ryn", "Carmen", "Alison", "Felicity", "Katalina", "Zariah", "Mira", "Jolene", "Emelia", "Bonnie", "Briar", "Leona", "Lina", "Remy", "Mina", "Mili", "Selene", "Angie", "Flora", "Violet", "Aya", "Ramona", "Bridget", "Mercy", "Paula", "Baylor", "Marianna", "Loretta", "Gwen", "Robin", "Katelyn", "Tiffany", "Lexie", "Kahlani"]
+var all_weapons =["Twin Daggers", "Crossbow", "Flintlock", "Arcane Wand", "Animated Spellbook", "Broad Sword", "Battle Axes", "Great Club"]
+var all_armors = ["Graceful Robes", "Bikini Armor", "Dancer's Silk", "Holy Garb", "Fantasy Fullplate", "Skimpy Streetrat"]
+var starter_weapons = ["Twin Daggers", "Crossbow", "Animated Spellbook", "Great Club"]
+var starter_armors = ["Graceful Robes", "Bikini Armor", "Skimpy Streetrat"]
 # uprgrade vars
 var fetish_cap = 0 #put at fetish generation, go up by 1 per level
 var weapon_level = starter_weapons
@@ -107,7 +109,7 @@ func _init():
 	self.threat = 20 #AT 0 NOT TARGETABLE, gather up party threat each round and roll
 	self.intelligence_change = 0
 	self.will_change = 0
-	self.agility_change = 0
+	self.agility_change = 0 
 	self.durability_change = 0
 	self.strength_change = 0
 	self.threat_change = 0 #AT 0 NOT TARGETABLE, gather up party threat each round and roll
@@ -327,7 +329,6 @@ func update_description(seeker):
 
 
 func apply_equipment(seeker):
-	_unequip_item_skills(seeker)
 	match seeker.weapon:
 		"Twin Daggers": #agility, will power weapon, low threat
 			seeker.skill_objects.append(Skill.new("Multi Slash",true, true, false, false, 3 + seeker.strength * 0.2 + seeker.agility * 0.2, 0, 0,[""], "Slashing", false, false, 2, "Swing with both daggers hitting twice, uses equal amount agility and strength for damage.", 5 + seeker.intelligence * 0.3, 1.5, 0, false, false, false, false, false )) #double attack, agility for damage
@@ -358,10 +359,13 @@ func apply_equipment(seeker):
 			seeker.skills.append("Electric Arc") #hit multiple apply shock
 			seeker.skills.append("Dispel Magic") #remove buffs or debuffs, interacts intelligenceh some curios
 		"Animated Spellbook":
+			seeker.skill_objects.append(Skill.new("Warding Words",false, false, true, false, 0, 0, 0,["Warded"], "Arcane", true, false, 1, "create a barrier that stops all harm, though the energy promotes desire.", 0, 0, 2, false, false, false, false, false ))
 			seeker.skills.append("Warding Words") #add a barrier to stamina and lust
+			seeker.skill_objects.append(Skill.new("Daemonic Advance",true, false, false, false, 1 + seeker.intelligence * 0.4 + seeker.will * 0.4, 0, 10,[""], "Arcane", true, false, 1, "Summon the power of abadon to flay your foes, harnessing their enegy has spicy consequences.", 1 + seeker.intelligence, 1.5, 0, false, false, false, false, false ))
 			seeker.skills.append("Daemonic Advance") #attack opponent based on will and intelligence
-			seeker.skills.append("Whispers of Woe") #chance fore power or lust
+			seeker.skill_objects.append(Skill.new("Echo of Ruin",true, false, false, false, 1 + seeker.lust * 0.4, 0, 10,[""], "Arcane", true, true, 1, "uses your lust as a conduit to burst outwards.", 1 + seeker.intelligence, 1.5, 1, false, true, false, false, false ))
 			seeker.skills.append("Echo of ruin") #deal damage porpotinate to missing hp of enemy
+			seeker.skills.append("Whispers of Venus") # gain lust or stamina at the end of the round
 		"Broad Sword": #strength and will
 			seeker.skills.append("Size up") #raise threat, barrier, strength
 			seeker.skills.append("Excellence of Execution") #increasee crit chance and damage
@@ -374,6 +378,7 @@ func apply_equipment(seeker):
 			seeker.skills.append("Reckless Charge") #knock opponent prone
 		"Great Club":
 			seeker.skills.append("Clang!") #heavy attack
+			seeker.skill_objects.append(Skill.new("Clang!",true, true, false, false, 10 + seeker.strength* 0.3 + seeker.durability * 0.1, 0, 0,[""], "Bludgeoning", false, false, 1, "Big weapon go bonk!.", 5 + seeker.intelligence * 0.4, 2.0, 0, false, false, false, false, true ))
 			seeker.skills.append("Colossal weapon") #High threat, low speed
 		"Long Spear": #drawing a blank right now
 			seeker.skills.append("Jab Thrust") #ignore barrier increase agaility
@@ -381,13 +386,17 @@ func apply_equipment(seeker):
 			seeker.skills.append("")
 		"Disarmed":
 			seeker.skills.append("Re-Equip") #chance to get weapon back
+			seeker.skill_objects.append(Skill.new("Re-equip",false, false, false, true, 0, 0, 0,[""], "", false, false, 1, "grab your weapon.", 5 + seeker.intelligence * 0.4, 2.0, 0, false, false, false, false, true ))
 		"Unarmed":
 			seeker.skills.append("Struggle") 
+			seeker.skill_objects.append(Skill.new("Struggle",true, true, false, false, 1 + seeker.will * 0.1 + seeker.durability * 0.1, 0, 0,[""], "Bludgeoning", false, false, 1, "Fight the best you can.", 5 + seeker.intelligence * 0.4, 2.0, 0, false, false, false, false, true ))
 	match seeker.armor:
 		"Naked":
 			seeker.skills.append("Cover up") #gain barrier, gain threat, gain lust
+			seeker.skill_objects.append(Skill.new("Cover up",false, false, false, false, 0, seeker.will * 0.5 , 10,[""], "", false, false, 1, "covering yourself in front of the enemy is somewhat tantilising.", 0, 0, 0, false, false, false, false, true ))
 		"Graceful Robes":
 			seeker.skills.append("Elegant Wrapping") #increases intelligence and will, lower threat. concentrate: next attack add intelligence to damage
+			#seeker.skill_objects.append(Skill.new("Elegant wrapping",false, false, false, false, 0, 0, 0,[""], "", false, false, 1, "", 0, 0, 0, false, false, false, false, true ))
 		"Bikini Armor":
 			seeker.skills.append("Fit") #increase durability and strength by alot. Taunt: raises threat by alot gives half stamina as temp. once per battle
 		"Dancer's Silk":
@@ -400,6 +409,25 @@ func apply_equipment(seeker):
 			seeker.skills.append("Hideaway") #increase agility and durability. Hideaway: lower threat to 0 for 1 round and gain brutality token
 	for i in seeker.skills:
 		match i:
+			"Elegant Wrapping":
+				seeker.intelligence += 5
+				seeker.will += 5
+				seeker.strength -= 5
+				seeker.threat = 20
+			"Fit":
+				seeker.strength += 5
+				seeker.durability += 5
+				seeker.intelligence -= 5
+				seeker.threat = 30
+			"Hideaway":
+				seeker.agility += 5
+				seeker.will += 5
+				seeker.durability -= 5
+				seeker.threat = 10
+			_:
+				pass
+	for i in seeker.skills:
+		match i:
 			"Lightfoot":
 				seeker.threat -= 3
 				seeker.agility += 5
@@ -409,27 +437,43 @@ func apply_equipment(seeker):
 			"Colossal weapon":
 				seeker.threat += 6
 				seeker.strength += 6
-				seeker.agility -= 3
+				seeker.agility -= 6
 			_:
 				pass
 
 
 func _unequip_item_skills(seeker):
-	match seeker.armor:
-		"Naked":
-			seeker.skills.erase("Cover up") #gain barrier, gain threat, gain lust
-		"Graceful Robes":
-			seeker.skills.erase("Elegant Wrapping") #increases intelligence and will, lower threat. concentrate: next attack add intelligence to damage
-		"Bikini Armor":
-			seeker.skills.erase("Fit") #increase durability and strength by alot. Taunt: raises threat by alot gives half stamina as temp. once per battle
-		"Dancer's Silk":
-			seeker.skills.erase("Entertainer") #Increases ddurability and agilkity. Encourage: remove a negative effect and give strength
-		"Holy Garb":
-			seeker.skills.erase("Healing Service") #Increse will dramatically, lower threat. Service: increase lust but regain stamina
-		"Fantasy Fullplate":
-			seeker.skills.erase("Mostly Protected") #Increase Strenght and durability raise threat, lower agility and intelligence. Protected: start combat intelligenceh 1 barrier
-		"Skimpy Streetrat":
-			seeker.skills.erase("Hideaway")
+	print("we are unequipping")
+	for i in seeker.skills:
+		match i:
+			"Elegant Wrapping":
+				seeker.intelligence -= 5
+				seeker.will -= 5
+				seeker.strength += 5
+			"Fit":
+				seeker.strength -= 5
+				seeker.durability -= 5
+				seeker.intelligence += 5
+			"Hideaway":
+				seeker.agility -= 5
+				seeker.will -= 5
+				seeker.durability += 5
+			_:
+				pass
+	for i in seeker.skills:
+		match i:
+			"Lightfoot":
+				seeker.threat += 3
+				seeker.agility -= 5
+			"Excellence of Execution":
+				seeker.strength -= 3
+				seeker.intelligence -= 3
+			"Colossal weapon":
+				seeker.threat -= 6
+				seeker.strength -= 6
+				seeker.agility += 3
+			_:
+				pass
 	match seeker.weapon:
 		"Twin Daggers": #agility, will power weapon, low threat
 			seeker.skill_objects.erase(Skill.new("Multi Slash",true, true, false, false, 3 + seeker.strength * 0.2 + seeker.agility * 0.2, 0, 0,[""], "Slashing", false, false, 2, "Swing with both daggers hitting twice, uses equal amount agility and strength for damage.", 5 + seeker.intelligence * 0.3, 1.5, 0, false, false, false, false, false )) #double attack, agility for damage
@@ -460,10 +504,13 @@ func _unequip_item_skills(seeker):
 			seeker.skills.erase("Electric Arc") #hit multiple apply shock
 			seeker.skills.erase("Dispel Magic") #remove buffs or debuffs, interacts intelligenceh some curios
 		"Animated Spellbook":
+			seeker.skill_objects.erase(Skill.new("Warding Words",false, false, true, false, 0, 0, 0,["Warded"], "Arcane", true, false, 1, "create a barrier that stops all harm, though the energy promotes desire.", 0, 0, 2, false, false, false, false, false ))
 			seeker.skills.erase("Warding Words") #add a barrier to stamina and lust
+			seeker.skill_objects.erase(Skill.new("Daemonic Advance",true, false, false, false, 1 + seeker.intelligence * 0.4 + seeker.will * 0.4, 0, 10,[""], "Arcane", true, false, 1, "Summon the power of abadon to flay your foes, harnessing their enegy has spicy consequences.", 1 + seeker.intelligence, 1.5, 0, false, false, false, false, false ))
 			seeker.skills.erase("Daemonic Advance") #attack opponent based on will and intelligence
-			seeker.skills.erase("Whispers of Woe") #chance fore power or lust
+			seeker.skill_objects.erase(Skill.new("Echo of Ruin",true, false, false, false, 1 + seeker.lust * 0.4, 0, 10,[""], "Arcane", true, true, 1, "uses your lust as a conduit to burst outwards.", 1 + seeker.intelligence, 1.5, 1, false, true, false, false, false ))
 			seeker.skills.erase("Echo of ruin") #deal damage porpotinate to missing hp of enemy
+			seeker.skills.erase("Whispers of Venus") 
 		"Broad Sword": #strength and will
 			seeker.skills.erase("Size up") #raise threat, barrier, strength
 			seeker.skills.erase("Excellence of Execution") #increasee crit chance and damage
@@ -476,6 +523,7 @@ func _unequip_item_skills(seeker):
 			seeker.skills.erase("Reckless Charge") #knock opponent prone
 		"Great Club":
 			seeker.skills.erase("Clang!") #heavy attack
+			seeker.skill_objects.erase(Skill.new("Clang!",true, true, false, false, 10 + seeker.strength* 0.3 + seeker.durability * 0.1, 0, 0,[""], "Bludgeoning", false, false, 1, "Big weapon go bonk!.", 5 + seeker.intelligence * 0.4, 2.0, 0, false, false, false, false, true ))
 			seeker.skills.erase("Colossal weapon") #High threat, low speed
 		"Long Spear": #drawing a blank right now
 			seeker.skills.erase("Jab Thrust") #ignore barrier increase agaility
@@ -483,22 +531,26 @@ func _unequip_item_skills(seeker):
 			seeker.skills.erase("")
 		"Disarmed":
 			seeker.skills.erase("Re-Equip") #chance to get weapon back
+			seeker.skill_objects.erase(Skill.new("Re-equip",false, false, false, true, 0, 0, 0,[""], "", false, false, 1, "grab your weapon.", 5 + seeker.intelligence * 0.4, 2.0, 0, false, false, false, false, true ))
 		"Unarmed":
 			seeker.skills.erase("Struggle") 
-	for i in seeker.skills:
-		match i:
-			"Lightfoot":
-				seeker.threat += 3
-				seeker.agility -= 5
-			"Excellence of Execution":
-				seeker.strength -= 3
-				seeker.intelligence -= 3
-			"Colossal weapon":
-				seeker.threat -= 6
-				seeker.agility += 3
-				seeker.strength -= 6
-			_:
-				pass
+			seeker.skill_objects.erase(Skill.new("Struggle",true, true, false, false, 1 + seeker.will * 0.1 + seeker.durability * 0.1, 0, 0,[""], "Bludgeoning", false, false, 1, "Fight the best you can.", 5 + seeker.intelligence * 0.4, 2.0, 0, false, false, false, false, true ))
+	match seeker.armor:
+		"Naked":
+			seeker.skills.erase("Cover up") #gain barrier, gain threat, gain lust
+			seeker.skill_objects.erase(Skill.new("Cover up",false, false, false, false, 0, seeker.will * 0.5 , 10,[""], "", false, false, 1, "covering yourself in front of the enemy is somewhat tantilising.", 0, 0, 0, false, false, false, false, true )) #gain barrier, gain threat, gain lust
+		"Graceful Robes":
+			seeker.skills.erase("Elegant Wrapping") #increases intelligence and will, lower threat. concentrate: next attack add intelligence to damage
+		"Bikini Armor":
+			seeker.skills.erase("Fit") #increase durability and strength by alot. Taunt: raises threat by alot gives half stamina as temp. once per battle
+		"Dancer's Silk":
+			seeker.skills.erase("Entertainer") #Increases ddurability and agilkity. Encourage: remove a negative effect and give strength
+		"Holy Garb":
+			seeker.skills.erase("Healing Service") #Increse will dramatically, lower threat. Service: increase lust but regain stamina
+		"Fantasy Fullplate":
+			seeker.skills.erase("Mostly Protected") #Increase Strenght and durability raise threat, lower agility and intelligence. Protected: start combat intelligenceh 1 barrier
+		"Skimpy Streetrat":
+			seeker.skills.erase("Hideaway")
 
 #
 var main_text: RichTextLabel
@@ -766,6 +818,7 @@ func _on_unequip_armor_pressed(seeker, unequip_armor_button): #have the women ha
 		button_container.add_child(back_button)
 		back_button.pressed.connect(Callable(self, "_inspect").bind(seeker))
 		left_buttons.append(back_button)
+		_recalculate_seeker_stats(seeker)
 		update_description(seeker)
 		main_text.text = "------------------------"
 		main_text.text += "\nSeeker Name: " + seeker.title
@@ -797,6 +850,7 @@ func _on_unequip_armor_pressed(seeker, unequip_armor_button): #have the women ha
 		_unequip_item_skills(seeker)
 		seeker.armor = "Naked"
 		apply_equipment(seeker)
+		_recalculate_seeker_stats(seeker)
 		update_description(seeker)
 		main_text.text = "------------------------"
 		main_text.text += "\nSeeker Name: " + seeker.title
@@ -827,16 +881,12 @@ func _on_unequip_armor_pressed(seeker, unequip_armor_button): #have the women ha
 
 
 func _on_unequip_weapon_pressed(seeker, unequip_weapon_button):
-	for ii in seeker.skill_objects:
-		print(ii.title)
-		print(ii.base_damage)
 	var overconfident = false
 	for i in seeker.quirks:
 		match i:
 			"Overconfident":
 				overconfident = true
 	if seeker.weapon == "Unarmed":
-		print("looking at inventory")
 		clear_seeker_buttons()
 		for weapun in armory:
 			var weapon_button = Button.new()
@@ -880,6 +930,7 @@ func _on_unequip_weapon_pressed(seeker, unequip_weapon_button):
 		_unequip_item_skills(seeker)
 		seeker.weapon = "Unarmed"
 		apply_equipment(seeker)
+		_recalculate_seeker_stats(seeker)
 		update_description(seeker)
 		main_text.text = "------------------------"
 		main_text.text += "\nSeeker Name: " + seeker.title
@@ -935,6 +986,7 @@ func equip_weapon(seeker, weapun):
 	armory.erase(weapun)
 	apply_equipment(seeker)
 	update_description(seeker)
+	_recalculate_seeker_stats(seeker)
 	main_text.text = "------------------------"
 	main_text.text += "\nSeeker Name: " + seeker.title
 	main_text.text += "\nHP: " + str(seeker.stamina) + "/" + str(seeker.max_stamina)
@@ -971,6 +1023,7 @@ func equip_armor(seeker, armori):
 	armor_armory.erase(armori)
 	apply_equipment(seeker)
 	update_description(seeker)
+	_recalculate_seeker_stats(seeker)
 	main_text.text = "------------------------"
 	main_text.text += "\nSeeker Name: " + seeker.title
 	main_text.text += "\nHP: " + str(seeker.stamina) + "/" + str(seeker.max_stamina)

@@ -443,6 +443,21 @@ func skill_logic(ability, seeker, target):
 						seeker.threat += 6
 					_:
 						pass
+		"Vault":
+			var seeker_threat_change = seeker.threat #- the value off this, then add back 10 after the buff runs out
+			swarm_stats.heat -= randi_range(3,6)
+			seeker.status.append("Moderate agility buff")
+			seeker.agility += 10
+			seeker.status.append("Backline")
+			seeker.threat = 10
+			for i in seeker.skills:
+				match i:
+					"Lightfoot":
+						seeker.threat -= 3
+					"Colossal weapon":
+						seeker.threat += 6
+					_:
+						pass
 			global.main_text.text += "\n------------------------\n" + str(seeker.title) + " nimbly kicks off a nearby goblin to disengage, she then surveys the battle field while skirting along its rim."
 	global.main_text.text += "\n------------------------\n"
 	current_turn += 1
@@ -532,7 +547,7 @@ func skill_info(seeker, skill_info_button):
 			"Inspire":
 				global.main_text.text += "Inspire:\n Heal another seeker's stamina with your will. You will have to focus on battle though, so the\n skill has a cooldown."
 				global.main_text.text += "\n------------------------\n"
-				
+			#armor
 				
 
 func skip_turn(seeker):
