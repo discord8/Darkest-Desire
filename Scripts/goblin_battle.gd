@@ -149,7 +149,8 @@ func goblin_turn(participant):
 		var index = randi_range(0,knocked_down_seekers.size() - 1)
 		var target = knocked_down_seekers[index]
 		var skill_check = randi_range(0,75) #change
-		swarm_stats.heat -= 20
+		if swarm_stats.heat == 20:
+			swarm_stats.heat -= 20
 		#make sure to have a general method to free captives, also a loss condition if all seekers are captured, maybe with a special sex scene where the goblins ride there mounts back to their village
 		if "Pony Fetish" in target.fetishes or "Submissive Slave" in target.fetishes or "Spanked Fetish" in target.fetishes:
 			var potential_memory = randi_range(1,2) #1/4?
@@ -198,6 +199,8 @@ func goblin_turn(participant):
 							damage = randi_range(1,3)
 						target.stamina -= damage
 						swarm_stats.heat -= 5
+						if swarm_stats.heat <= 0:
+							swarm_stats.heat = 0
 						global.main_text.text += " Gritting through the pain " + str(target.title) + " shakes her leg harshly sending the gobling bouncing across the ground upon his ejection."
 					else: 
 						var damage = randi_range(4,9)
@@ -205,6 +208,8 @@ func goblin_turn(participant):
 							damage = randi_range(1,6)
 						target.stamina -= damage
 						swarm_stats.heat -= 10
+						if swarm_stats.heat <= 0:
+							swarm_stats.heat = 0
 						knocked_down_seekers.append(target)
 						active_seekers.erase(target)
 						global.main_text.text += " Unable to contest the sharp pain " + str(target.title) + " falls to her knees as the surrounding goblins start to surround her."
@@ -213,12 +218,16 @@ func goblin_turn(participant):
 					var dodge_roll = randi_range(1,70)
 					if target.agility >= dodge_roll or target.strength >= dodge_roll:
 						swarm_stats.heat -= 5
+						if swarm_stats.heat <= 0:
+							swarm_stats.heat = 0
 						if target.agility >= target.strength: #add masochist who can't dodge effect? maybe sadist who throws it back
 							global.main_text.text += str(target.title) + " Swiftly side steps as the goblin flies past her and bounces roughly on the ground."
 						else:
 							global.main_text.text += str(target.title) + " catches her assailant by the throat before slamming him onto the ground with causing instantaneous unconsciousness."
 					else:
 						swarm_stats.heat -= 10
+						if swarm_stats.heat <= 0:
+							swarm_stats.heat = 0
 						var damage = randi_range(8,13)
 						if target.armor == "Fantasy Fullplate":
 							damage = randi_range(5,10)
@@ -426,6 +435,8 @@ func skill_logic(ability, seeker, target):
 			swarm_stats.hp -= damage_done
 		"Inspire":
 			swarm_stats.heat -= randi_range(3,6)
+			if swarm_stats.heat <= 0:
+				swarm_stats.heat = 0
 			if did_crit == false:
 				damage_done = int(randi_range(0,5) + ability.base_damage)
 				global.main_text.text += "\n------------------------\n" + str(seeker.title) + " encourages " + str(target.title) + " to keep pushing forward. Some of the Goblins snicker at her optimism. Healing [color=crimson]" + str(damage_done) + " [/color]stamina."
@@ -438,6 +449,8 @@ func skill_logic(ability, seeker, target):
 		"Vault":
 			var seeker_threat_change = seeker.threat #- the value off this, then add back 10 after the buff runs out
 			swarm_stats.heat -= randi_range(3,6)
+			if swarm_stats.heat <= 0:
+				swarm_stats.heat = 0
 			seeker.status.append("Moderate agility buff")
 			seeker.agility += 10
 			seeker.status.append("Backline")
@@ -453,6 +466,8 @@ func skill_logic(ability, seeker, target):
 		"Vault":
 			var seeker_threat_change = seeker.threat #- the value off this, then add back 10 after the buff runs out
 			swarm_stats.heat -= randi_range(3,6)
+			if swarm_stats.heat <= 0:
+				swarm_stats.heat = 0
 			seeker.status.append("Moderate agility buff")
 			seeker.agility += 10
 			seeker.status.append("Backline")
