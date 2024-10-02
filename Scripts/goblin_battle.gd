@@ -52,6 +52,7 @@ var main_enemy_health
 var main_enemy_heat
 var main_enemy_hp_label
 var main_enemy_heat_label
+var inspect_current_text = ""
 
 func _ready():
 	var current_scene = get_tree().current_scene
@@ -284,7 +285,10 @@ func goblin_turn(participant):
 
 func player_turn(participant):
 	global.clear_seeker_buttons()
+	inspect_current_text = global.main_text.text
 	#if sex in status do that instead of regular turn
+	print("skill objects")
+	print(participant.skill_objects)
 	for ability in participant.skill_objects:
 		var skill_button = Button.new()
 		skill_button.text = ability.title  # 'ability' is a string representing the skill name
@@ -301,6 +305,11 @@ func player_turn(participant):
 	global.button_container.add_child(skill_info_button)
 	skill_info_button.pressed.connect(Callable(self, "skill_info").bind(participant,skill_info_button))
 	global.left_buttons.append(skill_info_button)
+	var inspect_button = Button.new() #change main text to a description of all current skills by doing for and describing them
+	inspect_button.text = "Inspect"
+	global.button_container.add_child(inspect_button)
+	inspect_button.pressed.connect(Callable(self, "inspect_choice").bind(participant,inspect_button))
+	global.left_buttons.append(inspect_button)
 
 func _perform_skill(ability, seeker):
 	var current_text = global.main_text.text
@@ -849,6 +858,82 @@ func goblin_ejaculation(seeker, sex_type):
 func ridden_turn(seeker):
 	pass
 
+func inspect_choice(seeker, inspect_text):
+	global.clear_seeker_buttons()
+	if inspect_current_text == "":
+		inspect_current_text = global.main_text.text
+		print(inspect_current_text)
+	global.main_text.text = str(inspect_current_text)
+	for i in active_seekers:
+		var inspect_button = Button.new()
+		inspect_button.text = i.title
+		global.button_container.add_child(inspect_button)
+		inspect_button.pressed.connect(Callable(self, "inspect").bind(i, "active"))
+		global.left_buttons.append(inspect_button)
+	for ii in knocked_down_seekers:
+		var inspect_button = Button.new()
+		inspect_button.text = ii.title
+		global.button_container.add_child(inspect_button)
+		inspect_button.pressed.connect(Callable(self, "inspect").bind(ii, "knocked down"))
+		global.left_buttons.append(inspect_button)
+	for iii in ridden_seekers:
+		var inspect_button = Button.new()
+		inspect_button.text = iii.title
+		global.button_container.add_child(inspect_button)
+		inspect_button.pressed.connect(Callable(self, "inspect").bind(iii, "ridden"))
+		global.left_buttons.append(inspect_button)
+	var back_button = Button.new()
+	back_button.text = "Back"
+	global.button_container.add_child(back_button)
+	back_button.pressed.connect(Callable(self, "back_to_skill_select").bind(seeker,inspect_current_text,back_button))
+	global.left_buttons.append(back_button)
+	
+
+func inspect(seeker, state,):
+	global.clear_seeker_buttons()
+	global.main_text.text = str(inspect_current_text)
+	global.main_text.text = "\n"
+	global.main_text.text += "------------------------"
+	global.main_text.text += "\nSeeker Name: " + seeker.title
+	global.main_text.text += "\nHP: " + str(seeker.stamina) + "/" + str(seeker.max_stamina)
+	global.main_text.text += "\nLust: " + str(seeker.lust) + "/" + str(seeker.max_lust)
+	global.main_text.text += "\n"
+	global.main_text.text += "\nStrength: " + str(seeker.strength)
+	global.main_text.text += "\nAgility: " + str(seeker.agility)
+	global.main_text.text += "\nDurability: " + str(seeker.durability)
+	global.main_text.text += "\nIntelligence: " + str(seeker.intelligence)
+	global.main_text.text += "\nWill: " + str(seeker.will)
+	global.main_text.text += "\nThreat: " + str(seeker.threat)
+	global.main_text.text += "\n"
+	global.main_text.text += "\nSkills: " + str(seeker.skills)
+	global.main_text.text += "\nQuirks: " + str(seeker.quirks)
+	global.main_text.text += "\nFetishes: " + str(seeker.fetishes)
+	global.main_text.text += "\n"
+	global.main_text.text += "\nDescription: " + seeker.description
+	global.main_text.text += "\n"
+	global.main_text.text += "\nWeapon: " + seeker.weapon
+	global.main_text.text += "\nArmor: " + seeker.armor + "\n\n"
+	if state == "active":
+		if seeker.lust <= seeker.max_lust * 0.5:
+			global.main_text.text += str(seeker.title) + " is ready to slay some Goblins!"
+		else:
+			global.main_text.text += str(seeker.title) + " is too horny to fight and instead needs to fuck!"
+	if state == "knocked down":
+		if seeker.lust <= seeker.max_lust * 0.5:
+			global.main_text.text += str(seeker.title) + " is knocked down and surrounded by Goblins! She is trying to escape."
+		else:
+			global.main_text.text += str(seeker.title) + " is knocked down surrounded by goblins and is super aroused!"
+	if state == "ridden":
+		if seeker.lust <= seeker.max_lust * 0.5:
+			global.main_text.text += str(seeker.title) + " is being ridden like a pony and can't fight back!"
+		else:
+			global.main_text.text += str(seeker.title) + " is being ridden like a sow, her pussy dripping with excitement!"
+	global.main_text.text += "\n------------------------\n\n"
+	var back_button = Button.new()
+	back_button.text = "Back"
+	global.button_container.add_child(back_button)
+	back_button.pressed.connect(Callable(self, "inspect_choice").bind(seeker,inspect_current_text))
+	global.left_buttons.append(back_button)
 
 # keep adding skills including armor
 # add goblin actions and display like hp

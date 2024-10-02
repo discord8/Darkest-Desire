@@ -157,8 +157,13 @@ func _init():
 func generate_quirks():
 	var all_generated_quirks = ["Durable", "Frail", "Strong", "Weak", "Aggressive","Lazy", "Energetic", "Resolute", "Corruptable", "Bright", "Dim","Bimbo", "Enlightened", "Talented", "Overconfident"]
 	var num_of_quirks = randi_range (1,3)
-	for i in num_of_quirks:
-		quirks.append(all_generated_quirks[randi_range(0,all_generated_quirks.size() - 1)])
+	for i in range(num_of_quirks):
+		var quirk = ""
+		while true:
+			quirk = all_generated_quirks[randi_range(0, all_generated_quirks.size() - 1)]
+			if quirk not in quirks:
+				quirks.append(quirk)
+				break
 		
 
 func generate_desires():
@@ -440,10 +445,11 @@ func apply_equipment(seeker):
 				seeker.agility -= 6
 			_:
 				pass
+	print(seeker.skill_objects)
 
 
 func _unequip_item_skills(seeker):
-	print("we are unequipping")
+	print(seeker.skill_objects)
 	for i in seeker.skills:
 		match i:
 			"Elegant Wrapping":
@@ -474,14 +480,12 @@ func _unequip_item_skills(seeker):
 				seeker.agility += 3
 			_:
 				pass
+	seeker.skill_objects.clear()
 	match seeker.weapon:
 		"Twin Daggers": #agility, will power weapon, low threat
-			seeker.skill_objects.erase(Skill.new("Multi Slash",true, true, false, false, 3 + seeker.strength * 0.2 + seeker.agility * 0.2, 0, 0,[""], "Slashing", false, false, 2, "Swing with both daggers hitting twice, uses equal amount agility and strength for damage.", 5 + seeker.intelligence * 0.3, 1.5, 0, false, false, false, false, false )) #double attack, agility for damage
 			seeker.skills.erase("Multi Slash")
 			seeker.skills.erase("Lightfoot") #lower threat based on agility
-			seeker.skill_objects.erase(Skill.new("Vital Cut",true, true, false, false, 32 - seeker.threat, 0, 0,[""], "Slashing", false, false, 1, "A sneak attack that does damage based on how low your threat is.", 10 + seeker.intelligence * 0.3, 2.0, 0, false, false, false, false, false ))
 			seeker.skills.erase("Vital Cut") #add flat value minus threat, low hit (20 then - current threat)
-			seeker.skill_objects.erase(Skill.new("Distracting Strike",true, true, false, false, 2 + seeker.agility * 0.3 + seeker.strength * 0.2, 0, 0,[""], "Slashing", false, false, 1, "A light attack that allows you to quickly hide after the strike.", 5 + seeker.intelligence * 0.4, 1.5, 2, false, false, false, false, true ))
 			seeker.skills.erase("Distracting Strike") #damage based on intelligence)
 		"Crossbow": #agility will power, average stats, extra skill
 			seeker.skill_objects.erase(Skill.new("Singular Shot",true, true, false, false, 6 + seeker.agility * 0.4 + seeker.will * 0.4, 0, 0,[""], "Piercing", true, false, 1, "A powerful bolt that takes a moment to fire again.", 1 + seeker.intelligence * 0.2, 1.5, 1, false, false, false, false, false ))
@@ -533,6 +537,7 @@ func _unequip_item_skills(seeker):
 			seeker.skills.erase("Re-Equip") #chance to get weapon back
 			seeker.skill_objects.erase(Skill.new("Re-equip",false, false, false, true, 0, 0, 0,[""], "", false, false, 1, "grab your weapon.", 5 + seeker.intelligence * 0.4, 2.0, 0, false, false, false, false, true ))
 		"Unarmed":
+			var item_skills = ["Struggle"]
 			seeker.skills.erase("Struggle") 
 			seeker.skill_objects.erase(Skill.new("Struggle",true, true, false, false, 1 + seeker.will * 0.1 + seeker.durability * 0.1, 0, 0,[""], "Bludgeoning", false, false, 1, "Fight the best you can.", 5 + seeker.intelligence * 0.4, 2.0, 0, false, false, false, false, true ))
 	match seeker.armor:
@@ -552,7 +557,12 @@ func _unequip_item_skills(seeker):
 		"Skimpy Streetrat":
 			seeker.skills.erase("Hideaway")
 
+func skill_erasing_func(seeker,item_list):
+	for skill in item_list:
+		seeker.skill_objects.erase(skill.title)
 #
+var scroll_container: ScrollContainer
+var scroll_bar
 var main_text: RichTextLabel
 var button_container: VBoxContainer
 var right_button_container: VBoxContainer
@@ -560,6 +570,8 @@ var skills_data
 
 func _ready():
 	var current_scene = get_tree().current_scene
+	scroll_container = current_scene.get_node("ScrollContainer")
+	scroll_bar = scroll_container.get_v_scroll_bar()
 	main_text = current_scene.get_node("ScrollContainer/main_text")
 	button_container = current_scene.get_node("ColorRect_base/VBoxContainer")
 	right_button_container = current_scene.get_node("ColorRect_base/right_side_container")
@@ -577,6 +589,7 @@ func fill_recruits():
 		print(seeker.durability)
 		print("-----------------------")
 		apply_equipment(seeker)
+		print(seeker.skill_objects)
 		_non_equipment_stats_update(seeker)
 		generate_description(seeker)
 		#generate_description(seeker)
@@ -684,7 +697,7 @@ func clear_enemy_buttons():
 # make it so duplicate quirks and names can't be plausible names not so much
 
 
-func _on_roster_pressed():
+func _to_roster():
 	clear_seeker_buttons()
 	main_text.text = ""
 	for seeker in roster:
@@ -729,7 +742,7 @@ func _inspect(seeker):
 	var back_button = Button.new()
 	back_button.text = "Backs"
 	button_container.add_child(back_button)
-	back_button.pressed.connect(Callable(self, "back_to_roster"))
+	back_button.pressed.connect(Callable(self, "_to_roster"))
 	left_buttons.append(back_button)
 	main_text.text = "------------------------"
 	main_text.text += "\nSeeker Name: " + seeker.title
@@ -765,15 +778,17 @@ func _inspect_departing(seeker):
 	if seeker.weapon == "Unarmed":
 		unequip_weapon_button.text = "Give Weapon"
 	button_container.add_child(unequip_weapon_button)
-	unequip_weapon_button.pressed.connect(Callable(self, "_on_unequip_weapon_pressed").bind(seeker,unequip_weapon_button))
+	unequip_weapon_button.pressed.connect(Callable(self, "_on_unequip_weapon_pressed_depart").bind(seeker,unequip_weapon_button))
 	left_buttons.append(unequip_weapon_button)
 	var unequip_armor_button = Button.new()
 	unequip_armor_button.text = "Strip Armor"
+	if seeker.armor == "Naked":
+		unequip_weapon_button.text = "Give Armor"
 	button_container.add_child(unequip_armor_button)
-	unequip_armor_button.pressed.connect(Callable(self, "_on_unequip_armor_pressed").bind(seeker,unequip_armor_button))
+	unequip_armor_button.pressed.connect(Callable(self, "_on_unequip_armor_pressed_depart").bind(seeker,unequip_armor_button))
 	left_buttons.append(unequip_armor_button)
 	var back_button = Button.new()
-	back_button.text = "Back"
+	back_button.text = "Backs"
 	button_container.add_child(back_button)
 	back_button.pressed.connect(Callable(self, "departing_screen"))
 	left_buttons.append(back_button)
@@ -958,26 +973,6 @@ func _on_unequip_weapon_pressed(seeker, unequip_weapon_button):
 	else:
 		main_text.text += "\n\n" + str(seeker.title) + ": There is no way I'm letting you take my weapon."
 		unequip_weapon_button.hide()
-
-func back_to_roster():
-	clear_seeker_buttons()
-	main_text.text = ""
-	for seeker in roster:
-		var inspect_button = Button.new()
-		inspect_button.text = seeker.title
-		button_container.add_child(inspect_button)
-		inspect_button.pressed.connect(Callable(self, "_inspect").bind(seeker))
-		left_buttons.append(inspect_button)
-	var departing_button = Button.new()
-	departing_button.text = "Departing"
-	button_container.add_child(departing_button)
-	departing_button.pressed.connect(Callable(self, "departing_screen"))
-	left_buttons.append(departing_button)
-	var back_button = Button.new()
-	back_button.text = "Back"
-	button_container.add_child(back_button)
-	back_button.pressed.connect(Callable(self, "create_start_buttons"))
-	left_buttons.append(back_button)
 	
 
 func equip_weapon(seeker, weapun):
@@ -1067,7 +1062,7 @@ func _add_to_party(seeker):
 		departing.append(seeker)
 		roster.erase(seeker)
 		clear_seeker_buttons()
-		back_to_roster()
+		_to_roster()
 	else: 
 		main_text.text += "\n\nDeparting is full."
 
@@ -1104,7 +1099,7 @@ func departing_screen():
 	var back_button = Button.new()
 	back_button.text = "Back"
 	button_container.add_child(back_button)
-	back_button.pressed.connect(Callable(self, "back_to_roster"))
+	back_button.pressed.connect(Callable(self, "_to_roster"))
 	left_buttons.append(back_button)
 	var depart_button = Button.new()
 	depart_button.text = "Depart"
@@ -1123,7 +1118,7 @@ func create_start_buttons():
 	var roster_button = Button.new()
 	roster_button.text = "Roster"
 	button_container.add_child(roster_button)
-	roster_button.pressed.connect(Callable(self, "_on_roster_pressed"))
+	roster_button.pressed.connect(Callable(self, "_to_roster"))
 	left_buttons.append(roster_button)
 
 func _depart():
@@ -1135,7 +1130,7 @@ func _depart():
 		var roster_button = Button.new()
 		roster_button.text = "Add more"
 		button_container.add_child(roster_button)
-		roster_button.pressed.connect(Callable(self, "_on_roster_pressed"))
+		roster_button.pressed.connect(Callable(self, "_to_roster"))
 		left_buttons.append(roster_button)
 		var proceed = Button.new()
 		proceed.text = "Proceed"
@@ -1188,9 +1183,227 @@ func _pick_mission():
 	left_buttons.append(proceed)
 
 
+func _on_unequip_armor_pressed_depart(seeker, unequip_armor_button): #have the women have logic on whether or not they will allow themselves to be striped
+	var overconfident = false
+	for i in seeker.quirks:
+		match i:
+			"Overconfident":
+				overconfident = true
+	if seeker.armor == "Naked":
+		clear_seeker_buttons()
+		for armor in armor_armory:
+			var armor_button = Button.new()
+			armor_button.text = armor
+			button_container.add_child(armor_button)
+			armor_button.pressed.connect(Callable(self, "equip_armor_departing").bind(seeker,armor))
+			left_buttons.append(armor_button)
+		var back_button = Button.new()
+		back_button.text = "Back"
+		button_container.add_child(back_button)
+		back_button.pressed.connect(Callable(self, "_inspect_departing").bind(seeker))
+		left_buttons.append(back_button)
+		_recalculate_seeker_stats(seeker)
+		update_description(seeker)
+		main_text.text = "------------------------"
+		main_text.text += "\nSeeker Name: " + seeker.title
+		main_text.text += "\nHP: " + str(seeker.stamina) + "/" + str(seeker.max_stamina)
+		main_text.text += "\nLust: " + str(seeker.lust) + "/" + str(seeker.max_lust)
+		main_text.text += "\n"
+		main_text.text += "\nStrength: " + str(seeker.strength)
+		main_text.text += "\nAgility: " + str(seeker.agility)
+		main_text.text += "\nDurability: " + str(seeker.durability)
+		main_text.text += "\nIntelligence: " + str(seeker.intelligence)
+		main_text.text += "\nWill: " + str(seeker.will)
+		main_text.text += "\nThreat: " + str(seeker.threat)
+		main_text.text += "\n"
+		main_text.text += "\nSkills: " + str(seeker.skills)
+		main_text.text += "\nQuirks: " + str(seeker.quirks)
+		main_text.text += "\nFetishes: " + str(seeker.fetishes)
+		main_text.text += "\n"
+		main_text.text += "\nDescription: " + seeker.description
+		main_text.text += "\n"
+		main_text.text += "\nWeapon: " + seeker.weapon
+		main_text.text += "\nArmor: " + seeker.armor
+		main_text.text += "\n------------------------"
+		unequip_armor_button.hide()
+		#back to roster function should help here
+		#do inventory here
+	elif overconfident == true and seeker.armor != "Naked":
+		unequip_armor_button.text = "Give Armor"
+		armor_armory.append(seeker.armor)
+		_unequip_item_skills(seeker)
+		seeker.armor = "Naked"
+		apply_equipment(seeker)
+		_recalculate_seeker_stats(seeker)
+		update_description(seeker)
+		main_text.text = "------------------------"
+		main_text.text += "\nSeeker Name: " + seeker.title
+		main_text.text += "\nHP: " + str(seeker.stamina) + "/" + str(seeker.max_stamina)
+		main_text.text += "\nLust: " + str(seeker.lust) + "/" + str(seeker.max_lust)
+		main_text.text += "\n"
+		main_text.text += "\nStrength: " + str(seeker.strength)
+		main_text.text += "\nAgility: " + str(seeker.agility)
+		main_text.text += "\nDurability: " + str(seeker.durability)
+		main_text.text += "\nIntelligence: " + str(seeker.intelligence)
+		main_text.text += "\nWill: " + str(seeker.will)
+		main_text.text += "\nThreat: " + str(seeker.threat)
+		main_text.text += "\n"
+		main_text.text += "\nSkills: " + str(seeker.skills)
+		main_text.text += "\nQuirks: " + str(seeker.quirks)
+		main_text.text += "\nFetishes: " + str(seeker.fetishes)
+		main_text.text += "\n"
+		main_text.text += "\nDescription: " + seeker.description
+		main_text.text += "\n"
+		main_text.text += "\nWeapon: " + seeker.weapon
+		main_text.text += "\nArmor: " + seeker.armor
+		main_text.text += "\n------------------------"
+		#have corruption diffent text and a couple randoms, for example high corruption: You're right i don't need a weapon to finish my enemies, or with fetishes maso: Hmm i'll be a walking training dummy~
+		main_text.text += "\n\n" + str(seeker.title) + ": Don't forget to pick your jaw off the floor once you're done staring at my perfect body."
+	else:
+		main_text.text += "\n\n" + str(seeker.title) + ": No, you just want to watch me strip, perv."
+		unequip_armor_button.hide()
 
 
+func _on_unequip_weapon_pressed_depart(seeker, unequip_weapon_button):
+	var overconfident = false
+	for i in seeker.quirks:
+		match i:
+			"Overconfident":
+				overconfident = true
+	if seeker.weapon == "Unarmed":
+		clear_seeker_buttons()
+		for weapun in armory:
+			var weapon_button = Button.new()
+			weapon_button.text = weapun
+			button_container.add_child(weapon_button)
+			weapon_button.pressed.connect(Callable(self, "equip_weapon_departing").bind(seeker,weapun))
+			left_buttons.append(weapon_button)
+		var back_button = Button.new()
+		back_button.text = "Back"
+		button_container.add_child(back_button)
+		back_button.pressed.connect(Callable(self, "_inspect_departing").bind(seeker))
+		left_buttons.append(back_button)
+		update_description(seeker)
+		main_text.text = "------------------------"
+		main_text.text += "\nSeeker Name: " + seeker.title
+		main_text.text += "\nHP: " + str(seeker.stamina) + "/" + str(seeker.max_stamina)
+		main_text.text += "\nLust: " + str(seeker.lust) + "/" + str(seeker.max_lust)
+		main_text.text += "\n"
+		main_text.text += "\nStrength: " + str(seeker.strength)
+		main_text.text += "\nAgility: " + str(seeker.agility)
+		main_text.text += "\nDurability: " + str(seeker.durability)
+		main_text.text += "\nIntelligence: " + str(seeker.intelligence)
+		main_text.text += "\nWill: " + str(seeker.will)
+		main_text.text += "\nThreat: " + str(seeker.threat)
+		main_text.text += "\n"
+		main_text.text += "\nSkills: " + str(seeker.skills)
+		main_text.text += "\nQuirks: " + str(seeker.quirks)
+		main_text.text += "\nFetishes: " + str(seeker.fetishes)
+		main_text.text += "\n"
+		main_text.text += "\nDescription: " + seeker.description
+		main_text.text += "\n"
+		main_text.text += "\nWeapon: " + seeker.weapon
+		main_text.text += "\nArmor: " + seeker.armor
+		main_text.text += "\n------------------------"
+		unequip_weapon_button.hide()
+		#back to roster function should help here
+		#do inventory here
+	elif overconfident == true and seeker.weapon != "Unarmed":
+		unequip_weapon_button.text = "Give Weapon"
+		armory.append(seeker.weapon)
+		_unequip_item_skills(seeker)
+		seeker.weapon = "Unarmed"
+		apply_equipment(seeker)
+		_recalculate_seeker_stats(seeker)
+		update_description(seeker)
+		main_text.text = "------------------------"
+		main_text.text += "\nSeeker Name: " + seeker.title
+		main_text.text += "\nHP: " + str(seeker.stamina) + "/" + str(seeker.max_stamina)
+		main_text.text += "\nLust: " + str(seeker.lust) + "/" + str(seeker.max_lust)
+		main_text.text += "\n"
+		main_text.text += "\nStrength: " + str(seeker.strength)
+		main_text.text += "\nAgility: " + str(seeker.agility)
+		main_text.text += "\nDurability: " + str(seeker.durability)
+		main_text.text += "\nIntelligence: " + str(seeker.intelligence)
+		main_text.text += "\nWill: " + str(seeker.will)
+		main_text.text += "\nThreat: " + str(seeker.threat)
+		main_text.text += "\n"
+		main_text.text += "\nSkills: " + str(seeker.skills)
+		main_text.text += "\nQuirks: " + str(seeker.quirks)
+		main_text.text += "\nFetishes: " + str(seeker.fetishes)
+		main_text.text += "\n"
+		main_text.text += "\nDescription: " + seeker.description
+		main_text.text += "\n"
+		main_text.text += "\nWeapon: " + seeker.weapon
+		main_text.text += "\nArmor: " + seeker.armor
+		main_text.text += "\n------------------------"
+		#have corruption diffent text and a couple randoms, for example high corruption: You're right i don't need a weapon to finish my enemies, or with fetishes maso: Hmm i'll be a walking training dummy~
+		main_text.text += "\n\n" + str(seeker.title) + ": Sure take it, I don't even need a weapon to be victorious."
+	else:
+		main_text.text += "\n\n" + str(seeker.title) + ": There is no way I'm letting you take my weapon."
+		unequip_weapon_button.hide()
 
+func equip_weapon_departing(seeker, weapun):
+	_unequip_item_skills(seeker)
+	seeker.weapon = weapun
+	armory.erase(weapun)
+	apply_equipment(seeker)
+	update_description(seeker)
+	_recalculate_seeker_stats(seeker)
+	main_text.text = "------------------------"
+	main_text.text += "\nSeeker Name: " + seeker.title
+	main_text.text += "\nHP: " + str(seeker.stamina) + "/" + str(seeker.max_stamina)
+	main_text.text += "\nLust: " + str(seeker.lust) + "/" + str(seeker.max_lust)
+	main_text.text += "\n"
+	main_text.text += "\nStrength: " + str(seeker.strength)
+	main_text.text += "\nAgility: " + str(seeker.agility)
+	main_text.text += "\nDurability: " + str(seeker.durability)
+	main_text.text += "\nIntelligence: " + str(seeker.intelligence)
+	main_text.text += "\nWill: " + str(seeker.will)
+	main_text.text += "\nThreat: " + str(seeker.threat)
+	main_text.text += "\n"
+	main_text.text += "\nSkills: " + str(seeker.skills)
+	main_text.text += "\nQuirks: " + str(seeker.quirks)
+	main_text.text += "\nFetishes: " + str(seeker.fetishes)
+	main_text.text += "\n"
+	main_text.text += "\nDescription: " + seeker.description
+	main_text.text += "\n"
+	main_text.text += "\nWeapon: " + seeker.weapon
+	main_text.text += "\nArmor: " + seeker.armor
+	main_text.text += "\n------------------------"
+	clear_seeker_buttons()
+	_inspect_departing(seeker)
+
+func equip_armor_departing(seeker, armori):
+	_unequip_item_skills(seeker)
+	seeker.armor = armori
+	armor_armory.erase(armori)
+	apply_equipment(seeker)
+	update_description(seeker)
+	_recalculate_seeker_stats(seeker)
+	main_text.text = "------------------------"
+	main_text.text += "\nSeeker Name: " + seeker.title
+	main_text.text += "\nHP: " + str(seeker.stamina) + "/" + str(seeker.max_stamina)
+	main_text.text += "\nLust: " + str(seeker.lust) + "/" + str(seeker.max_lust)
+	main_text.text += "\n"
+	main_text.text += "\nStrength: " + str(seeker.strength)
+	main_text.text += "\nAgility: " + str(seeker.agility)
+	main_text.text += "\nDurability: " + str(seeker.durability)
+	main_text.text += "\nIntelligence: " + str(seeker.intelligence)
+	main_text.text += "\nWill: " + str(seeker.will)
+	main_text.text += "\nThreat: " + str(seeker.threat)
+	main_text.text += "\n"
+	main_text.text += "\nSkills: " + str(seeker.skills)
+	main_text.text += "\nQuirks: " + str(seeker.quirks)
+	main_text.text += "\nFetishes: " + str(seeker.fetishes)
+	main_text.text += "\n"
+	main_text.text += "\nDescription: " + seeker.description
+	main_text.text += "\n"
+	main_text.text += "\nWeapon: " + seeker.weapon
+	main_text.text += "\nArmor: " + seeker.armor
+	main_text.text += "\n------------------------"
+	clear_seeker_buttons()
+	_inspect_departing(seeker)
 
 
 
