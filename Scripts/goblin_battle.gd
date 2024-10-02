@@ -25,6 +25,7 @@ var current_turn = 0
 var seeker_turn = false
 var show_intia = true
 var available_skills = []
+var active_turn
 func _init():
 	self.title = ""
 	self.hp = randi_range(400,600)
@@ -132,8 +133,7 @@ func process_turns():
 			#in_combat.erase(participant)
 		else:  
 			global.main_text.text += str(participant.title) + " acts."
-			print(active_seekers)
-			print(knocked_down_seekers)
+			active_turn = participant
 			if participant in active_seekers:
 				player_turn(participant)
 			if participant in knocked_down_seekers:
@@ -287,8 +287,6 @@ func player_turn(participant):
 	global.clear_seeker_buttons()
 	inspect_current_text = global.main_text.text
 	#if sex in status do that instead of regular turn
-	print("skill objects")
-	print(participant.skill_objects)
 	for ability in participant.skill_objects:
 		var skill_button = Button.new()
 		skill_button.text = ability.title  # 'ability' is a string representing the skill name
@@ -485,7 +483,7 @@ func skill_logic(ability, seeker, target):
 func end_round():
 	global.main_text.text += "\n------------------------\n"
 	if knocked_down_seekers.size() == 0:
-		swarm_stats.heat += randi_range(1,5)
+		swarm_stats.heat += randi_range(3,8)
 	for seeker in active_seekers:
 		var current_seeker = seeker
 		for status in seeker.status:
@@ -519,8 +517,15 @@ func end_round():
 
 
 func skill_info(seeker, skill_info_button):
+	global.clear_seeker_buttons()
 	var current_text = global.main_text.text
 	global.button_container.remove_child(skill_info_button)
+	for ability in seeker.skill_objects:
+		var skill_button = Button.new()
+		skill_button.text = ability.title  # 'ability' is a string representing the skill name
+		global.button_container.add_child(skill_button)
+		skill_button.pressed.connect(Callable(self, "_perform_skill").bind(ability, seeker))
+		global.left_buttons.append(skill_button)
 	var back_button = Button.new()
 	back_button.text = "Back"
 	global.button_container.add_child(back_button)
@@ -568,6 +573,7 @@ func skip_turn(seeker):
 	process_turns()
 
 func back_to_skill_select(seeker,current_text, back_button):
+	seeker = active_turn
 	global.main_text.text = current_text
 	global.button_container.remove_child(back_button)
 	player_turn(seeker)
@@ -634,59 +640,59 @@ func knocked_down_seeker_turn(seeker):
 		print(skill_check_1)
 		match skill_check_1:
 			"Push Away":
-				if seeker.strength >= skill_check_roll_1:
-					success_points += 1
-					global.main_text.text += "A a bunch goblins dive onto " + str(seeker.title) + " and grab hold to restrain her they are quickly tossed and shaken off as she struggles free."
-				elif seeker.strength >= skill_check_roll_1 * 1.5:
+				if seeker.strength >= skill_check_roll_1 * 1.5:
 					success_points += 2
+					global.main_text.text += "A a bunch goblins dive onto " + str(seeker.title) + " and grab hold to restrain her they are quickly tossed and shaken off as she struggles free."
+				elif seeker.strength >= skill_check_roll_1:
+					success_points += 1
 					global.main_text.text += "A a bunch goblins dive onto " + str(seeker.title) + " and grab hold to restrain her they are quickly tossed and shaken off as she struggles free."
 				else: 
 					seeker.lust +=  3
 					#maybe have restraint loving memory and fetish, also rape fantasy. where they don't resist
 					global.main_text.text += "A a bunch goblins dive onto " + str(seeker.title) + " and grab hold and restrain her. She bucks wildly unable to free herself from their grasp as the goblins prepare for the next step."
 			"Scramble":
-				if seeker.agility >= skill_check_roll_1:
-					success_points += 1
-					global.main_text.text += str(seeker.title) + " attempts to scramble out of the group of goblins and succeeds, crawling away from being surrounded."
-				elif seeker.agility >= skill_check_roll_1 * 1.5:
+				if seeker.agility >= skill_check_roll_1 * 1.5:
 					success_points += 2
 					global.main_text.text += str(seeker.title) + " attempts to scramble out of the group of goblins and fully succeeds, able to stand up and get ready for their next move."
+				elif seeker.agility >= skill_check_roll_1:
+					success_points += 1
+					global.main_text.text += str(seeker.title) + " attempts to scramble out of the group of goblins and succeeds, crawling away from being surrounded, but the goblins follow her movements."
 				else: 
 					swarm_stats.heat += 3
 					#maybe have restraint loving memory and fetish, also rape fantasy. where they don't resist
 					global.main_text.text += str(seeker.title) + " attempts to scramble out of the group of goblins and succeeds, until a goblin catches her legs and pulls her back into the group's centre."
 			"Outlast":
-				if seeker.durability >= skill_check_roll_1:
+				if seeker.durability >= skill_check_roll_1 * 1.5:
+					success_points += 2
+					global.main_text.text += str(seeker.title) + " starts kissing and carressing the goblins as they do the same to her. she notices shes draining the nearby goblin's strength like a succubus and takes the opportunity to simply get up and leave."
+				elif seeker.durability >= skill_check_roll_1:
 					seeker.lust +=  1
 					success_points += 1
 					global.main_text.text += str(seeker.title) + " starts kissing and carressing the goblins as they do the same to her. At this rate though she should be able to find an oppening when the goblins tire."
-				elif seeker.durability >= skill_check_roll_1 * 1.5:
-					success_points += 2
-					global.main_text.text += str(seeker.title) + " starts kissing and carressing the goblins as they do the same to her. she notices shes draining the nearby goblin's strength like a succubus and takes the opportunity to simply get up and leave."
 				else: 
 					seeker.lust +=  5
 					#maybe have restraint loving memory and fetish, also rape fantasy. where they don't resist
 					global.main_text.text += str(seeker.title) + " starts kissing and carressing the goblins as they do the same to her, her plan is to tire out the goblins to give herself an opportunity to escape. Unfortunately for her, her plan back fires as she archs her back and squirts to the goblins agressive and energetic forplay."
 			"Distract":
-				if seeker.intelligence >= skill_check_roll_1:
+				if seeker.intelligence >= skill_check_roll_1 * 1.5:
+					success_points += 2
+					global.main_text.text += str(seeker.title) + " starts by distract the goblins with her body and eroticism to give herself room to atleast stand up. She strikes poses and talks suggestively about how hot she feels by being watched. The goblins masturbate to her performance which goes on long enough for her to pose standing and when she asks for the goblins to close their eyes to recieve thier gift, she bolts out of there."
+				elif seeker.intelligence >= skill_check_roll_1:
 					seeker.lust +=  1
 					success_points += 1
 					global.main_text.text += str(seeker.title) + " distracts the goblins with her body and eroticism with the aim to give herself room to atleast stand up. She strikes poses and talks suggestively about how hot she feels by being watched. The goblins masturbate to her performance but it's not enough to find an escape route."
-				elif seeker.intelligence >= skill_check_roll_1 * 1.5:
-					success_points += 2
-					global.main_text.text += str(seeker.title) + " starts by distract the goblins with her body and eroticism to give herself room to atleast stand up. She strikes poses and talks suggestively about how hot she feels by being watched. The goblins masturbate to her performance which goes on long enough for her to pose standing and when she asks for the goblins to close their eyes to recieve thier gift, she bolts out of there."
 				else: 
 					seeker.lust +=  5
 					#maybe have restraint loving memory and fetish, also rape fantasy. where they don't resist
 					global.main_text.text += str(seeker.title) + " starts to distract the goblins with her body and eroticism in order to give herself room to atleast stand up. but it backfires she is quickly assualted by the goblins which start rubbing their meat against her, begging her to jerk them off."
 			"Cover up":
-				if seeker.intelligence >= skill_check_roll_1:
+				if seeker.intelligence >= skill_check_roll_1 * 1.5:
+					success_points += 2
+					global.main_text.text += str(seeker.title) + " covers up her erotic body causing the goblins to jeer and get slightly bored with how stingy shes being. They quickly lose interest and " + str(seeker.title) + " gladly takes the opportunity to sneak away."
+				elif seeker.intelligence >= skill_check_roll_1:
 					seeker.lust +=  1
 					success_points += 1
 					global.main_text.text += str(seeker.title) + " covers up her erotic body causing the goblins to jeer and get slightly bored with how stingy shes being. If they let their guard down just a tiny bit more she'll be able to escape."
-				elif seeker.intelligence >= skill_check_roll_1 * 1.5:
-					success_points += 2
-					global.main_text.text += str(seeker.title) + " covers up her erotic body causing the goblins to jeer and get slightly bored with how stingy shes being. They quickly lose interest and " + str(seeker.title) + " gladly takes the opportunity to sneak away."
 				else: 
 					swarm_stats.heat += 3
 					#maybe have restraint loving memory and fetish, also rape fantasy. where they don't resist
@@ -696,59 +702,59 @@ func knocked_down_seeker_turn(seeker):
 			print(skill_check_1)
 			match skill_check_2:
 				"Push Away":
-					if seeker.strength >= skill_check_roll_1:
-						success_points += 1
-						global.main_text.text += "A a bunch goblins dive onto " + str(seeker.title) + " and grab hold to restrain her they are quickly tossed and shaken off as she struggles free."
-					elif seeker.strength >= skill_check_roll_1 * 1.5:
+					if seeker.strength >= skill_check_roll_1 * 1.5:
 						success_points += 2
 						global.main_text.text += "A a bunch goblins dive onto " + str(seeker.title) + " and grab hold to restrain her they are quickly tossed and shaken off as she struggles free and stands up."
+					elif seeker.strength >= skill_check_roll_1:
+						success_points += 1
+						global.main_text.text += "A a bunch goblins dive onto " + str(seeker.title) + " and grab hold to restrain her they are quickly tossed and shaken off as she struggles free."
 					else: 
 						seeker.lust +=  3
 						#maybe have restraint loving memory and fetish, also rape fantasy. where they don't resist
 						global.main_text.text += "A a bunch goblins dive onto " + str(seeker.title) + " and grab hold and restrain her. She bucks wildly unable to free herself from their grasp as the goblins prepare for the next step."
 				"Scramble":
-					if seeker.agility >= skill_check_roll_1:
-						success_points += 1
-						global.main_text.text += str(seeker.title) + " attempts to scramble out of the group of goblins and succeeds, crawling away from being surrounded."
-					elif seeker.agility >= skill_check_roll_1 * 1.5:
+					if seeker.agility >= skill_check_roll_1 * 1.5:
 						success_points += 2
 						global.main_text.text += str(seeker.title) + " attempts to scramble out of the group of goblins and fully succeeds, able to stand up and get ready for their next move."
+					elif seeker.agility >= skill_check_roll_1:
+						success_points += 1
+						global.main_text.text += str(seeker.title) + " attempts to scramble out of the group of goblins and succeeds, crawling away from being surrounded but the goblins follow close behind."
 					else: 
 						swarm_stats.heat += 3
 						#maybe have restraint loving memory and fetish, also rape fantasy. where they don't resist
 						global.main_text.text += str(seeker.title) + " attempts to scramble out of the group of goblins and succeeds, until a goblin catches her legs and pulls her back into the group's centre."
 				"Outlast":
-					if seeker.durability >= skill_check_roll_1:
+					if seeker.durability >= skill_check_roll_1 * 1.5:
+						success_points += 2
+						global.main_text.text += str(seeker.title) + " starts kissing and carressing the goblins as they do the same to her. she notices shes draining the nearby goblin's strength like a succubus and takes the opportunity to simply get up and leave."
+					elif seeker.durability >= skill_check_roll_1:
 						seeker.lust +=  1
 						success_points += 1
 						global.main_text.text += str(seeker.title) + " starts kissing and carressing the goblins as they do the same to her. At this rate though she should be able to find an oppening when the goblins tire."
-					elif seeker.durability >= skill_check_roll_1 * 1.5:
-						success_points += 2
-						global.main_text.text += str(seeker.title) + " starts kissing and carressing the goblins as they do the same to her. she notices shes draining the nearby goblin's strength like a succubus and takes the opportunity to simply get up and leave."
 					else: 
 						seeker.lust +=  5
 						#maybe have restraint loving memory and fetish, also rape fantasy. where they don't resist
 						global.main_text.text += str(seeker.title) + " starts kissing and carressing the goblins as they do the same to her, her plan is to tire out the goblins to give herself an opportunity to escape. Unfortunately for her, her plan back fires as she archs her back and squirts to the goblins agressive and energetic forplay."
 				"Distract":
-					if seeker.intelligence >= skill_check_roll_1:
+					if seeker.intelligence >= skill_check_roll_1 * 1.5:
+						success_points += 2
+						global.main_text.text += str(seeker.title) + " starts by distract the goblins with her body and eroticism to give herself room to atleast stand up. She strikes poses and talks suggestively about how hot she feels by being watched. The goblins masturbate to her performance which goes on long enough for her to pose standing and when she asks for the goblins to close their eyes to recieve thier gift, she bolts out of there."
+					elif seeker.intelligence >= skill_check_roll_1:
 						seeker.lust +=  1
 						success_points += 1
 						global.main_text.text += str(seeker.title) + " distracts the goblins with her body and eroticism with the aim to give herself room to atleast stand up. She strikes poses and talks suggestively about how hot she feels by being watched. The goblins masturbate to her performance giving her a chance to find a way to escape."
-					elif seeker.intelligence >= skill_check_roll_1 * 1.5:
-						success_points += 2
-						global.main_text.text += str(seeker.title) + " starts by distract the goblins with her body and eroticism to give herself room to atleast stand up. She strikes poses and talks suggestively about how hot she feels by being watched. The goblins masturbate to her performance which goes on long enough for her to pose standing and when she asks for the goblins to close their eyes to recieve thier gift, she bolts out of there."
 					else: 
 						seeker.lust +=  5
 						#maybe have restraint loving memory and fetish, also rape fantasy. where they don't resist
 						global.main_text.text += str(seeker.title) + " starts to distract the goblins with her body and eroticism in order to give herself room to atleast stand up. but it backfires she is quickly assualted by the goblins which start rubbing their meat against her, begging her to jerk them off."
 				"Cover up":
-					if seeker.intelligence >= skill_check_roll_1:
+					if seeker.intelligence >= skill_check_roll_1 * 1.5:
+						success_points += 2
+						global.main_text.text += str(seeker.title) + " covers up her erotic body causing the goblins to jeer and get slightly bored with how stingy shes being. They quickly lose interest and " + str(seeker.title) + " gladly takes the opportunity to sneak away."
+					elif seeker.intelligence >= skill_check_roll_1:
 						seeker.lust +=  1
 						success_points += 1
 						global.main_text.text += str(seeker.title) + " covers up her erotic body causing the goblins to jeer and get slightly bored with how stingy shes being. If they let their guard down just a tiny bit more she'll be able to escape."
-					elif seeker.intelligence >= skill_check_roll_1 * 1.5:
-						success_points += 2
-						global.main_text.text += str(seeker.title) + " covers up her erotic body causing the goblins to jeer and get slightly bored with how stingy shes being. They quickly lose interest and " + str(seeker.title) + " gladly takes the opportunity to sneak away."
 					else: 
 						swarm_stats.heat += 3
 						#maybe have restraint loving memory and fetish, also rape fantasy. where they don't resist
