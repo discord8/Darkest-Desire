@@ -82,9 +82,9 @@ var oral_fetish = []
 var breasts_fetish = []
 var paras
 var names = ["Lilica", "Vex", "Lara", "Tilly", "Mili", "Isabell", "Ivy", "Melody", "Melissa", "Anna", "Dorathy", "Jess", "Mika", "Eda", "Stacy", "Trish", "Stephanie", "Linda", "Molly", "Mandy", "Dakota", "Iyo", "Kairi", "Nia", "Peyton", "Yera", "Triena", "Aath", "Miu", "Mikan", "Tsumiki", "Miku", "Fili", "Sage", "Evelyn", "Lucy", "Emma", "Terial", "Lyra", "Titiana", "Nip", "Sarah", "Sara", "Mimi", "Octavia", "Corin", "Gigi", "Mandy", "Rose", "Liv", "Rhea", "Jasmine", "Piper", "Dove", "Jade", "Ingrid", "Umi", "Tori", "Cindy", "Velvet", "Mariah", "Tessa", "Tess", "Daphney", "Dora", "Zelda", "Hitomi", "Seras", "Ava", "Olivia", "Sophie", "Amelia", "Mary", "Isabella", "Victoria", "Charlotte", "Luna", "Mia", "Kalifa", "Lana", "Amber", "Gianna", "Annie", "Nora", "Layla", "Lilly", "Nikki", "Aoi", "Lulu", "Mami", "Hazel", "Madi", "Isla", "Willow", "Zoe", "Grace", "Ivy", "Naomi", "Maya", "Alice", "Sadie", "Hailey", "Aubrey", "Skye", "Vivian", "Eve", "Freya", "Amara", "Chel", "Catalina", "Ashley", "Chloe", "Faith", "Kimberly", "Taylor", "Sutton", "Vera", "Kaia", "Lilly", "Selena", "Aubrey", "Nyla", "Lia", "Kiara", "Elise", "Hope", "Lola", "Lilith", "Ophelia", "Dahlia", "Blair", "Celeste", "Rebecca", "Nina", "Trinity", "Vanessa", "Camilla", "Adrianna", "Celine", "Lucianna", "Reign", "Cali", "Viviana", "Serena", "Destiny", "Elle", "Veronica", "Azaela", "Raya", "Raven", "Scarlet", "Sylvie", "Lexi", "Ryn", "Carmen", "Alison", "Felicity", "Katalina", "Zariah", "Mira", "Jolene", "Emelia", "Bonnie", "Briar", "Leona", "Lina", "Remy", "Mina", "Mili", "Selene", "Angie", "Flora", "Violet", "Aya", "Ramona", "Bridget", "Mercy", "Paula", "Baylor", "Marianna", "Loretta", "Gwen", "Robin", "Katelyn", "Tiffany", "Lexie", "Kahlani"]
-var all_weapons =["Twin Daggers", "Crossbow", "Flintlock", "Arcane Wand", "Animated Spellbook", "Broad Sword", "Battle Axes", "Great Club"]
+var all_weapons =["Twin Daggers", "Crossbow", "Flintlock", "Arcane Wand", "Bound Tome", "Broad Sword", "Battle Axes", "Great Club"]
 var all_armors = ["Graceful Robes", "Bikini Armor", "Dancer's Silk", "Holy Garb", "Fantasy Fullplate", "Skimpy Streetrat"]
-var starter_weapons = ["Twin Daggers", "Crossbow", "Animated Spellbook", "Great Club"]
+var starter_weapons = ["Twin Daggers", "Crossbow", "Bound Tome", "Great Club"]
 var starter_armors = ["Graceful Robes", "Bikini Armor", "Skimpy Streetrat"]
 # uprgrade vars
 var fetish_cap = 0 #put at fetish generation, go up by 1 per level
@@ -344,11 +344,11 @@ func apply_equipment(seeker):
 			seeker.skill_objects.append(Skill.new("Distracting Strike",true, true, false, false, 2 + seeker.agility * 0.3 + seeker.strength * 0.2, 0, 0,[""], "Slashing", false, false, 1, "A light attack that allows you to quickly hide after the strike.", 5 + seeker.intelligence * 0.4, 1.5, 2, false, false, false, false, true ))
 			seeker.skills.append("Distracting Strike") #damage based on intelligence)
 		"Crossbow": #agility will power, average stats, extra skill
-			seeker.skill_objects.append(Skill.new("Singular Shot",true, true, false, false, 6 + seeker.agility * 0.4 + seeker.will * 0.4, 0, 0,[""], "Piercing", true, false, 1, "A powerful bolt that takes a moment to fire again.", 1 + seeker.intelligence * 0.2, 1.5, 1, false, false, false, false, false ))
+			seeker.skill_objects.append(Skill.new("Singular Shot",true, true, false, false, 6 + seeker.agility * 0.5 + seeker.will * 0.5, 0, 0,[""], "Piercing", true, false, 1, "A powerful bolt that takes a moment to fire again.", 1 + seeker.intelligence * 0.2, 1.5, 1, false, false, false, false, false ))
 			seeker.skills.append("Singular Shot") #strong bolt, 1 turn cooldown
 			seeker.skill_objects.append(Skill.new("Vault",false, false, false, true, 15, 0, 0,["Vault"], "", false, false, 1, "Increases agility and lowers threat.", 0, 0, 1, false, false, false, false, true ))
 			seeker.skills.append("Vault") #lower threat increase speed and agility, reloads
-			seeker.skill_objects.append(Skill.new("Napalm Bolt",true, true, false, false, 2 + seeker.agility * 0.2 + seeker.will * 0.3, 0, 0,["Burn"], "Fire", true, true, 1, "Shot a mortar like bolt that rains fire down onto the battlefield", 1 + seeker.intelligence, 1.2, 0, true, false, true, false, false))
+			seeker.skill_objects.append(Skill.new("Napalm Bolt",true, true, false, false, 6 + seeker.agility * 0.2 + seeker.will * 0.3, 0, 0,["Burn"], "Fire", true, true, 1, "Shot a mortar like bolt that rains fire down onto the battlefield", 1 + seeker.intelligence, 1.2, 0, true, false, true, false, false))
 			seeker.skills.append("Focus Impact") #increases dasmage by will, add to each Crossbow attack
 			seeker.skills.append("Napalm Bolt") #aoe burn
 			seeker.skill_objects.append(Skill.new("Inspire",false, false, true, false, 1 + seeker.will * 0.6, 0, 0,[""], "", true, false, 1, "Inspire allies using your will to regain stamina and keep pushing forward.", 1 + seeker.intelligence, 1.5, 1, false, false, false, false, false))
@@ -363,13 +363,13 @@ func apply_equipment(seeker):
 			seeker.skills.append("Runed Recovery") #lower lust and raise stamina slightly
 			seeker.skills.append("Electric Arc") #hit multiple apply shock
 			seeker.skills.append("Dispel Magic") #remove buffs or debuffs, interacts intelligenceh some curios
-		"Animated Spellbook":
-			seeker.skill_objects.append(Skill.new("Warding Words",false, false, true, false, 0, 0, 0,["Warded"], "Arcane", true, false, 1, "create a barrier that stops all harm, though the energy promotes desire.", 0, 0, 2, false, false, false, false, false ))
+		"Bound Tome":
+			seeker.skill_objects.append(Skill.new("Warding Words",false, false, true, true, 5 + seeker.intelligence * 0.3 + seeker.lust * 0.6, 0, 0,["Warded"], "Arcane", true, false, 1, "create a barrier that stops all harm, though the energy promotes desire.", 0, 0, 0, true, false, false, false, false ))
 			seeker.skills.append("Warding Words") #add a barrier to stamina and lust
-			seeker.skill_objects.append(Skill.new("Daemonic Advance",true, false, false, false, 1 + seeker.intelligence * 0.4 + seeker.will * 0.4, 0, 10,[""], "Arcane", true, false, 1, "Summon the power of abadon to flay your foes, harnessing their enegy has spicy consequences.", 1 + seeker.intelligence, 1.5, 0, false, false, false, false, false ))
+			seeker.skill_objects.append(Skill.new("Daemonic Advance",false, true, false, false, 1 + seeker.intelligence * 0.3 + seeker.lust * 0.5, 0, 10,[""], "Arcane", true, true, 1, "Summon the power of abadon to flay your foes, harnessing their enegy has spicy consequences.", 1 + seeker.intelligence, 1.5, 0, false, false, false, false, false ))
 			seeker.skills.append("Daemonic Advance") #attack opponent based on will and intelligence
-			seeker.skill_objects.append(Skill.new("Echo of Ruin",true, false, false, false, 1 + seeker.lust * 0.4, 0, 10,[""], "Arcane", true, true, 1, "uses your lust as a conduit to burst outwards.", 1 + seeker.intelligence, 1.5, 1, false, true, false, false, false ))
-			seeker.skills.append("Echo of ruin") #deal damage porpotinate to missing hp of enemy
+			seeker.skill_objects.append(Skill.new("Echo of Ruin",false, true, false, false, 1 + seeker.intelligence * 0.2 + seeker.lust * 0.7, 0, 10,[""], "Arcane", true, true, 1, "uses your lust as a conduit to burst outwards.", 1 + seeker.intelligence, 1.5, 1, false, true, false, false, false ))
+			seeker.skills.append("Echo of Ruin") #deal damage porpotinate to missing hp of enemy
 			seeker.skills.append("Whispers of Venus") # gain lust or stamina at the end of the round
 		"Broad Sword": #strength and will
 			seeker.skills.append("Size up") #raise threat, barrier, strength
@@ -383,8 +383,8 @@ func apply_equipment(seeker):
 			seeker.skills.append("Reckless Charge") #knock opponent prone
 		"Great Club":
 			seeker.skills.append("Clang!") #heavy attack
-			seeker.skill_objects.append(Skill.new("Clang!",true, true, false, false, 10 + seeker.strength* 0.3 + seeker.durability * 0.1, 0, 0,[""], "Bludgeoning", false, false, 1, "Big weapon go bonk!.", 5 + seeker.intelligence * 0.4, 2.0, 0, false, false, false, false, true ))
-			seeker.skills.append("Colossal weapon") #High threat, low speed
+			seeker.skill_objects.append(Skill.new("Clang!",true, true, false, false, 10 + seeker.strength* 0.5 + seeker.durability * 0.2, 0, 0,[""], "Bludgeoning", false, false, 1, "Big weapon go bonk!.", 5 + seeker.intelligence * 0.4, 2.0, 0, false, false, false, false, true ))
+			seeker.skills.append("Colossal Weapon") #High threat, low speed
 		"Long Spear": #drawing a blank right now
 			seeker.skills.append("Jab Thrust") #ignore barrier increase agaility
 			seeker.skills.append("")
@@ -439,7 +439,7 @@ func apply_equipment(seeker):
 			"Excellence of Execution":
 				seeker.strength += 3
 				seeker.intelligence += 3
-			"Colossal weapon":
+			"Colossal Weapon":
 				seeker.threat += 6
 				seeker.strength += 6
 				seeker.agility -= 6
@@ -474,7 +474,7 @@ func _unequip_item_skills(seeker):
 			"Excellence of Execution":
 				seeker.strength -= 3
 				seeker.intelligence -= 3
-			"Colossal weapon":
+			"Colossal Weapon":
 				seeker.threat -= 6
 				seeker.strength -= 6
 				seeker.agility += 3
@@ -507,13 +507,13 @@ func _unequip_item_skills(seeker):
 			seeker.skills.erase("Runed Recovery") #lower lust and raise stamina slightly
 			seeker.skills.erase("Electric Arc") #hit multiple apply shock
 			seeker.skills.erase("Dispel Magic") #remove buffs or debuffs, interacts intelligenceh some curios
-		"Animated Spellbook":
+		"Bound Tome":
 			seeker.skill_objects.erase(Skill.new("Warding Words",false, false, true, false, 0, 0, 0,["Warded"], "Arcane", true, false, 1, "create a barrier that stops all harm, though the energy promotes desire.", 0, 0, 2, false, false, false, false, false ))
 			seeker.skills.erase("Warding Words") #add a barrier to stamina and lust
 			seeker.skill_objects.erase(Skill.new("Daemonic Advance",true, false, false, false, 1 + seeker.intelligence * 0.4 + seeker.will * 0.4, 0, 10,[""], "Arcane", true, false, 1, "Summon the power of abadon to flay your foes, harnessing their enegy has spicy consequences.", 1 + seeker.intelligence, 1.5, 0, false, false, false, false, false ))
 			seeker.skills.erase("Daemonic Advance") #attack opponent based on will and intelligence
 			seeker.skill_objects.erase(Skill.new("Echo of Ruin",true, false, false, false, 1 + seeker.lust * 0.4, 0, 10,[""], "Arcane", true, true, 1, "uses your lust as a conduit to burst outwards.", 1 + seeker.intelligence, 1.5, 1, false, true, false, false, false ))
-			seeker.skills.erase("Echo of ruin") #deal damage porpotinate to missing hp of enemy
+			seeker.skills.erase("Echo of Ruin") #deal damage porpotinate to missing hp of enemy
 			seeker.skills.erase("Whispers of Venus") 
 		"Broad Sword": #strength and will
 			seeker.skills.erase("Size up") #raise threat, barrier, strength
@@ -528,7 +528,7 @@ func _unequip_item_skills(seeker):
 		"Great Club":
 			seeker.skills.erase("Clang!") #heavy attack
 			seeker.skill_objects.erase(Skill.new("Clang!",true, true, false, false, 10 + seeker.strength* 0.3 + seeker.durability * 0.1, 0, 0,[""], "Bludgeoning", false, false, 1, "Big weapon go bonk!.", 5 + seeker.intelligence * 0.4, 2.0, 0, false, false, false, false, true ))
-			seeker.skills.erase("Colossal weapon") #High threat, low speed
+			seeker.skills.erase("Colossal Weapon") #High threat, low speed, ignore any enemy resist
 		"Long Spear": #drawing a blank right now
 			seeker.skills.erase("Jab Thrust") #ignore barrier increase agaility
 			seeker.skills.erase("")
