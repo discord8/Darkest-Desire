@@ -119,10 +119,10 @@ func _init():
 	self.quirks = ["Overconfident"]
 	self.skills = [] #names of skills for display
 	self.skill_objects = [] #actual skills
-	self.max_stamina = 10 + durability * 2
+	self.max_stamina = 20 + durability * 2
 	self.stamina = max_stamina
 	self.lust = 0
-	self.max_lust = 10 + will * 2
+	self.max_lust = 20 + will * 2
 	self.status = []
 	self.weapon = weapon_level[randi_range(0,weapon_level.size() - 1)]
 	self.allows_weapon_strip = false
@@ -567,6 +567,7 @@ var main_text: RichTextLabel
 var button_container: VBoxContainer
 var right_button_container: VBoxContainer
 var skills_data
+var cass_pic: TextureRect
 
 func _ready():
 	var current_scene = get_tree().current_scene
@@ -576,6 +577,7 @@ func _ready():
 	button_container = current_scene.get_node("ColorRect_base/VBoxContainer")
 	right_button_container = current_scene.get_node("ColorRect_base/right_side_container")
 	skills_data = "res://Scripts/Skills.gd"
+	cass_pic = get_node("Cass")
 	create_start_buttons()
 	fill_recruits()
 

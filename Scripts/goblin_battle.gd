@@ -29,7 +29,7 @@ var available_skills = []
 var active_turn
 func _init():
 	self.title = ""
-	self.hp = randi_range(400,600)
+	self.hp = randi_range(250,400)
 	self.heat = randi_range(5,10)
 	self.attacks = ["Swarm", "Taunt", "Throw Rock", "Hump", "Club", "Pull hair", "Masturbate", "Bite"]
 	self.opportunity_attacks = ["Ride Mount", "Ejaculate"]
@@ -152,7 +152,9 @@ func process_turns():
 func goblin_turn(participant):
 	var action_choice = randi_range(1,10)
 	global.main_text.text += str(participant.title) + " takes a turn.\n\n"
-	if action_choice >= 3 and swarm_stats.heat >= 20 and knocked_down_seekers.size() >= 1 or action_choice >= 3 and swarm_stats.heat == 0 and knocked_down_seekers.size() >= 1:
+	print(swarm_stats.heat)
+	print("swarm_stats.heat")
+	if action_choice >= 3 and swarm_stats.heat == 20 and knocked_down_seekers.size() >= 1 or action_choice >= 3 and swarm_stats.heat == 0 and knocked_down_seekers.size() >= 1:
 		var index = randi_range(0,knocked_down_seekers.size() - 1)
 		var target = knocked_down_seekers[index]
 		var skill_check = randi_range(0,75) #change
@@ -382,6 +384,8 @@ func skill_logic(ability, seeker, target):
 	#maybe move damage and effects here so that its more modular
 	check_for_crit(ability)
 	swarm_stats.heat += randi_range(1,3) #if high heat they do scarier actions
+	if swarm_stats.heat >= 20:
+		swarm_stats.heat = 20
 	match ability.title:
 		"Clang!":
 			if did_crit == false:
@@ -423,7 +427,7 @@ func skill_logic(ability, seeker, target):
 		"Distracting Strike":
 			if "opportunity" in seeker.status:
 				did_crit = true
-				seeker.status.erase("opportunity")
+				seeker.status.erase("Opportunity")
 			if did_crit == false:
 				damage_done = int(randi_range(1,5) + ability.base_damage * 0.8)
 				global.main_text.text += "\n------------------------\n" + str(seeker.title) + " With an intentionally violent slash a fountain of blood erupts from a slain goblin coating his brothers in crimson. Dealing [color=crimson]" + str(damage_done) + " [/color]damage and distracting the group."
@@ -570,26 +574,34 @@ func end_round():
 				seeker.stamina += 5
 				if seeker.stamina >= seeker.max_stamina:
 					seeker.stamina = seeker.max_stamina
-				global.main_text.text += str(seeker.title) + " regains 5 stamina from her tome's residual energy.\n" + str(seeker.title) + ":\n New Stamina: " + str(seeker.stamina) + "/" + str(seeker.max_stamina)
+				global.main_text.text += str(seeker.title) + " regains 5 stamina from her tome's residual energy.\n" + str(seeker.title) + ":\n New Stamina: " + str(seeker.stamina) + "/" + str(seeker.max_stamina) + "\n"
 			else:
 				
 				seeker.lust += 5
 				if seeker.lust >= seeker.max_lust:
 					seeker.lust = seeker.max_lust
-				global.main_text.text += str(seeker.title) + " notices her tome whispers in a cacophony of unknown words, suddenly she feels her desire florish and her body to heat up. Gaining 5 lust.\n" + str(seeker.title) + ":\n New Lust: " + str(seeker.lust) + "/" + str(seeker.max_lust)
+				global.main_text.text += str(seeker.title) + " notices her tome whispers in a cacophony of unknown words, suddenly she feels her desire florish and her body to heat up. Gaining 5 lust.\n" + str(seeker.title) + ":\n New Lust: " + str(seeker.lust) + "/" + str(seeker.max_lust) + "\n"
 	global.main_text.text += "\n------------------------\n"
 	if knocked_down_seekers.size() == 0:
 		swarm_stats.heat += randi_range(3,8)
+		if swarm_stats.heat >= 20:
+			swarm_stats.heat = 20
 	for seeker in active_seekers:
-		var current_seeker = seeker
 		for status in seeker.status:
-			var status_keep = 0
-			if status_keep <= 0:
-				seeker.status.erase(status)
-				global.main_text.text += str(current_seeker.title) + " has lost " + str(status) + "\n\n"
+			if status == "Opportunity":
+				pass
+			else:
+				var remove_status = randi_range(1,3)
+				if remove_status == 1:
+					global.main_text.text += str(seeker.title) + " has lost " + str(status) + "\n\n"
+					seeker.status.erase(status)
 		for skill in seeker.cooldown_1:
-			seeker.skill_objects.append(skill)
-			seeker.cooldown_1.erase(skill)
+			if skill is String:
+				if skill == "Opportunity":
+					pass
+				else:
+					seeker.skill_objects.append(skill)
+					seeker.cooldown_1.erase(skill)
 		for skill in seeker.cooldown_2:
 			seeker.cooldown_1.append(skill)
 			seeker.cooldown_2.erase(skill)
@@ -695,7 +707,7 @@ func create_swarm(swarm_stats):
 	main_enemy_health.max_value = swarm_stats.hp
 	main_enemy_health.value = swarm_stats.hp
 	main_enemy_hp_label.text = "HP: " + str(swarm_stats.hp)
-	main_enemy_heat.max_value = 50
+	main_enemy_heat.max_value = 20
 	main_enemy_heat.value = swarm_stats.heat
 	main_enemy_heat_label.text = "Heat: " + str(swarm_stats.heat)
 	
@@ -750,7 +762,7 @@ func knocked_down_seeker_turn(seeker):
 	var skill_check_2 = skill_list[randi_range(0,skill_list.size() - 1)]
 	var skill_check_roll_2 = randi_range(5,50)
 	var sex_skill_list = ["Handjob", "Blowjob", "Titjob", "Vaginal", "Anal"]
-	var sex_skill_use = "Handjob" #sex_skill_list[randi_range(0,sex_skill_list.size() - 1)]
+	var sex_skill_use = sex_skill_list[randi_range(0,sex_skill_list.size() - 1)]
 	var success_points = 0
 	print("lust")
 	print(seeker.lust)
@@ -761,13 +773,17 @@ func knocked_down_seeker_turn(seeker):
 				global.main_text.text += str(seeker.title) + " uses her hand to grasp and jerk off a nearby goblin standing over her."
 				goblin_ejaculation(seeker, "knocked_down_active_handjob")
 			"Blowjob":
-				pass
+				global.main_text.text += str(seeker.title) + " helps guide a lengthy goblin schlong into her hot mouth. As it enters she doesn't waste time, bobbing her head lustfully slopily cleaning his rock hard member."
+				goblin_ejaculation(seeker, "knocked_down_active_blowjob")
 			"Titjob":
-				pass
+				global.main_text.text += str(seeker.title) + " wraps her bosum around a nearby goblins prick and starts servicing it with her " + str(seeker.breast_type) + " tits."
+				goblin_ejaculation(seeker, "knocked_down_active_titjob")
 			"Vaginal":
-				pass
+				global.main_text.text += str(seeker.title) + " pushes over an over zealous goblin causing him to fall onto his back, taking the opportunity she crawls ontop of him and before he even has a chance to react " + str(seeker.title) + "slams her wet pussy onto his thick shaft."
+				goblin_ejaculation(seeker, "knocked_down_active_vaginal")
 			"Anal":
-				pass
+				global.main_text.text += str(seeker.title) + " feels a goblin thrust his shaft between her ass cheeks, his hot throbing rod glides lecherously in the valley, tantilisingly close to her back door. Unable to resist the teasing she leans away before slamming all the way back on his dick, lancing it deep into her ass as they both share an orgasmic cry of surprise and sublime pleasure."
+				goblin_ejaculation(seeker, "knocked_down_active_anal")
 				
 	else:
 		print(skill_check_1)
@@ -792,6 +808,8 @@ func knocked_down_seeker_turn(seeker):
 					global.main_text.text += str(seeker.title) + " attempts to scramble out of the group of goblins and succeeds, crawling away from being surrounded, but the goblins follow her movements."
 				else: 
 					swarm_stats.heat += 3
+					if swarm_stats.heat >= 20:
+						swarm_stats.heat = 20
 					#maybe have restraint loving memory and fetish, also rape fantasy. where they don't resist
 					global.main_text.text += str(seeker.title) + " attempts to scramble out of the group of goblins and succeeds, until a goblin catches her legs and pulls her back into the group's centre."
 			"Outlast":
@@ -828,6 +846,8 @@ func knocked_down_seeker_turn(seeker):
 					global.main_text.text += str(seeker.title) + " covers up her erotic body causing the goblins to jeer and get slightly bored with how stingy shes being. If they let their guard down just a tiny bit more she'll be able to escape."
 				else: 
 					swarm_stats.heat += 3
+					if swarm_stats.heat >= 20:
+						swarm_stats.heat = 20
 					#maybe have restraint loving memory and fetish, also rape fantasy. where they don't resist
 					global.main_text.text += str(seeker.title) + " covers up her erotic body causing the goblins to jeer and get angry with how prunish shes being. They lecherously ply her arms and legs open for everyone to witness how wet she truly is."
 		if success_points <= 1:
@@ -854,6 +874,8 @@ func knocked_down_seeker_turn(seeker):
 						global.main_text.text += str(seeker.title) + " attempts to scramble out of the group of goblins and succeeds, crawling away from being surrounded but the goblins follow close behind."
 					else: 
 						swarm_stats.heat += 3
+						if swarm_stats.heat >= 20:
+							swarm_stats.heat = 20
 						#maybe have restraint loving memory and fetish, also rape fantasy. where they don't resist
 						global.main_text.text += str(seeker.title) + " attempts to scramble out of the group of goblins and succeeds, until a goblin catches her legs and pulls her back into the group's centre."
 				"Outlast":
@@ -890,12 +912,16 @@ func knocked_down_seeker_turn(seeker):
 						global.main_text.text += str(seeker.title) + " covers up her erotic body causing the goblins to jeer and get slightly bored with how stingy shes being. If they let their guard down just a tiny bit more she'll be able to escape."
 					else: 
 						swarm_stats.heat += 3
+						if swarm_stats.heat >= 20:
+							swarm_stats.heat = 20
 						#maybe have restraint loving memory and fetish, also rape fantasy. where they don't resist
 						global.main_text.text += str(seeker.title) + " covers up her erotic body causing the goblins to jeer and get angry with how prunish shes being. They lecherously ply her arms and legs open for everyone to witness how wet she truly is."
 		if success_points >= 2:
-			global.main_text.text += "\n\n" + str(seeker.title) + " is able to escape!"
+			global.main_text.text += "\n\n" + str(seeker.title) + " is able to escape!\n\n"
 			active_seekers.append(seeker)
 			knocked_down_seekers.erase(seeker)
+			in_combat.append(seeker)
+			process_turns()
 		else:
 			global.main_text.text += "\n\n" + str(seeker.title) + " is unable to escape from the crowd of Goblins."
 		current_turn += 1
@@ -930,12 +956,53 @@ func goblin_ejaculation(seeker, sex_type):
 			chosen_fetish = "Cock Worship"
 		_:
 			pass
+	if sex_type == "knocked_down_active_blowjob":
+		damage = randi_range(5,10)
+		ejaculation_location = ["onto the ground", "onto her " + str(seeker.breast_type) + " breasts", " down her throat", "onto her face", "into her hair", "onto her stomach", "into her mouth"]
+		chosen_location = ejaculation_location[randi_range(0,ejaculation_location.size() - 1)]
+		#logic here
+		swarm_stats.hp -= damage
+		if chosen_text == false:
+			if chosen_location == "down her throat":
+				global.main_text.text += " looks up at his pleasure distorted face pleased with her technique she decides to take it up a notch, recklessly pushing her gaping messy mouth deeper and deeper on his turgid dick, saliva bubbling out and splatting all over the place. tears start to form at her eyes but they aren't from despair. She feels his cock throb that special kind of twitch and as she pushes one final time throating the dick fully to the base she gags and chokes awaiting for her reward. The goblin ejaculates " + str(ejaculation_amount) + "ml of cum " + str(chosen_location) + ". Causing[color=red] " + str(damage) + "[/color] damage to the goblins."
+			else:
+				global.main_text.text += " looks up at his pleasure distorted face pleased with her technique she decides to take it up a notch, recklessly pushing her gaping messy mouth deeper and deeper on his turgid dick, saliva bubbling out and splatting all over the place. tears start to form at her eyes but they aren't from despair. She feels his cock throb that special kind of twitch and as she pushes one down to the base before she pells her lips off with an wet obscene \" pah\". The goblin jerks himself off to completion ejaculating " + str(ejaculation_amount) + "ml of jizz " + str(chosen_location) + ". Causing[color=red] " + str(damage) + "[/color] damage to the goblins."
+	if sex_type == "knocked_down_active_titjob":
+		damage = randi_range(5,10)
+		ejaculation_location = ["onto the ground", "onto her " + str(seeker.breast_type) + " breasts", "down her throat", "onto her face", "into her hair", "onto her stomach", "into her mouth"]
+		chosen_location = ejaculation_location[randi_range(0,ejaculation_location.size() - 1)]
+		#logic here
+		swarm_stats.hp -= damage
+		if chosen_text == false:
+			if chosen_location == "down her throat":
+				global.main_text.text += " She continues to slide her breasts up and down the goblins shaft with increasing vigor. with each downward thrust she makes sure she's pumping his entire cock and feeling the full pleasure of her soft tits. " + str(seeker.title) + " feels the goblin pulse between her breasts, knowing that she mercilissly attacks his dick even wrapping her lips around the tip and with that The goblin ejaculates " + str(ejaculation_amount) + "ml of cum " + str(chosen_location) + ". Causing[color=red] " + str(damage) + "[/color] damage to the goblins."
+			else:
+				global.main_text.text += " She continues to slide her breasts up and down the goblins shaft with increasing vigor. with each downward thrust she makes sure she's pumping his entire cock and feeling the full pleasure of her soft tits. " + str(seeker.title) + " feels the goblin pulse between her breasts, knowing that she mercilissly attacks his dick grinding her " + str(seeker.breast_type) + " with all her might against the goblin's formidable cock, he is unable to last and climaxes. The goblin ejaculates " + str(ejaculation_amount) + "ml of cum " + str(chosen_location) + ". Causing[color=red] " + str(damage) + "[/color] damage to the goblins."
+	if sex_type == "knocked_down_active_anal":
+		damage = randi_range(5,10)
+		ejaculation_location = ["into her ass"]
+		chosen_location = ejaculation_location[randi_range(0,ejaculation_location.size() - 1)]
+		#logic here
+		swarm_stats.hp -= damage
+		if chosen_text == false:
+			global.main_text.text += " Slowly " + str(seeker.title) + " allows the cock to expand her tight asshole, the goblin being a goblin though is here to fuck and fuck hard, he ups the pace aggressively causeing " + str(seeker.title) + " to groan and make a face contorted by a mix of pain and bliss. Once the goblins rough pace sinks in she fights back, slamming back and crushing his cock with her grip. It doesn't take long for the goblin to reach his limit as the goblin ejaculates " + str(ejaculation_amount) + "ml of cum " + str(chosen_location) + " he wrenches his softening cock free but even still it stretches her ass even on the way out causing her expanded hole to gape for more abuse. The damage causing[color=red] " + str(damage) + "[/color] to the goblins."
+	if sex_type == "knocked_down_active_vaginal":
+		damage = randi_range(5,10)
+		ejaculation_location = ["into her womb"]
+		chosen_location = ejaculation_location[randi_range(0,ejaculation_location.size() - 1)]
+		#logic here
+		swarm_stats.hp -= damage
+		if chosen_text == false:
+			global.main_text.text += str(seeker.title) + " squirms in pleasure, climaxing just the tip entering. Its nowhere near enough, especially now that her womanly need to breed has been fired up. She begins lewdly sliding up and down the Goblin's rock hard rod, that bends in all the right ways, prodding and poking her walls and weak spots vigilantly. " + str(seeker.title) + " moans and writhes at every new pleasurable grind and bump and before she knows it his tip kisses her wanting womb. Now the fun begins, she raises up slowly the cock slowing departing from her soaked passage before confidently and obscenly slamming back down, causing a wet plap and a spray of squirt, she continues fucking herself with his monstrous shaft until she feels the fated pulse, the goblin thrusts forward pushing his dick deep into her pussy and with a glorious burst ejaculates " + str(ejaculation_amount) + "ml of cum into her vulnerable vagina. With a naughty plop " + str(seeker.title) + " detaches herself from the goblin her pussy sloppy and full. Causing[color=red] " + str(damage) + "[/color] damage to the goblins."
+		chosen_location = ejaculation_location[randi_range(0,ejaculation_location.size() - 1)]
 	if sex_type == "knocked_down_active_handjob":
 		damage = randi_range(5,10)
 		ejaculation_location = ["onto the ground", "onto her " + str(seeker.breast_type) + " boobs", " which coats her hands", "onto her face", "into her hair", "onto her stomach", "into her mouth"]
 		chosen_location = ejaculation_location[randi_range(0,ejaculation_location.size() - 1)]
 		if chosen_fetish == "Cum Waster":
 			swarm_stats.heat += randi_range(5,10)
+			if swarm_stats.heat >= 20:
+				swarm_stats.heat = 20
 			damage += 5
 			chosen_text = true
 			ejaculation_location = ["onto the ground " + str(seeker.title) + " giggles at his worthless climax.", "back onto himself " + str(seeker.title) + " enjoys the goblins frustrated glare."]
@@ -962,6 +1029,8 @@ func goblin_ejaculation(seeker, sex_type):
 			ejaculation_amount = 0
 			damage += 3
 			swarm_stats.heat += 5
+			if swarm_stats.heat >= 20:
+				swarm_stats.heat = 20
 			chosen_text = true
 			global.main_text.text += " The goblin thrusts into her hand and " + str(seeker.title) + " feels him getting close to bursting. After some intense stroking he's about to blow, she looses her grip and giggles as pre drips from his engorged twitching tip.\n\n" + str(seeker.title) + ": Oh? Did you want to cum?\n\n The gobbos not going to be happy when he comes down from his high."
 		elif chosen_fetish == "Nimble Fingers":
@@ -987,8 +1056,16 @@ func goblin_ejaculation(seeker, sex_type):
 			" " + str(seeker.title) + " pulls the goblin by his cock so that he's kneeling over her face. As she jerks it with an underhand grip she slurps and kisses the underside of his dick and balls drowing in it's perverted musk. eventaually and too soon for " + str(seeker.title) + " the goblin cums " + str(ejaculation_amount) + "ml of cum" + str(chosen_location)
 		swarm_stats.hp -= damage
 		if chosen_text == false:
-			global.main_text.text += " Not caring about his pleasure she roughly mills his cock with two hands until he ejaculates " + str(ejaculation_amount) + str(chosen_location) + ". Causing[color=red] " + str(damage) + "[/color] damage."
-		global.main_text.text += ". Causing[color=red] " + str(damage) + "[/color] damage."
+			global.main_text.text += " Not caring about his pleasure she roughly mills his cock with two hands until he ejaculates " + str(ejaculation_amount) + "ml of cum " + str(chosen_location) + ". Causing[color=red] " + str(damage) + "[/color] damage."
+		if chosen_text == true:
+			global.main_text.text += ". Causing[color=red] " + str(damage) + "[/color] damage."
+	seeker.lust += randi_range(1,5)
+	if seeker.lust >= seeker.max_lust:
+		global.main_text.text += "\n\n" + str(seeker.title) + " orgasms! Squirting messily."
+		global.main_text.text += "\n" + str(seeker.title) + ":\nNew Stamina: " + str(seeker.stamina) + "/" + str(seeker.max_stamina) + "\nNew Lust: " + str(seeker.lust) + "/" + str(seeker.max_lust)
+		seeker.lust = seeker.max_lust * 0.5
+		seeker.stamina -= randi_range(2,5)
+	global.main_text.text += "\n------------------------\n"
 	update_ui()
 	current_turn += 1
 	process_turns()
