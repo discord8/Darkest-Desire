@@ -294,6 +294,19 @@ func goblin_turn(participant):
 					global.main_text.text += "the goblins surround " + str(target.title) + " and toppel her over. Dealing [color=red]" + str(damage) + " damage [/color]." #just for testing will be a normal attacks otherwise
 					knocked_down_seekers.append(target)
 					active_seekers.erase(target)
+		if knocked_down_seekers.size() >= 1: #elif for ridden then knocked_down
+			var index = randi_range(0,knocked_down_seekers.size() - 1)
+			target = active_seekers[index]
+			if target
+		else:
+			var index = randi_range(0,all_seekers.size() - 1)
+			target = all_seekers[index]
+			lust = randi_range(2,5)
+			target.lust += lust
+			if target.lust > target.max_lust:
+				target.lust = target.max_lust
+			global.main_text.text += "the goblins lecherously jack off to " + str(target.title) + " just watching their manhoods get pumped makes her burn with temptation. Gaining "
+			global.main_text.text += "\n\n" + str(target.title) + "\nNew lust: " + str(target.lust) + "/" + str(target.max_lust)
 	#if target.stamina <= 0:
 		#global.main_text.text = "\n\n" + str(target.title) + " has ran out of stamina and is unable to fight anymore." 
 	global.main_text.text += "\n------------------------\n"
@@ -555,7 +568,7 @@ func skill_logic(ability, seeker, target):
 				global.main_text.text += "\n------------------------\n" + str(seeker.title) + " flips open her tome of tremendous power and chants an entry.  " + str(target.title) + " is washed in a barrier of buzzing pink energy. Protecting her from further harm. However the lustful backlash wracks " + str(seeker.title) + " with torturous desire. gaining [color=hotpink]" + str(damage_done) + " [/color]lust."
 			if seeker.stamina >= seeker.max_stamina:
 				seeker.stamina = seeker.max_stamina
-			global.main_text.text += "\n\n" + str(seeker.title) + "\nNew lust: " + str(seeker.lust) + "/" + str(seeker.max_lust)			
+			global.main_text.text += "\n\n" + str(seeker.title) + "\nNew lust: " + str(seeker.lust) + "/" + str(seeker.max_lust)
 	global.main_text.text += "\n------------------------\n"
 	current_turn += 1
 	if ability.cooldown == 2:
