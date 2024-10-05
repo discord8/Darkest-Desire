@@ -214,7 +214,7 @@ func goblin_turn(participant):
 							swarm_stats.heat = 0
 						global.main_text.text += " Gritting through the pain " + str(target.title) + " shakes her leg harshly sending the gobling bouncing across the ground upon his ejection."
 					else: 
-						var damage = randi_range(4,9)
+						var damage = randi_range(2,7)
 						if target.armor == "Fantasy Fullplate":
 							damage = randi_range(1,6)
 						target.stamina -= damage
@@ -239,9 +239,9 @@ func goblin_turn(participant):
 						swarm_stats.heat -= 10
 						if swarm_stats.heat <= 0:
 							swarm_stats.heat = 0
-						var damage = randi_range(8,13)
+						var damage = randi_range(6,11)
 						if target.armor == "Fantasy Fullplate":
-							damage = randi_range(5,10)
+							damage = randi_range(3,8)
 						target.stamina -= damage
 						global.main_text.text += " " + str(target.title) + " is unable to react fast enough as the Goblin fangs sinks violently into her neck causing an eruption of blood. Dealing [color=red]" + str(damage) + " damage [/color]."
 				else:
@@ -250,11 +250,11 @@ func goblin_turn(participant):
 					var pain_memory = randi_range(1,20)
 					var damage = randi_range(1,4)
 					if "Sensitive Breasts" in target.fetishes and random_location == "left breast" or random_location == "right breast" and "Sensitive Breasts" in target.fetishes:
-						var lust_gain = randi_range(15,20)
+						var lust_gain = randi_range(1,20)
 						target.lust += lust_gain
 						global.main_text.text += " because of her sensitive breasts " + str(target.title) + " moans with pleasure even through the pain, gaining " + str(lust_gain) + " lust."
 					elif "Sensitive Ass" in target.fetishes and random_location == "left ass cheek" or random_location == "right ass cheek" and "Sensitive Ass" in target.fetishes:
-						var lust_gain = randi_range(15,20)
+						var lust_gain = randi_range(10,20)
 						target.lust += lust_gain
 						global.main_text.text += " because of her sensitive ass " + str(target.title) + " coos with pleasure even through the pain, gaining " + str(lust_gain) + " lust."
 					else:
@@ -262,7 +262,7 @@ func goblin_turn(participant):
 						target.lust += lust_gain
 						global.main_text.text += " a mixture of pain and pleasure stimulates her mind, causing her to gain [color=hotpink]" + str(lust_gain) + "[/color] lust."
 					if target.armor == "Fantasy Fullplate":
-						damage = randi_range(1,3)
+						damage = randi_range(1,4)
 					target.stamina -= damage
 					if "Bitten Fetish" not in target.fetishes and potential_memory == 1 and "Bite Mark" not in target.memories:
 						target.memories.append("Bite Mark")
@@ -273,15 +273,15 @@ func goblin_turn(participant):
 				print(target.stamina)
 				var damage = randi_range(3,8)
 				if target.armor == "Fantasy Fullplate":
-					damage = randi_range(1,5)
+					damage = randi_range(1,6)
 				target.stamina -= damage
 				print(target.stamina)
 				global.main_text.text += str(participant.title) + " bonks " + str(target.title) + " with his club. Dealing [color=red]" + str(damage) + " damage [/color]."
 			elif action_choice <= 10:
 				var dodge_roll = randi_range(1,60)
-				var damage = randi_range(8,13)
+				var damage = randi_range(4,7)
 				if target.armor == "Fantasy Fullplate":
-					damage = randi_range(5,10)
+					damage = randi_range(2,5)
 				if target.agility >= dodge_roll or target.strength >= dodge_roll:
 					if target.agility <= target.strength: #add masochist who can't dodge effect? maybe sadist who throws it back
 						global.main_text.text += "With a triumphant Goblin battle cry the goblins attempt to knock " + str(target.title) + ". down with force but is instead thrown away easily."
