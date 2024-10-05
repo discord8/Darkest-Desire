@@ -81,11 +81,6 @@ func Goblin_battle():
 	global.departing.clear()
 	swarm_stats = goblins.new()
 	create_swarm(swarm_stats)
-	var alive_goblins = swarm_stats.hp/50
-	for i in alive_goblins:
-		var current_goblin = goblins.new()
-		current_goblin.title = "Goblins"
-		goblin_bucket.append(current_goblin)
 	show_intia = true
 	roll_initiative()
 
@@ -99,7 +94,11 @@ func roll_initiative():
 	else:
 		if show_intia == true:
 			global.main_text.text = "battle against goblins has begun\n\n"
-		var alive_goblins = swarm_stats.hp/5
+		var alive_goblins = swarm_stats.hp/40 + 1
+		for i in alive_goblins:
+			var current_goblin = goblins.new()
+			current_goblin.title = "Goblins"
+			goblin_bucket.append(current_goblin)
 		main_enemy.show()
 		while goblin_bucket.size() > alive_goblins:
 			goblin_bucket.erase(goblin_bucket[0])
@@ -122,7 +121,9 @@ func process_turns():
 	if current_turn >= in_combat.size():  # Reset turns if all turns are completed
 		current_turn = 0
 		global.clear_seeker_buttons()
+		print("sfdurhyvgbweruygbfuhrwevbfgbregbgbretbwsbgwirbgujtreghrtg")
 		end_round()
+		
 	else:
 		var participant = in_combat[current_turn]
 		print(participant.title)
@@ -144,7 +145,6 @@ func process_turns():
 			global.main_text.text += str(participant.title) + " acts."
 			active_turn = participant
 			if participant in active_seekers:
-				print("performing")
 				player_turn(participant)
 			if participant in knocked_down_seekers:
 				knocked_down_seeker_turn(participant)
@@ -303,8 +303,6 @@ func goblin_turn(participant):
 	
 
 func player_turn(seeker):
-	print("we here")
-	print(seeker.stamina)
 	var loss_by_stamina_counter = 0 #used to count how many seekers have 0 stamina. if all then loss
 	global.clear_seeker_buttons()
 	if seeker.stamina <= 0:
@@ -312,19 +310,18 @@ func player_turn(seeker):
 			if i.stamina <= 0:
 				loss_by_stamina_counter += 1
 			if loss_by_stamina_counter >= all_seekers.size():
-				global.main_text.text += str(seeker.title) + " doesn't have enough stamina to act.\n\n"
+				global.main_text.text += "\n" + str(seeker.title) + " doesn't have enough stamina to act.\n\n"
 				global.main_text.text += "\n------------------------\n"
 				loss()
-		global.main_text.text += str(seeker.title) + " doesn't have enough stamina to act.\n\n"
+				break
+		global.main_text.text += "\n" + str(seeker.title) + " doesn't have enough stamina to act.\n\n"
 		global.main_text.text += "\n------------------------\n"
-		print("why we here?????")
 		current_turn += 1
 		update_ui()
 		process_turns()
 	else:
 		inspect_current_text = global.main_text.text
 		#if sex in status do that instead of regular turn
-		print("we are past the if to the turn")
 		for ability in seeker.skill_objects:
 			var skill_button = Button.new()
 			skill_button.text = ability.title  # 'ability' is a string representing the skill name
@@ -473,8 +470,8 @@ func skill_logic(ability, seeker, target):
 			if swarm_stats.heat <= 0:
 				swarm_stats.heat = 0
 			if did_crit == false:
-				damage_done = int(randi_range(1,5) + ability.base_damage)
-				global.main_text.text += "\n------------------------\n" + str(seeker.title) + " encourages " + str(target.title) + " to keep pushing forward. Some of the Goblins snicker at her optimism. Healing [color=crimson]" + str(damage_done) + " [/color]stamina."
+				damage_done = int(randi_range(1,5) + ability.base_damage * ability.crit_value)
+				global.main_text.text += "\n------------------------\n" + str(seeker.title) + " encourages " + str(target.title) + " to keep pushing forward. Some of the Goblins snicker at her optimism. Healing [color=green]" + str(damage_done) + " [/color]stamina."
 			else:
 				damage_done = int(randi_range(1,5) + ability.base_damage * ability.crit_value)
 				global.main_text.text += "\n------------------------\n" + str(seeker.title) + " encourages " + str(target.title) + " to keep pushing forward. Some of the Goblins snicker at her optimism. Criting and healing [color=green]" + str(damage_done) + " [/color]stamina."
@@ -561,12 +558,12 @@ func skill_logic(ability, seeker, target):
 			global.main_text.text += "\n\n" + str(seeker.title) + "\nNew lust: " + str(seeker.lust) + "/" + str(seeker.max_lust)			
 	global.main_text.text += "\n------------------------\n"
 	current_turn += 1
-	if ability.cooldown == 1:
-		seeker.skill_objects.erase(ability)
-		seeker.cooldown_2.append(ability)
 	if ability.cooldown == 2:
 		seeker.skill_objects.erase(ability)
 		seeker.cooldown_3.append(ability)
+	if ability.cooldown == 1:
+		seeker.skill_objects.erase(ability)
+		seeker.cooldown_2.append(ability)
 	if ability.one_use == true:
 		seeker.skill_objects.erase(ability)
 		seeker.cooldown_battle.append(ability)
@@ -577,11 +574,6 @@ func skill_logic(ability, seeker, target):
 
 
 func end_round():
-	var next_turn = Button.new()
-	next_turn.text = "End Round"
-	global.button_container.add_child(next_turn)
-	next_turn.pressed.connect(Callable(self, "roll_initiative"))
-	global.left_buttons.append(next_turn)
 	for seeker in all_seekers:
 		if seeker.weapon == "Bound Tome":
 			var random_roll = randi_range(1,2)
@@ -601,28 +593,6 @@ func end_round():
 		swarm_stats.heat += randi_range(3,8)
 		if swarm_stats.heat >= 20:
 			swarm_stats.heat = 20
-	for seeker in active_seekers:
-		for status in seeker.status:
-			if status == "Opportunity":
-				pass
-			else:
-				var remove_status = randi_range(1,3)
-				if remove_status == 1:
-					global.main_text.text += str(seeker.title) + " has lost " + str(status) + "\n\n"
-					seeker.status.erase(status)
-		for skill in seeker.cooldown_1:
-			if skill is String:
-				if skill == "Opportunity":
-					pass
-				else:
-					seeker.skill_objects.append(skill)
-					seeker.cooldown_1.erase(skill)
-		for skill in seeker.cooldown_2:
-			seeker.cooldown_1.append(skill)
-			seeker.cooldown_2.erase(skill)
-		for skill in seeker.cooldown_3:
-			seeker.cooldown_2.append(skill)
-			seeker.cooldown_3.erase(skill)
 	for status in swarm_stats.status:
 		if status == "Burn":
 			swarm_stats.hp -= randi_range(10,20)
@@ -630,8 +600,37 @@ func end_round():
 			if status_keep <= 0:
 				swarm_stats.status.erase("Burn")
 				global.main_text.text += " The Goblins that were on fire have either died or put it out.\n\n" 
+	cooldowns()
 	update_ui()
+	var next_turn = Button.new()
+	next_turn.text = "End Round"
+	global.button_container.add_child(next_turn)
+	next_turn.pressed.connect(Callable(self, "roll_initiative"))
+	global.left_buttons.append(next_turn)
 
+func cooldowns():
+	for seeker in all_seekers:
+		print(seeker.title)
+		print(seeker.cooldown_1)
+		for skill in seeker.cooldown_1:
+			print(skill)
+			if skill is String:
+				if skill == "Opportunity":
+					pass
+			else:
+				print(seeker.cooldown_1)
+				print(seeker.skill_objects)
+				seeker.skill_objects.append(skill)
+				seeker.cooldown_1.erase(skill)
+				print(seeker.cooldown_1)
+				print(seeker.skill_objects)
+		for skill in seeker.cooldown_2:
+			seeker.cooldown_1.append(skill)
+			seeker.cooldown_2.erase(skill)
+		for skill in seeker.cooldown_3:
+			seeker.cooldown_2.append(skill)
+			seeker.cooldown_3.erase(skill)
+			
 
 func skill_info(seeker, skill_info_button):
 	global.clear_seeker_buttons()
@@ -814,9 +813,6 @@ func knocked_down_seeker_turn(seeker):
 	var sex_skill_list = ["Handjob", "Blowjob", "Titjob", "Vaginal", "Anal"]
 	var sex_skill_use = sex_skill_list[randi_range(0,sex_skill_list.size() - 1)]
 	var success_points = 0
-	print("lust")
-	print(seeker.lust)
-	print(seeker.max_lust * 0.5)
 	if seeker.lust >= seeker.max_lust * 0.5:
 		match sex_skill_use:
 			"Handjob":
@@ -973,10 +969,10 @@ func knocked_down_seeker_turn(seeker):
 			process_turns()
 		else:
 			global.main_text.text += "\n\n" + str(seeker.title) + " is unable to escape from the crowd of Goblins."
-		current_turn += 1
-		global.main_text.text += "\n------------------------\n"
-		update_ui()
-		process_turns()
+			current_turn += 1
+			global.main_text.text += "\n------------------------\n"
+			update_ui()
+			process_turns()
 
 
 func goblin_ejaculation(seeker, sex_type):
