@@ -63,6 +63,7 @@ var roster: Array = []
 var reflecting: Array = []
 var exploring: Array = []
 var departing: Array = []
+var pondering_seekers: Array = []
 var max_party_size = 3
 # random lists
 var armory = []
@@ -1183,6 +1184,7 @@ func _pick_mission():
 	button_container.add_child(proceed)
 	proceed.pressed.connect(Callable(goblinbattle, "Goblin_battle"))
 	left_buttons.append(proceed)
+	# at the start of a mission clear departing, because her there should be a back option
 
 
 func _on_unequip_armor_pressed_depart(seeker, unequip_armor_button): #have the women have logic on whether or not they will allow themselves to be striped
@@ -1406,6 +1408,23 @@ func equip_armor_departing(seeker, armori):
 	main_text.text += "\n------------------------"
 	clear_seeker_buttons()
 	_inspect_departing(seeker)
+	
+	
+
+func returning(result, returning_seekers):
+	goblinbattle.main_enemy.hide()
+	if result == "goblin loss":
+		pass
+		#create missions to recover the lost seekers from what ever the loss was to, for example recover from the goblin village.
+	else: 
+		for seeker in returning_seekers:
+			if seeker.memories.size() >= 1:
+				pondering_seekers.append(seeker)
+			roster.append(seeker)
+			seeker.stamina = seeker.max_stamina
+			seeker.lust = seeker.max_lust
+			seeker.status.clear()
+	
 
 
 

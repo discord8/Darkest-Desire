@@ -84,7 +84,7 @@ func Goblin_battle():
 	var alive_goblins = swarm_stats.hp/50
 	for i in alive_goblins:
 		var current_goblin = goblins.new()
-		current_goblin.title = "Goblin " + str(i)
+		current_goblin.title = "Goblins"
 		goblin_bucket.append(current_goblin)
 	show_intia = true
 	roll_initiative()
@@ -125,6 +125,8 @@ func process_turns():
 		end_round()
 	else:
 		var participant = in_combat[current_turn]
+		print(participant.title)
+		print("current_turn")
 		if show_intia == true:
 			global.main_text.text = "------------------------\n\n"
 			global.main_text.text += "Turn Order\n"
@@ -142,6 +144,7 @@ func process_turns():
 			global.main_text.text += str(participant.title) + " acts."
 			active_turn = participant
 			if participant in active_seekers:
+				print("performing")
 				player_turn(participant)
 			if participant in knocked_down_seekers:
 				knocked_down_seeker_turn(participant)
@@ -151,12 +154,11 @@ func process_turns():
 
 func goblin_turn(participant):
 	var action_choice = randi_range(1,10)
+	var target
 	global.main_text.text += str(participant.title) + " takes a turn.\n\n"
-	print(swarm_stats.heat)
-	print("swarm_stats.heat")
 	if action_choice >= 3 and swarm_stats.heat == 20 and knocked_down_seekers.size() >= 1 or action_choice >= 3 and swarm_stats.heat == 0 and knocked_down_seekers.size() >= 1:
 		var index = randi_range(0,knocked_down_seekers.size() - 1)
-		var target = knocked_down_seekers[index]
+		target = knocked_down_seekers[index]
 		var skill_check = randi_range(0,75) #change
 		if swarm_stats.heat == 20:
 			swarm_stats.heat -= 15
@@ -196,7 +198,7 @@ func goblin_turn(participant):
 	else: 
 		if active_seekers.size() >= 1: #elif for ridden then knocked_down
 			var index = randi_range(0,active_seekers.size() - 1)
-			var target = active_seekers[index]
+			target = active_seekers[index]
 			if action_choice >= 7 and swarm_stats.heat >= 10:
 				var skill_check = randi_range(1,55)
 				var location_list = ["left breast", "right breast", "left ass cheek", "right ass cheek", "left ankle", "right ankle", "neck"]
@@ -292,49 +294,62 @@ func goblin_turn(participant):
 					global.main_text.text += "the goblins surround " + str(target.title) + " and toppel her over. Dealing [color=red]" + str(damage) + " damage [/color]." #just for testing will be a normal attacks otherwise
 					knocked_down_seekers.append(target)
 					active_seekers.erase(target)
+	#if target.stamina <= 0:
+		#global.main_text.text = "\n\n" + str(target.title) + " has ran out of stamina and is unable to fight anymore." 
 	global.main_text.text += "\n------------------------\n"
 	update_ui()
-	#put goblin logic here
 	current_turn += 1
-	if current_turn < in_combat.size():
-		process_turns()
-		#gobling logic
-	else:
-		process_turns()
+	process_turns()
 	
 
-func player_turn(participant):
+func player_turn(seeker):
+	print("we here")
+	print(seeker.stamina)
+	var loss_by_stamina_counter = 0 #used to count how many seekers have 0 stamina. if all then loss
 	global.clear_seeker_buttons()
-	inspect_current_text = global.main_text.text
-	#if sex in status do that instead of regular turn
-	for ability in participant.skill_objects:
-		var skill_button = Button.new()
-		skill_button.text = ability.title  # 'ability' is a string representing the skill name
-		global.button_container.add_child(skill_button)
-		skill_button.pressed.connect(Callable(self, "_perform_skill").bind(ability, participant))
-		global.left_buttons.append(skill_button)
-	var next_turn = Button.new()
-	next_turn.text = "Do Nothing"
-	global.button_container.add_child(next_turn)
-	next_turn.pressed.connect(Callable(self, "skip_turn").bind(participant))
-	global.left_buttons.append(next_turn)
-	var skill_info_button = Button.new() #change main text to a description of all current skills by doing for and describing them
-	skill_info_button.text = "Skill Info"
-	global.button_container.add_child(skill_info_button)
-	skill_info_button.pressed.connect(Callable(self, "skill_info").bind(participant,skill_info_button))
-	global.left_buttons.append(skill_info_button)
-	var inspect_button = Button.new() #change main text to a description of all current skills by doing for and describing them
-	inspect_button.text = "Inspect"
-	global.button_container.add_child(inspect_button)
-	inspect_button.pressed.connect(Callable(self, "inspect_choice").bind(participant,inspect_button))
-	global.left_buttons.append(inspect_button)
+	if seeker.stamina <= 0:
+		for i in all_seekers:
+			if i.stamina <= 0:
+				loss_by_stamina_counter += 1
+			if loss_by_stamina_counter >= all_seekers.size():
+				global.main_text.text += str(seeker.title) + " doesn't have enough stamina to act.\n\n"
+				global.main_text.text += "\n------------------------\n"
+				loss()
+		global.main_text.text += str(seeker.title) + " doesn't have enough stamina to act.\n\n"
+		global.main_text.text += "\n------------------------\n"
+		print("why we here?????")
+		current_turn += 1
+		update_ui()
+		process_turns()
+	else:
+		inspect_current_text = global.main_text.text
+		#if sex in status do that instead of regular turn
+		print("we are past the if to the turn")
+		for ability in seeker.skill_objects:
+			var skill_button = Button.new()
+			skill_button.text = ability.title  # 'ability' is a string representing the skill name
+			global.button_container.add_child(skill_button)
+			skill_button.pressed.connect(Callable(self, "_perform_skill").bind(ability, seeker))
+			global.left_buttons.append(skill_button)
+		var next_turn = Button.new()
+		next_turn.text = "Do Nothing"
+		global.button_container.add_child(next_turn)
+		next_turn.pressed.connect(Callable(self, "skip_turn").bind(seeker))
+		global.left_buttons.append(next_turn)
+		var skill_info_button = Button.new() #change main text to a description of all current skills by doing for and describing them
+		skill_info_button.text = "Skill Info"
+		global.button_container.add_child(skill_info_button)
+		skill_info_button.pressed.connect(Callable(self, "skill_info").bind(seeker,skill_info_button))
+		global.left_buttons.append(skill_info_button)
+		var inspect_button = Button.new() #change main text to a description of all current skills by doing for and describing them
+		inspect_button.text = "Inspect"
+		global.button_container.add_child(inspect_button)
+		inspect_button.pressed.connect(Callable(self, "inspect_choice").bind(seeker,inspect_button))
+		global.left_buttons.append(inspect_button)
 
 func _perform_skill(ability, seeker):
 	var current_text = global.main_text.text
 	global.main_text.text += "\n" + str(seeker.title) +  " uses " + str(ability.title)
-	print(ability.target_enemy)
-	print(ability.target_ally)
-	print(ability.target_self)
 	if ability.target_enemy == true:
 		global.clear_seeker_buttons()
 		if global.right_buttons.size() >= 2:
@@ -746,12 +761,47 @@ func victory():
 			seeker.skill_objects.append(skill)
 		var memory_goblin_superiority = randi_range(1,10)
 		seeker.status.clear() #maybe have some status stay after combat like horbny where lust rises each turn.
-		if "Overconfident" in seeker.quirks and memory_goblin_superiority >= 5: #make like one, high for testing purpose
+		if "Overconfident" in seeker.quirks and memory_goblin_superiority >= 6 and seeker.stamina != 0: #make like one, high for testing purpose
 			seeker.memories.append("Superior to Goblins")
 			global.main_text.text += "\n\n[color=orchid]" + str(seeker.title) + " savors this triumph and considers herself truly greater then goblins. She has gained the \"Superior to Goblins\" memory. [/color] " #have a memory if losing to goblins and has this memory something like "lost to inferior goblins!"
-	
+	global.returning("victory", active_seekers)
 	
 
+func loss():
+	global.clear_seeker_buttons()
+	for seeker in knocked_down_seekers:
+		knocked_down_seekers.erase(seeker)
+		active_seekers.append(seeker)
+		# damsel memory because she was saved.
+	for seeker in ridden_seekers:
+		ridden_seekers.erase(seeker)
+		active_seekers.append(seeker)
+	for seeker in active_seekers:
+		for skill in seeker.cooldown_battle: #if bugs out just add if statement if size is true
+			seeker.cooldown_battle.erase(skill)
+			seeker.skill_objects.append(skill)
+		for skill in seeker.cooldown_1: 
+			seeker.cooldown_1.erase(skill)
+			seeker.skill_objects.append(skill)
+		for skill in seeker.cooldown_2: 
+			seeker.cooldown_2.erase(skill)
+			seeker.skill_objects.append(skill)
+		for skill in seeker.cooldown_3: 
+			seeker.cooldown_3.erase(skill)
+			seeker.skill_objects.append(skill)
+		var humiliating_defeat = randi_range(1,10)
+		seeker.status.clear() #maybe have some status stay after combat like horbny where lust rises each turn.
+		if "Overconfident" in seeker.quirks and humiliating_defeat >= 6: #make like one, high for testing purpose
+			seeker.memories.append("Lost to Goblins")
+			if "Overconfident" in seeker.quirks:
+				seeker.quirks.erase("Overconfident")
+	var loss = Button.new()
+	loss.text = "End Combat"
+	global.button_container.add_child(loss)
+	loss.pressed.connect(Callable(global,"returning").bind("goblin loss", []))
+	global.left_buttons.append(loss)
+	#use recovery_orb
+	# return to main menu
 
 func knocked_down_seeker_turn(seeker):
 	print("performing")
@@ -916,11 +966,10 @@ func knocked_down_seeker_turn(seeker):
 							swarm_stats.heat = 20
 						#maybe have restraint loving memory and fetish, also rape fantasy. where they don't resist
 						global.main_text.text += str(seeker.title) + " covers up her erotic body causing the goblins to jeer and get angry with how prunish shes being. They lecherously ply her arms and legs open for everyone to witness how wet she truly is."
-		if success_points >= 2:
+		if success_points >= 0:
 			global.main_text.text += "\n\n" + str(seeker.title) + " is able to escape!\n\n"
 			active_seekers.append(seeker)
 			knocked_down_seekers.erase(seeker)
-			in_combat.append(seeker)
 			process_turns()
 		else:
 			global.main_text.text += "\n\n" + str(seeker.title) + " is unable to escape from the crowd of Goblins."
@@ -1072,7 +1121,24 @@ func goblin_ejaculation(seeker, sex_type):
 
 
 func ridden_turn(seeker):
-	pass
+	var buck_check = randi_range(1,80)
+	if seeker.strength >= buck_check: 
+		active_seekers.append(seeker)
+		ridden_seekers.erase(seeker)
+		global.main_text.text += str(seeker.title) + " tries to buck the rider off her back. and succeeds sending the goblin tumbling to the ground. She spits out the gag and stands up preparing for the continued fight."
+	elif active_seekers.size() >= 1:
+		var damage = randi_range(4,8)
+		var target_choice
+		for target in active_seekers:
+			target_choice = target
+		target_choice.stamina += damage
+		global.main_text.text += str(seeker.title) + " follows her rider's commands charging at " + str(target_choice.title) + " the goblin strikes her knee with his solid club. Dealing[color=red] " + str(damage) + "."
+	elif ridden_seekers.size() >= all_seekers.size():
+		if all_seekers.size() >= 2:
+			loss()
+			global.main_text.text += "The Goblins cry in victory! They gather up their new breeding whores and start leading them back to their village."
+			
+		
 
 func inspect_choice(seeker, inspect_text):
 	global.clear_seeker_buttons()
