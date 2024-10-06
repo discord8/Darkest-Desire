@@ -13,13 +13,12 @@ var status: Array
 ##var taunt: String #increase lust
 #var swarm: String #strength check or be tipped over
 # Called when the node enters the scene tree for the first time.
-var active_seekers = []
-var all_seekers = []
-var active_enemies = []
-var knocked_down_seekers = []
-var ridden_seekers = []
-var unconscious_seekers = []
-var swarm_stats
+var active_seekers = [] #thos that can act
+var all_seekers = [] #all seekers in the mission no matter what statew
+var active_enemies = [] 
+var knocked_down_seekers = [] #seekers knoicked
+var ridden_seekers = [] #seekers ridden
+var swarm_stats #main enemy get to 0 hp to win
 var goblin_bucket = []
 var in_combat = []
 var current_turn = 0
@@ -121,7 +120,6 @@ func process_turns():
 	if current_turn >= in_combat.size():  # Reset turns if all turns are completed
 		current_turn = 0
 		global.clear_seeker_buttons()
-		print("sfdurhyvgbweruygbfuhrwevbfgbregbgbretbwsbgwirbgujtreghrtg")
 		end_round()
 		
 	else:
@@ -210,6 +208,8 @@ func goblin_turn(participant):
 						var damage = randi_range(1,6)
 						if target.armor == "Fantasy Fullplate":
 							damage = randi_range(1,3)
+						if "Warded" in target.status:
+							damage = 0
 						target.stamina -= damage
 						swarm_stats.heat -= 5
 						if swarm_stats.heat <= 0:
@@ -219,6 +219,8 @@ func goblin_turn(participant):
 						var damage = randi_range(2,7)
 						if target.armor == "Fantasy Fullplate":
 							damage = randi_range(1,6)
+						if "Warded" in target.status:
+							damage = 0
 						target.stamina -= damage
 						swarm_stats.heat -= 10
 						if swarm_stats.heat <= 0:
@@ -244,6 +246,8 @@ func goblin_turn(participant):
 						var damage = randi_range(6,11)
 						if target.armor == "Fantasy Fullplate":
 							damage = randi_range(3,8)
+						if "Warded" in target.status:
+							damage = 0
 						target.stamina -= damage
 						global.main_text.text += " " + str(target.title) + " is unable to react fast enough as the Goblin fangs sinks violently into her neck causing an eruption of blood. Dealing [color=red]" + str(damage) + " damage [/color]."
 				else:
@@ -265,6 +269,8 @@ func goblin_turn(participant):
 						global.main_text.text += " a mixture of pain and pleasure stimulates her mind, causing her to gain [color=hotpink]" + str(lust_gain) + "[/color] lust."
 					if target.armor == "Fantasy Fullplate":
 						damage = randi_range(1,4)
+					if "Warded" in target.status:
+						damage = 0
 					target.stamina -= damage
 					if "Bitten Fetish" not in target.fetishes and potential_memory == 1 and "Bite Mark" not in target.memories:
 						target.memories.append("Bite Mark")
@@ -276,6 +282,8 @@ func goblin_turn(participant):
 				var damage = randi_range(3,8)
 				if target.armor == "Fantasy Fullplate":
 					damage = randi_range(1,6)
+				if "Warded" in target.status:
+					damage = 0
 				target.stamina -= damage
 				print(target.stamina)
 				global.main_text.text += str(participant.title) + " bonks " + str(target.title) + " with his club. Dealing [color=red]" + str(damage) + " damage [/color]."
@@ -284,6 +292,8 @@ func goblin_turn(participant):
 				var damage = randi_range(4,7)
 				if target.armor == "Fantasy Fullplate":
 					damage = randi_range(2,5)
+				if "Warded" in target.status:
+					damage = 0
 				if target.agility >= dodge_roll or target.strength >= dodge_roll:
 					if target.agility <= target.strength: #add masochist who can't dodge effect? maybe sadist who throws it back
 						global.main_text.text += "With a triumphant Goblin battle cry the goblins attempt to knock " + str(target.title) + ". down with force but is instead thrown away easily."
@@ -294,19 +304,101 @@ func goblin_turn(participant):
 					global.main_text.text += "the goblins surround " + str(target.title) + " and toppel her over. Dealing [color=red]" + str(damage) + " damage [/color]." #just for testing will be a normal attacks otherwise
 					knocked_down_seekers.append(target)
 					active_seekers.erase(target)
-		if knocked_down_seekers.size() >= 1: #elif for ridden then knocked_down
+		elif knocked_down_seekers.size() >= 1: #elif for ridden then knocked_down
 			var index = randi_range(0,knocked_down_seekers.size() - 1)
-			target = active_seekers[index]
-			if target
-		else:
-			var index = randi_range(0,all_seekers.size() - 1)
-			target = all_seekers[index]
-			lust = randi_range(2,5)
-			target.lust += lust
-			if target.lust > target.max_lust:
-				target.lust = target.max_lust
-			global.main_text.text += "the goblins lecherously jack off to " + str(target.title) + " just watching their manhoods get pumped makes her burn with temptation. Gaining "
-			global.main_text.text += "\n\n" + str(target.title) + "\nNew lust: " + str(target.lust) + "/" + str(target.max_lust)
+			target = knocked_down_seekers[index]
+			if target.lust >= target.max_lust * 0.5:
+				var sex_type = ["handjob", "blowjob", "vaginal", "anal", "spitroast", "both holes", "double anal",]
+				var sex_type_choice = sex_type[randi_range(0,sex_type.size() - 1)]
+				var tagteam_type = ["handjob", "vaginal", "anal", "spitroast", "evreything", "both holes", "double anal", "double vaginal"]
+				var tagteam = randi_range(1,3)
+				var lust = randi_range(3,7)
+				if target.fucking_intensity == 0:
+					target.lust += lust
+					target.fucking_intensity = 1
+					sex_type = ["handjob", "blowjob", "groping", "degradation"]
+					sex_type_choice = sex_type[randi_range(0,sex_type.size() - 1)]
+					if sex_type_choice == "handjob":
+						global.main_text.text += "\nThe goblins surround " + str(target.title) + " and perform foreplay.\n Ready for some fun, the goblins push their girthy meat towards her while snickering. " + str(target.title) + " grasps their rods milling them with her hands making them feel loved before moving to the next set of cocks. Her gentle hand dances across their meat rhythmically causing a rising lust between the goblins."
+					if sex_type_choice == "blowjob":
+						global.main_text.text += "\nThe goblins surround " + str(target.title) + ", she kisses their tips each in turn before oppening wide and clamping down, her head starts bobbing and spit starts flying as she pleasures and lubricates a cock before moving to the next delictably girthy shaft."
+					if sex_type_choice == "degradation":
+						global.main_text.text += "\nThe goblins surround " + str(target.title) + " and perform foreplay.\n The goblins make sure she knows her place, degrading her, spitting on her, spanking and caressing her robust ass while yanking her hair, despite the bullying " + str(target.title) + " can't help but to get super wet from all the attention."
+					if sex_type_choice == "groping":
+						global.main_text.text += "\nThe goblins surround " + str(target.title) + " they grope he ass and " + str(target.breast_type) + " lecherously causing moans to escape her soft lips, tempted, the goblins groping go from touching to fingering, their digits erotically prying their way into her wet hot holes."
+					if target.lust >= target.max_lust:
+						target.lust = target.max_lust * 0.5
+						target.stamina -= randi_range(2,5)
+						global.main_text.text += "\n\n" + str(target.title) + " orgasms! Squirting messily."
+						global.main_text.text += "\n" + str(target.title) + ":\nNew Stamina: " + str(target.stamina) + "/" + str(target.max_stamina) + "\nNew Lust: " + str(target.lust) + "/" + str(target.max_lust)
+					else:
+						global.main_text.text += "\n\n" + str(target.title) + "\nNew lust: " + str(target.lust) + "/" + str(target.max_lust)
+
+				elif target.fucking_intensity == 1:
+					var ejaculate = randi_range(50,80)
+					var damage = randi_range(5,15)
+					swarm_stats.hp -= damage
+					lust += randi_range(1,3)
+					target.lust += lust
+					target.fucking_intensity = 2
+					sex_type = ["vaginal", "blowjob", ] #"titjob", "anal"
+					sex_type_choice = sex_type[randi_range(0,sex_type.size() - 1)]
+					if sex_type_choice == "vaginal":
+						global.main_text.text += "\nThe goblins decide that they want to impregnate" + str(target.title) + " they shift her easily pliable legs open and the first in line lines up his forbodingingly gruesome shaft, as he thrusts carelessly it slides off her wet needy slit. her meaty hole cries in desire as she spasms and squirts a little onto the phallice even from the gentle pleasure. As the goblin tries again the shaft soars with little resistance right into the wombs lips, the pressure doesn't take long with a couple quick thrust's the gobling explodes " + str(ejaculate) + "ml of goblin sperm into her tight little pussy " + str(target.title) + " moans in satisfaction as hot jizz fills her up and roils out of her needy hole. Thats when the next goblin in line enters, fucking her without rest, obscene plap noises and lustful moaning emanates loudly from the orgy. Dealing [color=red]" + str(damage) + " [/color] damage ."
+					if sex_type_choice == "blowjob":
+						global.main_text.text += "\nA particularly eager goblin grabs " + str(target.title) + " by her hair and pulls her skilled sloppy mouth onto his swollen shaft. She instantly gags as the long girthy phallice prods at the back of her throat, the goblin loves the sensation and begins to skull fuck her throat pussy rhymically. With every gag and wet choking noise " + str(target.title) + " gets more and more into her role as convinient fuck toy and starts forcing herself to match his harsh thrusts. she feels his cock twitch in her gullet and picks up the pace even more causing a messily expulsion of " + str(ejaculate) + " ml of cum into her throat pussy. She feels incomplete as the limp cock exits her mouth but luckily for her the other goblins are emboldened by their brothers erotic bravery and start crowding around. " + str(target.title) + " can't help but to lick her lips to get ready for the next serving of piping hot jizz. Dealing [color=red]" + str(damage) + "[/color] damage to the goblins."
+					if target.lust >= target.max_lust:
+						target.lust = target.max_lust * 0.5
+						target.stamina -= randi_range(2,5)
+						global.main_text.text += "\n\n" + str(target.title) + " orgasms! Squirting messily."
+						global.main_text.text += "\n" + str(target.title) + ":\nNew Stamina: " + str(target.stamina) + "/" + str(target.max_stamina) + "\nNew Lust: " + str(target.lust) + "/" + str(target.max_lust)
+					else:
+						global.main_text.text += "\n\n" + str(target.title) + "\nNew lust: " + str(target.lust) + "/" + str(target.max_lust)
+				elif target.fucking_intensity == 2:
+					var ejaculate = randi_range(100,160)
+					var damage = randi_range(10,20)
+					swarm_stats.hp -= damage
+					lust += randi_range(2,6)
+					target.lust += lust
+					target.fucking_intensity = 3
+					sex_type = ["vaginal and anal", ] #spitroast
+					sex_type_choice = sex_type[randi_range(0,sex_type.size() - 1)]
+					if sex_type_choice == "vaginal and anal":
+						global.main_text.text += "\nThe goblins heated with lust focus in on " + str(target.title) + " and her needy willing ass and pussy. A goblin slides underneath shoving his massive shaft into her pussy while another mounts her fat ass and presses his obscenely thick member pass the rim. With libidinous thrusts and salacious howls the goblins expand and fuck their respective hungry holes until they all cum in unison, spraying " + str(ejaculate) + "ml of goblin sperm into her used holes as the goblins disperse two more take their place, replacing her blissfully vulgar afterglow with two hard pistoning cocks in her gaping ass and creampied pussy. Dealing [color=red]" + str(damage) + "[/color] damage to the goblins."
+					if target.lust >= target.max_lust:
+						target.lust = target.max_lust * 0.5
+						target.stamina -= randi_range(2,5)
+						global.main_text.text += "\n\n" + str(target.title) + " orgasms! ejecting the cocks from her sensitive holes."
+						global.main_text.text += "\n" + str(target.title) + ":\nNew Stamina: " + str(target.stamina) + "/" + str(target.max_stamina) + "\nNew Lust: " + str(target.lust) + "/" + str(target.max_lust)
+					else:
+						global.main_text.text += "\n\n" + str(target.title) + "\nNew lust: " + str(target.lust) + "/" + str(target.max_lust)
+				elif target.fucking_intensity == 3:
+					var ejaculate = randi_range(300,540)
+					var damage = randi_range(20,40)
+					swarm_stats.hp -= damage
+					lust += randi_range(4,12)
+					target.lust += lust
+					target.fucking_intensity = 2
+					sex_type = ["orgy", ] #spitroast
+					sex_type_choice = sex_type[randi_range(0,sex_type.size() - 1)]
+					if sex_type_choice == "orgy":
+						global.main_text.text += "\nThe goblins fuck " + str(target.title) + " in all of her holes, spraying " + str(ejaculate) + "ml of steaming hot goblin jizz all in and over her. Dealing [color=red]" + str(damage) + " damage to the goblins [/color]."
+					if target.lust >= target.max_lust:
+						target.lust = target.max_lust * 0.5
+						target.stamina -= randi_range(2,5)
+						global.main_text.text += "\n\n" + str(target.title) + " orgasms! Squirting messily."
+						global.main_text.text += "\n" + str(target.title) + ":\nNew Stamina: " + str(target.stamina) + "/" + str(target.max_stamina) + "\nNew Lust: " + str(target.lust) + "/" + str(target.max_lust)
+					else:
+						global.main_text.text += "\n\n" + str(target.title) + "\nNew lust: " + str(target.lust) + "/" + str(target.max_lust)
+			else:
+				index = randi_range(0,all_seekers.size() - 1)
+				target = all_seekers[index]
+				var lust = randi_range(2,5)
+				target.lust += lust
+				if target.lust > target.max_lust:
+					target.lust = target.max_lust
+				global.main_text.text += "the goblins lecherously jack off to " + str(target.title) + " just watching their manhoods get pumped makes her burn with temptation. Gaining [color=hotpink]" + str(lust) + "[/color] lust."
+				global.main_text.text += "\n\n" + str(target.title) + "\nNew lust: " + str(target.lust) + "/" + str(target.max_lust)
 	#if target.stamina <= 0:
 		#global.main_text.text = "\n\n" + str(target.title) + " has ran out of stamina and is unable to fight anymore." 
 	global.main_text.text += "\n------------------------\n"
@@ -414,10 +506,10 @@ func skill_logic(ability, seeker, target):
 	match ability.title:
 		"Clang!":
 			if did_crit == false:
-				damage_done = int(randi_range(1,5) + ability.base_damage)
+				damage_done = int(randi_range(1,5) + seeker.strength* 0.5 + seeker.durability * 0.2 + ability.base_damage)
 				global.main_text.text += "\n------------------------\n" + str(seeker.title) + " heaves her ginormous weapon, and targets a particular goblin. It watches in horror as the shadow of the grand weapon encroches upon him and with a resounding splat, that Goblin is done. Dealing [color=crimson]" + str(damage_done) + " [/color]damage."
 			else:
-				damage_done = int(randi_range(1,5) + ability.base_damage * ability.crit_value)
+				damage_done = int(randi_range(1,5) + seeker.strength* 0.5 + seeker.durability * 0.2 + ability.base_damage * ability.crit_value)
 				global.main_text.text += "\n------------------------\n" + str(seeker.title) + " heaves her ginormous weapon, and targets a particular goblin. It watches in horror as the shadow of the grand weapon encroches upon him and with a resounding splat, that Goblin is done. Dealing [color=crimson]" + str(damage_done) + " [/color]damage."
 			swarm_stats.hp -= damage_done
 		"Multi Slash":
@@ -428,9 +520,9 @@ func skill_logic(ability, seeker, target):
 			var critical_hits = 0
 			for i in ability.multihit:
 				if did_crit == false:
-					damage_done = int(randi_range(1,5) + ability.base_damage)
+					damage_done = int(randi_range(1,5) + seeker.strength * 0.1 + seeker.agility * 0.2 + ability.base_damage)
 				else:
-					damage_done = int(randi_range(1,5) + ability.base_damage * ability.crit_value)
+					damage_done = int(randi_range(1,5) + seeker.strength * 0.1 + seeker.agility * 0.2 + ability.base_damage * ability.crit_value)
 					critical_hits += 1
 				swarm_stats.hp -= damage_done
 				total_damage += damage_done
@@ -443,10 +535,10 @@ func skill_logic(ability, seeker, target):
 				did_crit = true
 				seeker.status.erase("opportunity")
 			if did_crit == false:
-				damage_done = int(randi_range(1,5) + ability.base_damage * 0.8)
+				damage_done = int(randi_range(1,5) - seeker.threat + ability.base_damage * 0.8)
 				global.main_text.text += "\n------------------------\n" + str(seeker.title) + " With precision strikes at a goblins vitals slaying them instantly. Dealing [color=crimson]" + str(damage_done) + " [/color]damage to the horde"
 			else:
-				damage_done = int(randi_range(1,5) + ability.base_damage * 0.8 * ability.crit_value)
+				damage_done = int(randi_range(1,5) - seeker.threat + ability.base_damage * 0.8 * ability.crit_value)
 				global.main_text.text += "\n------------------------\n" + str(seeker.title) + " With precision strikes at a goblins vitals slaying them instantly. Criting and dealing [color=crimson]" + str(damage_done) + " [/color]damage to the horde"
 			swarm_stats.hp -= damage_done
 		"Distracting Strike":
@@ -454,28 +546,28 @@ func skill_logic(ability, seeker, target):
 				did_crit = true
 				seeker.status.erase("Opportunity")
 			if did_crit == false:
-				damage_done = int(randi_range(1,5) + ability.base_damage * 0.8)
+				damage_done = int(randi_range(1,5) + seeker.agility * 0.3 + seeker.strength * 0.2 + ability.base_damage * 0.8)
 				global.main_text.text += "\n------------------------\n" + str(seeker.title) + " With an intentionally violent slash a fountain of blood erupts from a slain goblin coating his brothers in crimson. Dealing [color=crimson]" + str(damage_done) + " [/color]damage and distracting the group."
 			else:
-				damage_done = int(randi_range(1,5) + ability.base_damage * 0.8 * ability.crit_value)
+				damage_done = int(randi_range(1,5) + seeker.agility * 0.3 + seeker.strength * 0.2 + ability.base_damage * 0.8 * ability.crit_value)
 				global.main_text.text += "\n------------------------\n" + str(seeker.title) + " With an intentionally violent slash a fountain of blood erupts from a slain goblin coating his brothers in crimson. Criting and dealing [color=crimson]" + str(damage_done) + " [/color]damage and distracting the group."
 			swarm_stats.hp -= damage_done
 			seeker.status.append("Opportunity") #
 		"Singular Shot":
 			if did_crit == false:
-				damage_done = int(randi_range(1,5) + ability.base_damage * 0.8)
+				damage_done = int(randi_range(1,5) + seeker.agility * 0.5 + seeker.will * 0.5 + ability.base_damage * 0.8)
 				global.main_text.text += "\n------------------------\n" + str(seeker.title) + " loads a heavy bolt and aims for the central mass of the Goblins penetrating and skewering multiple enemies from the violent impact. Dealing [color=crimson]" + str(damage_done) + " [/color]damage."
 			else:
-				damage_done = int(randi_range(1,5) + ability.base_damage * 0.8 * ability.crit_value)
+				damage_done = int(randi_range(1,5) + seeker.agility * 0.5 + seeker.will * 0.5 + ability.base_damage * 0.8 * ability.crit_value)
 				global.main_text.text += "\n------------------------\n" + str(seeker.title) + " loads a heavy bolt and aims for the central mass of the Goblins penetrating and skewering multiple enemies from the violent impact. Criting and dealing [color=crimson]" + str(damage_done) + " [/color]damage."
 			swarm_stats.hp -= damage_done
 		"Napalm Bolt":
 			swarm_stats.status.append("Burn")
 			if did_crit == false:
-				damage_done = int(randi_range(1,5) + ability.base_damage * 1.8)
+				damage_done = int(randi_range(1,5) + seeker.agility * 0.2 + seeker.will * 0.3 + ability.base_damage * 1.8)
 				global.main_text.text += "\n------------------------\n" + str(seeker.title) + " Swiftly modifies her ammo as the goblins lecherously aproaches her, kicking one back after her preperations she dives back while shooting the monster causing a detonation of dire heat and frightining fire, the goblins caught in the blast scream and run about flesh melting away. Dealing [color=crimson]" + str(damage_done) + " [/color]damage."
 			else:
-				damage_done = int(randi_range(1,5) + ability.base_damage * 1.8 * ability.crit_value)
+				damage_done = int(randi_range(1,5) + seeker.agility * 0.2 + seeker.will * 0.3 + ability.base_damage * 1.8 * ability.crit_value)
 				global.main_text.text += "\n------------------------\n" + str(seeker.title) + " Swiftly modifies her ammo as the goblins lecherously aproaches her, kicking one back after her preperations she dives back while shooting the monster causing a detonation of dire heat and frightining fire, the goblins caught in the blast scream and run about flesh melting away. Criting and dealing [color=crimson]" + str(damage_done) + " [/color]damage."
 			swarm_stats.hp -= damage_done
 		"Inspire":
@@ -483,10 +575,10 @@ func skill_logic(ability, seeker, target):
 			if swarm_stats.heat <= 0:
 				swarm_stats.heat = 0
 			if did_crit == false:
-				damage_done = int(randi_range(1,5) + ability.base_damage * ability.crit_value)
+				damage_done = int(randi_range(1,5) + seeker.will * 0.6 + ability.base_damage * ability.crit_value)
 				global.main_text.text += "\n------------------------\n" + str(seeker.title) + " encourages " + str(target.title) + " to keep pushing forward. Some of the Goblins snicker at her optimism. Healing [color=green]" + str(damage_done) + " [/color]stamina."
 			else:
-				damage_done = int(randi_range(1,5) + ability.base_damage * ability.crit_value)
+				damage_done = int(randi_range(1,5) + seeker.will * 0.6 + ability.base_damage * ability.crit_value)
 				global.main_text.text += "\n------------------------\n" + str(seeker.title) + " encourages " + str(target.title) + " to keep pushing forward. Some of the Goblins snicker at her optimism. Criting and healing [color=green]" + str(damage_done) + " [/color]stamina."
 			target.stamina += damage_done
 			if seeker.stamina >= seeker.max_stamina:
@@ -519,10 +611,10 @@ func skill_logic(ability, seeker, target):
 		"Daemonic Advance":
 			print("agaga")
 			if did_crit == false:
-				damage_done = int(randi_range(1,5) + ability.base_damage * 1.2)
+				damage_done = int(randi_range(1,5) + seeker.intelligence * 0.3 + seeker.lust * 0.5 + ability.base_damage * 1.2)
 				global.main_text.text += "\n------------------------\n" + str(seeker.title) + " summons a swarm of large undulating tentacles to cause chaos, they grasp and squeeze, flinging goblins like toys. Dealing [color=crimson]" + str(damage_done) + " [/color]damage."
 			else:
-				damage_done = int(randi_range(1,5) + ability.base_damage * ability.crit_value * 1.2)
+				damage_done = int(randi_range(1,5) + seeker.intelligence * 0.3 + seeker.lust * 0.5 + ability.base_damage * ability.crit_value * 1.2)
 				global.main_text.text += "\n------------------------\n" + str(seeker.title) + " summons a swarm of large undulating tentacles to cause chaos, they grasp and squeeze, flinging goblins like toys. Dealing [color=crimson]" + str(damage_done) + " [/color]damage."
 			swarm_stats.hp -= damage_done
 		"Echo of Ruin":
@@ -530,7 +622,7 @@ func skill_logic(ability, seeker, target):
 			var lust_gain = randi_range(5,10)
 			seeker.lust += lust_gain
 			if did_crit == false:
-				damage_done = int(randi_range(1,5) + ability.base_damage * 1.4)
+				damage_done = int(randi_range(1,5) + seeker.intelligence * 0.2 + seeker.lust * 0.7 + ability.base_damage * 1.4 )
 				global.main_text.text += "\n------------------------\n" + str(seeker.title) + " Conjures chaotic crackling energy from her tome, it coalesces before cascading forth in a brilliant explosion. Dealing [color=crimson]" + str(damage_done) + " [/color]damage."
 				if knocked_down_seekers.size() >= 1:
 					global.main_text.text += " The blast is so reckless it's residual energy affects those that can't escape the blast zone."
@@ -543,6 +635,7 @@ func skill_logic(ability, seeker, target):
 						# check for stamina dropping to 0
 						global.main_text.text += "\n" + str(victim.title) + "\nNew Stamina: " + str(victim.stamina) + "/" + str(victim.max_stamina) + "\nNew Lust: " + str(victim.lust) + "/" + str(victim.max_lust)
 			else:
+				damage_done = int((randi_range(1,5) + seeker.intelligence * 0.2 + seeker.lust * 0.7 + ability.base_damage + ability.crit_value) * 1.2  )
 				global.main_text.text += "\n------------------------\n" + str(seeker.title) + " Conjures chaotic crackling energy from her tome, it coalesces before cascading forth in a brilliant explosion. Dealing [color=crimson]" + str(damage_done) + " [/color]damage."
 				if knocked_down_seekers.size() >= 1:
 					global.main_text.text += " The blast is so reckless it's residual energy affects those that can't escape the blast zone."
@@ -554,16 +647,17 @@ func skill_logic(ability, seeker, target):
 			swarm_stats.hp -= damage_done
 			global.main_text.text += "\n\n" + str(seeker.title) + "\nNew Lust: " + str(seeker.lust) + "/" + str(seeker.max_lust)
 		"Warding Words":
+			target.cooldown_2.append("Warded")
 			target.status.append("Warded")
 			swarm_stats.heat -= randi_range(3,6)
 			if swarm_stats.heat <= 0:
 				swarm_stats.heat = 0
 			if did_crit == false:
-				damage_done = int(randi_range(1,15) + ability.base_damage)
+				damage_done = int(randi_range(1,5) + seeker.intelligence * 0.3 + seeker.lust * 0.6 + ability.base_damage)
 				seeker.lust += damage_done
 				global.main_text.text += "\n------------------------\n" + str(seeker.title) + " flips open her tome of tremendous power and chants an entry.  " + str(target.title) + " is washed in a barrier of buzzing pink energy. Protecting her from further harm. However the lustful backlash wracks " + str(seeker.title) + " with torturous desire. gaining [color=hotpink]" + str(damage_done) + " [/color]lust."
 			else:
-				damage_done = int(randi_range(1,15) + ability.base_damage * ability.crit_value) #currently can't crit
+				damage_done = int(randi_range(1,5) + seeker.intelligence * 0.3 + seeker.lust * 0.6 + ability.base_damage * ability.crit_value) #currently can't crit
 				seeker.lust += damage_done
 				global.main_text.text += "\n------------------------\n" + str(seeker.title) + " flips open her tome of tremendous power and chants an entry.  " + str(target.title) + " is washed in a barrier of buzzing pink energy. Protecting her from further harm. However the lustful backlash wracks " + str(seeker.title) + " with torturous desire. gaining [color=hotpink]" + str(damage_done) + " [/color]lust."
 			if seeker.stamina >= seeker.max_stamina:
@@ -587,6 +681,7 @@ func skill_logic(ability, seeker, target):
 
 
 func end_round():
+	var defeat_by_stamina_check = 0
 	for seeker in all_seekers:
 		if seeker.weapon == "Bound Tome":
 			var random_roll = randi_range(1,2)
@@ -596,7 +691,6 @@ func end_round():
 					seeker.stamina = seeker.max_stamina
 				global.main_text.text += str(seeker.title) + " regains 5 stamina from her tome's residual energy.\n" + str(seeker.title) + ":\n New Stamina: " + str(seeker.stamina) + "/" + str(seeker.max_stamina) + "\n"
 			else:
-				
 				seeker.lust += 5
 				if seeker.lust >= seeker.max_lust:
 					seeker.lust = seeker.max_lust
@@ -615,34 +709,47 @@ func end_round():
 				global.main_text.text += " The Goblins that were on fire have either died or put it out.\n\n" 
 	cooldowns()
 	update_ui()
-	var next_turn = Button.new()
-	next_turn.text = "End Round"
-	global.button_container.add_child(next_turn)
-	next_turn.pressed.connect(Callable(self, "roll_initiative"))
-	global.left_buttons.append(next_turn)
+	for seeker in all_seekers:
+		if seeker.stamina <= 0:
+			defeat_by_stamina_check += 1
+	if defeat_by_stamina_check >= all_seekers.size():
+		loss()
+	else:
+		var next_turn = Button.new()
+		next_turn.text = "End Round"
+		global.button_container.add_child(next_turn)
+		next_turn.pressed.connect(Callable(self, "roll_initiative"))
+		global.left_buttons.append(next_turn)
 
 func cooldowns():
 	for seeker in all_seekers:
 		print(seeker.title)
 		print(seeker.cooldown_1)
 		for skill in seeker.cooldown_1:
-			print(skill)
 			if skill is String:
-				if skill == "Opportunity":
-					pass
+				if skill == "Warded":
+					global.main_text.text += "\n" + str(seeker.title) + " is no longer warded."
+					seeker.cooldown_1.erase(skill)
+					seeker.status.erase(skill)
 			else:
-				print(seeker.cooldown_1)
-				print(seeker.skill_objects)
 				seeker.skill_objects.append(skill)
 				seeker.cooldown_1.erase(skill)
-				print(seeker.cooldown_1)
-				print(seeker.skill_objects)
-		for skill in seeker.cooldown_2:
-			seeker.cooldown_1.append(skill)
-			seeker.cooldown_2.erase(skill)
-		for skill in seeker.cooldown_3:
-			seeker.cooldown_2.append(skill)
-			seeker.cooldown_3.erase(skill)
+		for skill in seeker.cooldown_1:
+			if skill is String:
+				if skill == "Warded":
+					seeker.cooldown_1.append(skill)
+					seeker.cooldown_2.erase(skill)
+			else:
+				seeker.cooldown_1.append(skill)
+				seeker.cooldown_2.erase(skill)
+		for skill in seeker.cooldown_1:
+			if skill is String:
+				if skill == "Warded":
+					seeker.cooldown_2.append(skill)
+					seeker.cooldown_3.erase(skill)
+			else:
+				seeker.cooldown_2.append(skill)
+				seeker.cooldown_3.erase(skill)
 			
 
 func skill_info(seeker, skill_info_button):
@@ -801,6 +908,8 @@ func loss():
 		for skill in seeker.cooldown_3: 
 			seeker.cooldown_3.erase(skill)
 			seeker.skill_objects.append(skill)
+		global.recovery_mission.append(seeker)
+		global.departing.clear()
 		var humiliating_defeat = randi_range(1,10)
 		seeker.status.clear() #maybe have some status stay after combat like horbny where lust rises each turn.
 		if "Overconfident" in seeker.quirks and humiliating_defeat >= 6: #make like one, high for testing purpose
@@ -816,7 +925,6 @@ func loss():
 	# return to main menu
 
 func knocked_down_seeker_turn(seeker):
-	print("performing")
 	global.main_text.text += "\n------------------------\n"
 	var skill_list = ["Push Away", "Scramble", "Cover up", "Distract", "Outlast"]
 	var skill_check_1 = skill_list[randi_range(0,skill_list.size() - 1)]
@@ -843,9 +951,7 @@ func knocked_down_seeker_turn(seeker):
 			"Anal":
 				global.main_text.text += str(seeker.title) + " feels a goblin thrust his shaft between her ass cheeks, his hot throbing rod glides lecherously in the valley, tantilisingly close to her back door. Unable to resist the teasing she leans away before slamming all the way back on his dick, lancing it deep into her ass as they both share an orgasmic cry of surprise and sublime pleasure."
 				goblin_ejaculation(seeker, "knocked_down_active_anal")
-				
 	else:
-		print(skill_check_1)
 		match skill_check_1:
 			"Push Away":
 				if seeker.strength >= skill_check_roll_1 * 1.5:
@@ -911,7 +1017,6 @@ func knocked_down_seeker_turn(seeker):
 					global.main_text.text += str(seeker.title) + " covers up her erotic body causing the goblins to jeer and get angry with how prunish shes being. They lecherously ply her arms and legs open for everyone to witness how wet she truly is."
 		if success_points <= 1:
 			global.main_text.text += "\n\n"
-			print(skill_check_1)
 			match skill_check_2:
 				"Push Away":
 					if seeker.strength >= skill_check_roll_1 * 1.5:
@@ -975,7 +1080,7 @@ func knocked_down_seeker_turn(seeker):
 							swarm_stats.heat = 20
 						#maybe have restraint loving memory and fetish, also rape fantasy. where they don't resist
 						global.main_text.text += str(seeker.title) + " covers up her erotic body causing the goblins to jeer and get angry with how prunish shes being. They lecherously ply her arms and legs open for everyone to witness how wet she truly is."
-		if success_points >= 0:
+		if success_points >= 2:
 			global.main_text.text += "\n\n" + str(seeker.title) + " is able to escape!\n\n"
 			active_seekers.append(seeker)
 			knocked_down_seekers.erase(seeker)
@@ -1119,10 +1224,10 @@ func goblin_ejaculation(seeker, sex_type):
 			global.main_text.text += ". Causing[color=red] " + str(damage) + "[/color] damage."
 	seeker.lust += randi_range(1,5)
 	if seeker.lust >= seeker.max_lust:
-		global.main_text.text += "\n\n" + str(seeker.title) + " orgasms! Squirting messily."
-		global.main_text.text += "\n" + str(seeker.title) + ":\nNew Stamina: " + str(seeker.stamina) + "/" + str(seeker.max_stamina) + "\nNew Lust: " + str(seeker.lust) + "/" + str(seeker.max_lust)
 		seeker.lust = seeker.max_lust * 0.5
 		seeker.stamina -= randi_range(2,5)
+		global.main_text.text += "\n\n" + str(seeker.title) + " orgasms! Squirting messily."
+		global.main_text.text += "\n" + str(seeker.title) + ":\nNew Stamina: " + str(seeker.stamina) + "/" + str(seeker.max_stamina) + "\nNew Lust: " + str(seeker.lust) + "/" + str(seeker.max_lust)
 	global.main_text.text += "\n------------------------\n"
 	update_ui()
 	current_turn += 1
@@ -1136,18 +1241,22 @@ func ridden_turn(seeker):
 		ridden_seekers.erase(seeker)
 		global.main_text.text += str(seeker.title) + " tries to buck the rider off her back. and succeeds sending the goblin tumbling to the ground. She spits out the gag and stands up preparing for the continued fight."
 	elif active_seekers.size() >= 1:
-		var damage = randi_range(4,8)
 		var target_choice
 		for target in active_seekers:
 			target_choice = target
+		var damage = randi_range(4,8)
+		if "Warded" in target_choice.status:
+			damage = 0
 		target_choice.stamina += damage
-		global.main_text.text += str(seeker.title) + " follows her rider's commands charging at " + str(target_choice.title) + " the goblin strikes her knee with his solid club. Dealing[color=red] " + str(damage) + "."
+		global.main_text.text += "\n" + str(seeker.title) + " follows her rider's commands charging at " + str(target_choice.title) + " the goblin strikes her knee with his solid club. Dealing[color=red] " + str(damage) + "[/color]."
 	elif ridden_seekers.size() >= all_seekers.size():
 		if all_seekers.size() >= 2:
 			loss()
 			global.main_text.text += "The Goblins cry in victory! They gather up their new breeding whores and start leading them back to their village."
 			
-		
+	update_ui()
+	current_turn += 1
+	process_turns()
 
 func inspect_choice(seeker, inspect_text):
 	global.clear_seeker_buttons()

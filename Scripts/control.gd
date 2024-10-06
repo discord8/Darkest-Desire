@@ -53,6 +53,7 @@ var threat_change: int
 var cum_milked: int #partially converted to PP
 var PP: int #perversion points, used to determine rank
 var has_cock: bool
+var fucking_intensity: int #1 foreplay, 2 beginner, 3 sex, 4 hardcore
 
 
 #system vars
@@ -64,6 +65,7 @@ var reflecting: Array = []
 var exploring: Array = []
 var departing: Array = []
 var pondering_seekers: Array = []
+var recovery_mission: Array = []
 var max_party_size = 3
 # random lists
 var armory = []
@@ -82,7 +84,7 @@ var ass_fetish = []
 var oral_fetish = []
 var breasts_fetish = []
 var paras
-var names = ["Lilica", "Vex", "Lara", "Tilly", "Mili", "Isabell", "Ivy", "Melody", "Melissa", "Anna", "Dorathy", "Jess", "Mika", "Eda", "Stacy", "Trish", "Stephanie", "Linda", "Molly", "Mandy", "Dakota", "Iyo", "Kairi", "Nia", "Peyton", "Yera", "Triena", "Aath", "Miu", "Mikan", "Tsumiki", "Miku", "Fili", "Sage", "Evelyn", "Lucy", "Emma", "Terial", "Lyra", "Titiana", "Nip", "Sarah", "Sara", "Mimi", "Octavia", "Corin", "Gigi", "Mandy", "Rose", "Liv", "Rhea", "Jasmine", "Piper", "Dove", "Jade", "Ingrid", "Umi", "Tori", "Cindy", "Velvet", "Mariah", "Tessa", "Tess", "Daphney", "Dora", "Zelda", "Hitomi", "Seras", "Ava", "Olivia", "Sophie", "Amelia", "Mary", "Isabella", "Victoria", "Charlotte", "Luna", "Mia", "Kalifa", "Lana", "Amber", "Gianna", "Annie", "Nora", "Layla", "Lilly", "Nikki", "Aoi", "Lulu", "Mami", "Hazel", "Madi", "Isla", "Willow", "Zoe", "Grace", "Ivy", "Naomi", "Maya", "Alice", "Sadie", "Hailey", "Aubrey", "Skye", "Vivian", "Eve", "Freya", "Amara", "Chel", "Catalina", "Ashley", "Chloe", "Faith", "Kimberly", "Taylor", "Sutton", "Vera", "Kaia", "Lilly", "Selena", "Aubrey", "Nyla", "Lia", "Kiara", "Elise", "Hope", "Lola", "Lilith", "Ophelia", "Dahlia", "Blair", "Celeste", "Rebecca", "Nina", "Trinity", "Vanessa", "Camilla", "Adrianna", "Celine", "Lucianna", "Reign", "Cali", "Viviana", "Serena", "Destiny", "Elle", "Veronica", "Azaela", "Raya", "Raven", "Scarlet", "Sylvie", "Lexi", "Ryn", "Carmen", "Alison", "Felicity", "Katalina", "Zariah", "Mira", "Jolene", "Emelia", "Bonnie", "Briar", "Leona", "Lina", "Remy", "Mina", "Mili", "Selene", "Angie", "Flora", "Violet", "Aya", "Ramona", "Bridget", "Mercy", "Paula", "Baylor", "Marianna", "Loretta", "Gwen", "Robin", "Katelyn", "Tiffany", "Lexie", "Kahlani"]
+var names = ["Lilica", "Misty", "Echo", "Effie", "Mordred", "Gretel", "Hannah", "Vex", "Lara", "Tilly", "Mili", "Isabell", "Ivy", "Melody", "Melissa", "Anna", "Dorathy", "Jess", "Mika", "Eda", "Stacy", "Trish", "Stephanie", "Linda", "Molly", "Mandy", "Dakota", "Iyo", "Kairi", "Nia", "Peyton", "Yera", "Triena", "Aath", "Miu", "Mikan", "Tsumiki", "Miku", "Fili", "Sage", "Evelyn", "Lucy", "Emma", "Terial", "Lyra", "Titiana", "Nip", "Sarah", "Sara", "Mimi", "Octavia", "Corin", "Gigi", "Mandy", "Rose", "Liv", "Rhea", "Jasmine", "Piper", "Dove", "Jade", "Ingrid", "Umi", "Tori", "Cindy", "Velvet", "Mariah", "Tessa", "Tess", "Daphney", "Dora", "Zelda", "Hitomi", "Seras", "Ava", "Olivia", "Sophie", "Amelia", "Mary", "Isabella", "Victoria", "Charlotte", "Luna", "Mia", "Kalifa", "Lana", "Amber", "Gianna", "Annie", "Nora", "Layla", "Lilly", "Nikki", "Aoi", "Lulu", "Mami", "Hazel", "Madi", "Isla", "Willow", "Zoe", "Grace", "Ivy", "Naomi", "Maya", "Alice", "Sadie", "Hailey", "Aubrey", "Skye", "Vivian", "Eve", "Freya", "Amara", "Chel", "Catalina", "Ashley", "Chloe", "Faith", "Kimberly", "Taylor", "Sutton", "Vera", "Kaia", "Lilly", "Selena", "Aubrey", "Nyla", "Lia", "Kiara", "Elise", "Hope", "Lola", "Lilith", "Ophelia", "Dahlia", "Blair", "Celeste", "Rebecca", "Nina", "Trinity", "Vanessa", "Camilla", "Adrianna", "Celine", "Lucianna", "Reign", "Cali", "Viviana", "Serena", "Destiny", "Elle", "Veronica", "Azaela", "Raya", "Raven", "Scarlet", "Sylvie", "Lexi", "Ryn", "Carmen", "Alison", "Felicity", "Katalina", "Zariah", "Mira", "Jolene", "Emelia", "Bonnie", "Briar", "Leona", "Lina", "Remy", "Mina", "Mili", "Selene", "Angie", "Flora", "Violet", "Aya", "Ramona", "Bridget", "Mercy", "Paula", "Baylor", "Marianna", "Loretta", "Gwen", "Robin", "Katelyn", "Tiffany", "Lexie", "Kahlani"]
 var all_weapons =["Twin Daggers", "Crossbow", "Flintlock", "Arcane Wand", "Bound Tome", "Broad Sword", "Battle Axes", "Great Club"]
 var all_armors = ["Graceful Robes", "Bikini Armor", "Dancer's Silk", "Holy Garb", "Fantasy Fullplate", "Skimpy Streetrat"]
 var starter_weapons = ["Twin Daggers", "Crossbow", "Bound Tome", "Great Club"]
@@ -150,6 +152,7 @@ func _init():
 	self.cum_milked = 0 #partially converted to PP
 	self.PP = 0 #perversion points, used to determine rank
 	self.has_cock = false
+	self.fucking_intensity = 0
 	generate_quirks()
 	generate_desires()
 	
@@ -337,22 +340,22 @@ func update_description(seeker):
 func apply_equipment(seeker):
 	match seeker.weapon:
 		"Twin Daggers": #agility, will power weapon, low threat
-			seeker.skill_objects.append(Skill.new("Multi Slash",true, true, false, false, 3 + seeker.strength * 0.2 + seeker.agility * 0.2, 0, 0,[""], "Slashing", false, false, 2, "Swing with both daggers hitting twice, uses equal amount agility and strength for damage.", 5 + seeker.intelligence * 0.3, 1.5, 0, false, false, false, false, false )) #double attack, agility for damage
+			seeker.skill_objects.append(Skill.new("Multi Slash",true, true, false, false, 1, 0, 0,[""], "Slashing", false, false, 2, "Swing with both daggers hitting twice, uses equal amount agility and strength for damage.", 5 + seeker.intelligence * 0.3, 1.5, 0, false, false, false, false, false )) #double attack, agility for damage
 			seeker.skills.append("Multi Slash")
 			seeker.skills.append("Lightfoot") #lower threat based on agility
-			seeker.skill_objects.append(Skill.new("Vital Cut",true, true, false, false, 37 - seeker.threat, 0, 0,[""], "Slashing", false, false, 1, "A sneak attack that does damage based on how low your threat is.", 10 + seeker.intelligence * 0.3, 2.0, 0, false, false, false, false, false ))
+			seeker.skill_objects.append(Skill.new("Vital Cut",true, true, false, false, 35, 0, 0,[""], "Slashing", false, false, 1, "A sneak attack that does damage based on how low your threat is.", 10 + seeker.intelligence * 0.3, 2.0, 0, false, false, false, false, false ))
 			seeker.skills.append("Vital Cut") #add flat value minus threat, low hit (20 then - current threat)
-			seeker.skill_objects.append(Skill.new("Distracting Strike",true, true, false, false, 2 + seeker.agility * 0.3 + seeker.strength * 0.2, 0, 0,[""], "Slashing", false, false, 1, "A light attack that allows you to quickly hide after the strike.", 5 + seeker.intelligence * 0.4, 1.5, 2, false, false, false, false, true ))
+			seeker.skill_objects.append(Skill.new("Distracting Strike",true, true, false, false, 2, 0, 0,[""], "Slashing", false, false, 1, "A light attack that allows you to quickly hide after the strike.", 5 + seeker.intelligence * 0.4, 1.5, 2, false, false, false, false, true ))
 			seeker.skills.append("Distracting Strike") #damage based on intelligence)
 		"Crossbow": #agility will power, average stats, extra skill
-			seeker.skill_objects.append(Skill.new("Singular Shot",true, true, false, false, 6 + seeker.agility * 0.5 + seeker.will * 0.5, 0, 0,[""], "Piercing", true, false, 1, "A powerful bolt that takes a moment to fire again.", 1 + seeker.intelligence * 0.2, 1.5, 1, false, false, false, false, false ))
+			seeker.skill_objects.append(Skill.new("Singular Shot",true, true, false, false, 6, 0, 0,[""], "Piercing", true, false, 1, "A powerful bolt that takes a moment to fire again.", 1 + seeker.intelligence * 0.2, 1.5, 1, false, false, false, false, false ))
 			seeker.skills.append("Singular Shot") #strong bolt, 1 turn cooldown
 			seeker.skill_objects.append(Skill.new("Vault",false, false, false, true, 15, 0, 0,["Vault"], "", false, false, 1, "Increases agility and lowers threat.", 0, 0, 1, false, false, false, false, true ))
 			seeker.skills.append("Vault") #lower threat increase speed and agility, reloads
-			seeker.skill_objects.append(Skill.new("Napalm Bolt",true, true, false, false, 6 + seeker.agility * 0.2 + seeker.will * 0.3, 0, 0,["Burn"], "Fire", true, true, 1, "Shot a mortar like bolt that rains fire down onto the battlefield", 1 + seeker.intelligence, 1.2, 0, true, false, true, false, false))
+			seeker.skill_objects.append(Skill.new("Napalm Bolt",true, true, false, false, 6, 0, 0,["Burn"], "Fire", true, true, 1, "Shot a mortar like bolt that rains fire down onto the battlefield", 1 + seeker.intelligence, 1.2, 0, true, false, true, false, false))
 			seeker.skills.append("Focus Impact") #increases dasmage by will, add to each Crossbow attack
 			seeker.skills.append("Napalm Bolt") #aoe burn
-			seeker.skill_objects.append(Skill.new("Inspire",false, false, true, false, 1 + seeker.will * 0.6, 0, 0,[""], "", true, false, 1, "Inspire allies using your will to regain stamina and keep pushing forward.", 1 + seeker.intelligence, 1.5, 1, false, false, false, false, false))
+			seeker.skill_objects.append(Skill.new("Inspire",false, false, true, false, 1, 0, 0,[""], "", true, false, 1, "Inspire allies using your will to regain stamina and keep pushing forward.", 1 + seeker.intelligence, 1.5, 1, false, false, false, false, false))
 			seeker.skills.append("Inspire") #will heal once per battle
 		"Flintlock": #intelligence agility weapon
 			seeker.skills.append("Alchemic Blast") #basic attack, causes burn, poison or shock
@@ -365,11 +368,11 @@ func apply_equipment(seeker):
 			seeker.skills.append("Electric Arc") #hit multiple apply shock
 			seeker.skills.append("Dispel Magic") #remove buffs or debuffs, interacts intelligenceh some curios
 		"Bound Tome":
-			seeker.skill_objects.append(Skill.new("Warding Words",false, false, true, true, 5 + seeker.intelligence * 0.3 + seeker.lust * 0.6, 0, 0,["Warded"], "Arcane", true, false, 1, "create a barrier that stops all harm, though the energy promotes desire.", 0, 0, 0, true, false, false, false, false ))
+			seeker.skill_objects.append(Skill.new("Warding Words",false, false, true, true, 5, 0, 0,["Warded"], "Arcane", true, false, 1, "create a barrier that stops all harm, though the energy promotes desire.", 0, 0, 1, true, false, false, false, false ))
 			seeker.skills.append("Warding Words") #add a barrier to stamina and lust
-			seeker.skill_objects.append(Skill.new("Daemonic Advance",false, true, false, false, 1 + seeker.intelligence * 0.3 + seeker.lust * 0.5, 0, 10,[""], "Arcane", true, true, 1, "Summon the power of abadon to flay your foes, harnessing their enegy has spicy consequences.", 1 + seeker.intelligence, 1.5, 0, false, false, false, false, false ))
+			seeker.skill_objects.append(Skill.new("Daemonic Advance",false, true, false, false, 1, 0, 10,[""], "Arcane", true, true, 1, "Summon the power of abadon to flay your foes, harnessing their enegy has spicy consequences.", 1 + seeker.intelligence, 1.5, 0, false, false, false, false, false ))
 			seeker.skills.append("Daemonic Advance") #attack opponent based on will and intelligence
-			seeker.skill_objects.append(Skill.new("Echo of Ruin",false, true, false, false, 1 + seeker.intelligence * 0.2 + seeker.lust * 0.7, 0, 10,[""], "Arcane", true, true, 1, "uses your lust as a conduit to burst outwards.", 1 + seeker.intelligence, 1.5, 1, false, true, false, false, false ))
+			seeker.skill_objects.append(Skill.new("Echo of Ruin",false, true, false, false, 1, 0, 10,[""], "Arcane", true, true, 1, "uses your lust as a conduit to burst outwards.", 1 + seeker.intelligence, 1.5, 1, false, true, false, false, false ))
 			seeker.skills.append("Echo of Ruin") #deal damage porpotinate to missing hp of enemy
 			seeker.skills.append("Whispers of Venus") # gain lust or stamina at the end of the round
 		"Broad Sword": #strength and will
@@ -384,7 +387,7 @@ func apply_equipment(seeker):
 			seeker.skills.append("Reckless Charge") #knock opponent prone
 		"Great Club":
 			seeker.skills.append("Clang!") #heavy attack
-			seeker.skill_objects.append(Skill.new("Clang!",true, true, false, false, 10 + seeker.strength* 0.5 + seeker.durability * 0.2, 0, 0,[""], "Bludgeoning", false, false, 1, "Big weapon go bonk!.", 5 + seeker.intelligence * 0.4, 2.0, 0, false, false, false, false, true ))
+			seeker.skill_objects.append(Skill.new("Clang!",true, true, false, false, 10, 0, 0,[""], "Bludgeoning", false, false, 1, "Big weapon go bonk!.", 5 + seeker.intelligence * 0.4, 2.0, 0, false, false, false, false, true ))
 			seeker.skills.append("Colossal Weapon") #High threat, low speed
 		"Long Spear": #drawing a blank right now
 			seeker.skills.append("Jab Thrust") #ignore barrier increase agaility
@@ -1414,6 +1417,9 @@ func equip_armor_departing(seeker, armori):
 func returning(result, returning_seekers):
 	goblinbattle.main_enemy.hide()
 	if result == "goblin loss":
+		clear_seeker_buttons()
+		create_start_buttons()
+		fill_recruits()
 		pass
 		#create missions to recover the lost seekers from what ever the loss was to, for example recover from the goblin village.
 	else: 
@@ -1424,6 +1430,10 @@ func returning(result, returning_seekers):
 			seeker.stamina = seeker.max_stamina
 			seeker.lust = seeker.max_lust
 			seeker.status.clear()
+			clear_seeker_buttons()
+			create_start_buttons()
+			fill_recruits()
+			#add events
 	
 
 
