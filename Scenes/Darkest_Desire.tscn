@@ -199,3 +199,9 @@ offset_right = -0.480103
 offset_bottom = -0.223999
 texture = ExtResource("3_df3nk")
 expand_mode = 1
+
+[node name="VScrollBar" type="VScrollBar" parent="Cass"]
+visible = false
+layout_mode = 0
+offset_right = 8.0
+offset_bottom = 8.0

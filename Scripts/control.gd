@@ -154,7 +154,6 @@ func _init():
 	self.has_cock = false
 	self.fucking_intensity = 0
 	generate_quirks()
-	generate_desires()
 	
 	
 
@@ -170,10 +169,27 @@ func generate_quirks():
 				break
 		
 
-func generate_desires():
+func generate_desires(seeker):
 	var starting_skills = ["Submit", "Fantasize", "Experiment", "Attract Attention", "Dominate"] #these skills branch off on observations which opens up what the girl is willing to intiate herself, they always consent.
 	var num_of_skills = randi_range(1,3)
+	var desire_objects = []
+	for desire in desire_objects:
+		match desire:
+			"Submit":
+				seeker.desires.append(Skill.new("Submit",false, true, false, false, 1, 0, 0,[""], "Erotic", false, false, 1, ".", 5 + seeker.intelligence * 0.3, 1.5, 0, false, false, false, false, false )) #allow self to be surround regain all stamina
+			"Fantasize":
+				seeker.desires.append(Skill.new("Fantasize",false, false, false, true, 1, 0, 0,[""], "Erotic", false, false, 1, ".", 5 + seeker.intelligence * 0.3, 1.5, 0, false, false, false, false, false )) #gain lust and stamina regain stamina
+			"Experiment":
+				seeker.desires.append(Skill.new("Experiment",false, true, false, false, 1, 0, 0,[""], "Erotic", false, false, 1, ".", 5 + seeker.intelligence * 0.3, 1.5, 0, false, false, false, false, false )) #chance to gain or deal damage or lust
+			"Attract Attention":
+				seeker.desires.append(Skill.new("Attract Attention",false, false, false, false, 1, 0, 0,[""], "Erotic", false, false, 1, ".", 5 + seeker.intelligence * 0.3, 1.5, 0, false, false, false, false, false )) # make threat = 50 gain a durability buff
+			"Dominate":
+				seeker.desires.append(Skill.new("Dominate",false, false, true, false, 1, 0, 0,[""], "Erotic", false, false, 1, ".", 5 + seeker.intelligence * 0.3, 1.5, 0, false, false, false, false, false )) #deal damage and lust to an ally give them an durability buff
+
+
+
 	for i in num_of_skills:
+		desire_objects.append(starting_skills[randi_range(0,starting_skills.size() - 1)])
 		desires.append(starting_skills[randi_range(0,starting_skills.size() - 1)])
 #masturbate is perversion, fantasize is submissive, Experiment is common, Attract attention is bdsm, dominate is dominance
 
@@ -334,6 +350,7 @@ func update_description(seeker):
 		seeker.description = "She is " + str(seeker.body_type) + " with " + str(seeker.lactation) + str(seeker.breast_type) + " breasts. She wears glasses and her eyes are " + str(seeker.eye_color) + ". She has " + str(seeker.hair_color) + " hair that is " + str(seeker.hair_type) + ". " + str(seeker.posture) + ". " + str(seeker.armor_description) 
 	else:
 		seeker.description = "She is " + str(seeker.body_type) + " with " + str(seeker.lactation) + str(seeker.breast_type) + " breasts. Her eyes are " + str(seeker.eye_color) + ". She has " + str(seeker.hair_color) + " hair that is " + str(seeker.hair_type) + ". " + str(seeker.posture) + ". " + str(seeker.armor_description) 
+	
 
 
 
@@ -577,6 +594,7 @@ func _ready():
 	var current_scene = get_tree().current_scene
 	scroll_container = current_scene.get_node("ScrollContainer")
 	scroll_bar = scroll_container.get_v_scroll_bar()
+	print(scroll_bar.max_value)
 	main_text = current_scene.get_node("ScrollContainer/main_text")
 	button_container = current_scene.get_node("ColorRect_base/VBoxContainer")
 	right_button_container = current_scene.get_node("ColorRect_base/right_side_container")
@@ -584,6 +602,9 @@ func _ready():
 	cass_pic = get_node("Cass")
 	create_start_buttons()
 	fill_recruits()
+
+func scroll_change():
+	pass
 
 func fill_recruits():
 	for_hire.clear()
@@ -597,6 +618,7 @@ func fill_recruits():
 		apply_equipment(seeker)
 		print(seeker.skill_objects)
 		_non_equipment_stats_update(seeker)
+		generate_desires(seeker)
 		generate_description(seeker)
 		#generate_description(seeker)
 		_recalculate_seeker_stats(seeker)

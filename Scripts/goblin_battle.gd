@@ -84,6 +84,7 @@ func Goblin_battle():
 	roll_initiative()
 
 func roll_initiative():
+	global.scroll_bar.value = 0
 	in_combat.clear()
 	if swarm_stats.hp <= 0:
 		victory()
@@ -425,7 +426,19 @@ func player_turn(seeker):
 		update_ui()
 		process_turns()
 	else:
-		inspect_current_text = global.main_text.text
+		if seeker.lust >= seeker.max_lust:
+			for ability in seeker.desires:
+				var skill_button = Button.new()
+				skill_button.text = ability.title  # 'ability' is a string representing the skill name
+				global.button_container.add_child(skill_button)
+				skill_button.pressed.connect(Callable(self, "_perform_desire").bind(ability, seeker))
+				global.left_buttons.append(skill_button)
+			var inspect_button = Button.new() #change main text to a description of all current skills by doing for and describing them
+			inspect_button.text = "Inspect"
+			global.button_container.add_child(inspect_button)
+			inspect_button.pressed.connect(Callable(self, "inspect_choice").bind(seeker,inspect_button))
+			global.left_buttons.append(inspect_button)
+			inspect_current_text = global.main_text.text
 		#if sex in status do that instead of regular turn
 		for ability in seeker.skill_objects:
 			var skill_button = Button.new()
@@ -486,17 +499,98 @@ func _perform_skill(ability, seeker):
 		skill_logic(ability, seeker, seeker)
 	did_crit = false
 
-##so the method to add skills isn't working, i think i fixed them showing up but can't find node, sent the message to the ai so should be fixable
+func _perform_desire(ability, seeker):
+	var current_text = global.main_text.text
+	global.main_text.text += "\n" + str(seeker.title) +  " uses " + str(ability.title)
+	if ability.target_enemy == true:
+		global.clear_seeker_buttons()
+		if global.right_buttons.size() >= 2:
+			global.clear_enemy_buttons()
+			for target in active_enemies:
+				var seeker_target = Button.new()
+				seeker_target.text = target.title
+				global.right_button_container.add_child(seeker_target)
+				seeker_target.pressed.connect(Callable(self, "desire_logic").bind(ability,seeker,target))
+				global.right_buttons.append(seeker_target)
+		else:
+			desire_logic(ability,seeker,swarm_stats) #this is right, swarm stats is the target if no other are available
+	elif ability.target_ally == true:
+		global.clear_seeker_buttons()
+		if ability.target_self == false:
+			active_seekers.erase(seeker)
+		for target in active_seekers:
+			var seeker_target = Button.new()
+			seeker_target.text = target.title
+			global.button_container.add_child(seeker_target)
+			seeker_target.pressed.connect(Callable(self, "desire_logic").bind(ability,seeker,target))
+			global.left_buttons.append(seeker_target)
+		var back_button = Button.new()
+		back_button.text = "Back"
+		global.button_container.add_child(back_button)
+		back_button.pressed.connect(Callable(self, "back_to_skill_select").bind(seeker,current_text,back_button))
+		global.left_buttons.append(back_button)
+		if ability.target_self == false:
+			active_seekers.append(seeker)
+	elif ability.target_self == true:
+		global.clear_seeker_buttons()
+		desire_logic(ability, seeker, seeker)
+	did_crit = false
 
 func check_for_crit(ability):
 	var d100 = randi_range(1,100)
 	if d100 <= ability.crit_range:
 		did_crit = true
 		
-
+func desire_logic(ability, seeker, target):
+	var damage_done = 0
+	#maybe move damage and effects here so that its more modular
+	check_for_crit(ability)
+	swarm_stats.heat += randi_range(1,3) #if high heat they do scarier actions
+	if swarm_stats.heat >= 20:
+		swarm_stats.heat = 20
+	match ability.title:
+		"Submit":
+			active_seekers.erase(seeker)
+			knocked_down_seekers.append(seeker)
+			seeker.stamina = seeker.max_stamina
+			global.main_text.text += "\n------------------------\n" + str(seeker.title) + " gives in to an odd temptation to give up. She drops to her knees and begs the goblins for mercy! He rheart beats faster as the goblin surround her making snide and crude remarks about her body.\n" + str(seeker.title) + ": I won't fight back anymore, i'll do whatever you want~" 
+			if did_crit == false:
+				damage_done = int(randi_range(1,5) + seeker.strength* 0.5 + seeker.durability * 0.2 + ability.base_damage)
+				global.main_text.text += "\n------------------------\n" + str(seeker.title) + " heaves her ginormous weapon, and targets a particular goblin. It watches in horror as the shadow of the grand weapon encroches upon him and with a resounding splat, that Goblin is done. Dealing [color=crimson]" + str(damage_done) + " [/color]damage."
+			else:
+				damage_done = int(randi_range(1,5) + seeker.strength* 0.5 + seeker.durability * 0.2 + ability.base_damage * ability.crit_value)
+				global.main_text.text += "\n------------------------\n" + str(seeker.title) + " heaves her ginormous weapon, and targets a particular goblin. It watches in horror as the shadow of the grand weapon encroches upon him and with a resounding splat, that Goblin is done. Dealing [color=crimson]" + str(damage_done) + " [/color]damage."
+			swarm_stats.hp -= damage_done
+		"Fantasize":
+			var heal = randi_range(5,10)
+			seeker.stamina += heal
+			if seeker.stamina >= seeker.max_stamina:
+				seeker.stamina = seeker.max_stamina
+			var lust = randi_range(5,10)
+			seeker.stamina += lust
+			if seeker.lust >= seeker.max_lust:
+				seeker.lust = seeker.max_lust
+			global.main_text.text += "\n------------------------\n" + str(seeker.title) + " mind drifts to erotic fantasy, the savage goblins with aproach her with carnal lust and tear away her clothes revealing her supple frame. then they would tease her body, rubbing up and down her limbs, squeezing and carressing her most erotic parts before finally parting her trembling legs and penetrating her as she cries out in overwhelming bliss. She feels her desire build as she's unable to stop her thighs from grinding together.\n" + str(seeker.title) + ": O-oh my god... ah, i'm so wet~\nrecovering[color=red] " + str(heal) + "[/color] stamina and gaining[color=hotpink] " + str(lust) + "[/color] lust."
+			global.main_text.text += "\n\n" + str(seeker.title) + "\nNew Lust: " + str(seeker.lust) + "/" + str(seeker.max_lust)
+			global.main_text.text += "\n\n" + str(seeker.title) + "\nNew Stamina: " + str(seeker.stamina) + "/" + str(seeker.max_stamina)
+	global.main_text.text += "\n------------------------\n"
+	current_turn += 1
+	if ability.cooldown == 2:
+		seeker.skill_objects.erase(ability)
+		seeker.cooldown_3.append(ability)
+	if ability.cooldown == 1:
+		seeker.skill_objects.erase(ability)
+		seeker.cooldown_2.append(ability)
+	if ability.one_use == true:
+		seeker.skill_objects.erase(ability)
+		seeker.cooldown_battle.append(ability)
+	if swarm_stats.hp <= 0:
+		victory()
+	global.scroll_bar.connect("changed", "scroll_to_bottom", self)
+	update_ui()
+	process_turns()
 
 func skill_logic(ability, seeker, target):
-	print(ability.title)
 	var damage_done = 0
 	#maybe move damage and effects here so that its more modular
 	check_for_crit(ability)
@@ -676,9 +770,14 @@ func skill_logic(ability, seeker, target):
 		seeker.cooldown_battle.append(ability)
 	if swarm_stats.hp <= 0:
 		victory()
+	global.scroll_bar.connect("changed", "scroll_to_bottom", self)
 	update_ui()
 	process_turns()
 
+func scroll_to_bottom():
+	print(global.scroll_bar.max_value)
+	global.scroll_bar.max_value = 1000
+	print(global.scroll_bar.max_value)
 
 func end_round():
 	var defeat_by_stamina_check = 0
@@ -1337,7 +1436,7 @@ func inspect(seeker, state,):
 
 # keep adding skills including armor
 # add goblin actions and display like hp
-#elif for ridden then knocked_down goblin actions if there are no active seekrs
+# elif for ridden then knocked_down goblin actions if there are no active seekrs
 # test knocked down and sex, do these edits for testing, add half of seekers lust, change all possible sex skills to handjobs, give multiple of the fetishes and check if they are being applied by putting prints in their logic
 # add sexskills when lust is half full based on desires
 # add goblin gangbang
