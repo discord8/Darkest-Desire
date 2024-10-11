@@ -208,8 +208,6 @@ func generate_description(seeker):
 	var hair_color_list = ["[color=crimson]crimson[/color]", "[color=orangered]fiery orange[/color]", "jet black", "[color=gray]soft black[/color]", "[color=silver]Silver[/color]", "snow white", "[color=peru]hazel[/color]", "[color=saddlebrown]dark brown[/color]", "[color=hotpink]light pink[/color]", "[color=magenta]magenta[/color]", "[color=chartreuse]spring green[/color]", "[color=darkgreen]dark green[/color]", "[color=aqua]light blue[/color]", "[color=yellow]bimbo blonde[/color]", "[color=navajowhite]platinum blonde[/color]", "[color=deepskyblue]vibrant blue[/color]"]
 	#var glasses_chance = randi_range(1,10)
 	seeker.breast_size = breast_size_roll
-	print("breast1")
-	print(seeker.breast_size)
 	seeker.posture = str(posture[randi_range(0,posture.size() - 1)])
 	seeker.body_type = str(body_type_list[randi_range(0,body_type_list.size() - 1)])
 	seeker.eye_color = str(eye_color_list[randi_range(0,eye_color_list.size() - 1)])
@@ -308,10 +306,6 @@ func generate_description(seeker):
 		seeker.will -= 3
 		seeker.intelligence -= 3
 		seeker.agility += 6
-	print("breast2:")
-	print(seeker.breast_size)
-	seeker.breast_type = boob_type[seeker.breast_size]
-	print(seeker.breast_type)
 	update_description(seeker)
 	
 	#1/10 chance shes wearing glasses, lowering agility, use body types as a way to change stats down the line
@@ -466,11 +460,9 @@ func apply_equipment(seeker):
 				seeker.agility -= 6
 			_:
 				pass
-	print(seeker.skill_objects)
 
 
 func _unequip_item_skills(seeker):
-	print(seeker.skill_objects)
 	for i in seeker.skills:
 		match i:
 			"Elegant Wrapping":
@@ -578,9 +570,9 @@ func _unequip_item_skills(seeker):
 		"Skimpy Streetrat":
 			seeker.skills.erase("Hideaway")
 
-func skill_erasing_func(seeker,item_list):
-	for skill in item_list:
-		seeker.skill_objects.erase(skill.title)
+#func skill_erasing_func(seeker,item_list):
+	#for skill in item_list:
+		#seeker.skill_objects.erase(skill.title)
 #
 var scroll_container: ScrollContainer
 var scroll_bar
