@@ -138,6 +138,7 @@ func process_turns():
 			global.main_text.text += str(participant.title) + " acts."
 			active_turn = participant
 			if participant in active_seekers:
+				participant.lust += participant.max_lust * 0.7
 				player_turn(participant)
 			if participant in knocked_down_seekers:
 				knocked_down_seeker_turn(participant)
@@ -447,25 +448,20 @@ func player_turn(seeker):
 		process_turns()
 	else:
 		if seeker.lust >= seeker.max_lust:
-			for ability in seeker.desires:
+			for desire in seeker.desires:
+				var desire_button = Button.new()
+				desire_button.text = desire.title  # 'ability' is a string representing the skill name
+				global.button_container.add_child(desire_button)
+				desire_button.pressed.connect(Callable(self, "_perform_desire").bind(desire, seeker))
+				global.left_buttons.append(desire_button)
+		#if sex in status do that instead of regular turn
+		else:
+			for ability in seeker.skill_objects:
 				var skill_button = Button.new()
 				skill_button.text = ability.title  # 'ability' is a string representing the skill name
 				global.button_container.add_child(skill_button)
-				skill_button.pressed.connect(Callable(self, "_perform_desire").bind(ability, seeker))
+				skill_button.pressed.connect(Callable(self, "_perform_skill").bind(ability, seeker))
 				global.left_buttons.append(skill_button)
-			var inspect_button = Button.new() #change main text to a description of all current skills by doing for and describing them
-			inspect_button.text = "Inspect"
-			global.button_container.add_child(inspect_button)
-			inspect_button.pressed.connect(Callable(self, "inspect_choice").bind(seeker,inspect_button))
-			global.left_buttons.append(inspect_button)
-			inspect_current_text = global.main_text.text
-		#if sex in status do that instead of regular turn
-		for ability in seeker.skill_objects:
-			var skill_button = Button.new()
-			skill_button.text = ability.title  # 'ability' is a string representing the skill name
-			global.button_container.add_child(skill_button)
-			skill_button.pressed.connect(Callable(self, "_perform_skill").bind(ability, seeker))
-			global.left_buttons.append(skill_button)
 		var next_turn = Button.new()
 		next_turn.text = "Do Nothing"
 		global.button_container.add_child(next_turn)
@@ -648,7 +644,6 @@ func desire_logic(ability, seeker, target):
 	if ability.one_use == true:
 		seeker.cooldown_battle.append(ability)
 		seeker.skill_objects.erase(ability)
-	global.scroll_bar.connect("changed", "scroll_to_bottom", self)
 	update_ui()
 	process_turns()
 

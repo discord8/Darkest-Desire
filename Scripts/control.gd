@@ -170,11 +170,19 @@ func generate_quirks():
 		
 
 func generate_desires(seeker):
-	var starting_skills = ["Submit", "Fantasize", "Experiment", "Attract Attention", "Dominate"] #these skills branch off on observations which opens up what the girl is willing to intiate herself, they always consent.
+	var starting_desires = ["Submit", "Fantasize", "Experiment", "Attract Attention", "Dominate"] #these skills branch off on observations which opens up what the girl is willing to intiate herself, they always consent.
 	var num_of_skills = randi_range(1,3)
-	var desire_objects = []
-	for desire in desire_objects:
-		match desire:
+	var desire_choice = []
+	for i in num_of_skills:
+		var desire = ""
+		while true:
+			desire = starting_desires[randi_range(0, starting_desires.size() - 1)]
+			if desire not in desire_choice:
+				desire_choice.append(desire)
+				break
+	for ii in desire_choice.size():
+		seeker.fetishes.append(desire_choice[ii])
+		match desire_choice[ii]:
 			"Submit":
 				seeker.desires.append(Skill.new("Submit",false, true, false, false, 1, 0, 0,[""], "Erotic", false, false, 1, ".", 5 + seeker.intelligence * 0.3, 1.5, 0, false, false, false, false, false )) #allow self to be surround regain all stamina
 			"Fantasize":
@@ -185,12 +193,6 @@ func generate_desires(seeker):
 				seeker.desires.append(Skill.new("Attract Attention",false, false, false, false, 1, 0, 0,[""], "Erotic", false, false, 1, ".", 5 + seeker.intelligence * 0.3, 1.5, 0, false, false, false, false, false )) # make threat = 50 gain a durability buff
 			"Dominate":
 				seeker.desires.append(Skill.new("Dominate",false, false, true, false, 1, 0, 0,[""], "Erotic", false, false, 1, ".", 5 + seeker.intelligence * 0.3, 1.5, 0, false, false, false, false, false )) #deal damage and lust to an ally give them an durability buff
-
-
-
-	for i in num_of_skills:
-		desire_objects.append(starting_skills[randi_range(0,starting_skills.size() - 1)])
-		desires.append(starting_skills[randi_range(0,starting_skills.size() - 1)])
 #masturbate is perversion, fantasize is submissive, Experiment is common, Attract attention is bdsm, dominate is dominance
 
 func generate_description(seeker):
@@ -611,6 +613,10 @@ func fill_recruits():
 		print(seeker.skill_objects)
 		_non_equipment_stats_update(seeker)
 		generate_desires(seeker)
+		print(seeker.title)
+		print(seeker.desires)
+		for desire in seeker.desires:
+			print(desire.title)
 		generate_description(seeker)
 		#generate_description(seeker)
 		_recalculate_seeker_stats(seeker)
@@ -665,7 +671,7 @@ func _on_recruit_show_pressed():
 			main_text.text += "\n"
 			main_text.text += "\nSkills: " + str(seeker.skills)
 			main_text.text += "\nQuirks: " + str(seeker.quirks)
-			main_text.text += "\nFetishes: " + str(seeker.fetishes)
+			main_text.text += "\nDesires: " + str(seeker.fetishes)
 			main_text.text += "\n"
 			main_text.text += "\nDescription: " + seeker.description
 			main_text.text += "\n"
@@ -778,7 +784,7 @@ func _inspect(seeker):
 	main_text.text += "\n"
 	main_text.text += "\nSkills: " + str(seeker.skills)
 	main_text.text += "\nQuirks: " + str(seeker.quirks)
-	main_text.text += "\nFetishes: " + str(seeker.fetishes)
+	main_text.text += "\nDesires: " + str(seeker.fetishes)
 	main_text.text += "\n"
 	main_text.text += "\nDescription: " + seeker.description
 	main_text.text += "\n"
@@ -826,7 +832,7 @@ func _inspect_departing(seeker):
 	main_text.text += "\n"
 	main_text.text += "\nSkills: " + str(seeker.skills)
 	main_text.text += "\nQuirks: " + str(seeker.quirks)
-	main_text.text += "\nFetishes: " + str(seeker.fetishes)
+	main_text.text += "\nDesires: " + str(seeker.fetishes)
 	main_text.text += "\n"
 	main_text.text += "\nDescription: " + seeker.description
 	main_text.text += "\n"
@@ -869,7 +875,7 @@ func _on_unequip_armor_pressed(seeker, unequip_armor_button): #have the women ha
 		main_text.text += "\n"
 		main_text.text += "\nSkills: " + str(seeker.skills)
 		main_text.text += "\nQuirks: " + str(seeker.quirks)
-		main_text.text += "\nFetishes: " + str(seeker.fetishes)
+		main_text.text += "\nDesires: " + str(seeker.fetishes)
 		main_text.text += "\n"
 		main_text.text += "\nDescription: " + seeker.description
 		main_text.text += "\n"
@@ -901,7 +907,7 @@ func _on_unequip_armor_pressed(seeker, unequip_armor_button): #have the women ha
 		main_text.text += "\n"
 		main_text.text += "\nSkills: " + str(seeker.skills)
 		main_text.text += "\nQuirks: " + str(seeker.quirks)
-		main_text.text += "\nFetishes: " + str(seeker.fetishes)
+		main_text.text += "\nDesires: " + str(seeker.fetishes)
 		main_text.text += "\n"
 		main_text.text += "\nDescription: " + seeker.description
 		main_text.text += "\n"
@@ -949,7 +955,7 @@ func _on_unequip_weapon_pressed(seeker, unequip_weapon_button):
 		main_text.text += "\n"
 		main_text.text += "\nSkills: " + str(seeker.skills)
 		main_text.text += "\nQuirks: " + str(seeker.quirks)
-		main_text.text += "\nFetishes: " + str(seeker.fetishes)
+		main_text.text += "\nDesires: " + str(seeker.fetishes)
 		main_text.text += "\n"
 		main_text.text += "\nDescription: " + seeker.description
 		main_text.text += "\n"
@@ -981,7 +987,7 @@ func _on_unequip_weapon_pressed(seeker, unequip_weapon_button):
 		main_text.text += "\n"
 		main_text.text += "\nSkills: " + str(seeker.skills)
 		main_text.text += "\nQuirks: " + str(seeker.quirks)
-		main_text.text += "\nFetishes: " + str(seeker.fetishes)
+		main_text.text += "\nDesires: " + str(seeker.fetishes)
 		main_text.text += "\n"
 		main_text.text += "\nDescription: " + seeker.description
 		main_text.text += "\n"
@@ -1016,7 +1022,7 @@ func equip_weapon(seeker, weapun):
 	main_text.text += "\n"
 	main_text.text += "\nSkills: " + str(seeker.skills)
 	main_text.text += "\nQuirks: " + str(seeker.quirks)
-	main_text.text += "\nFetishes: " + str(seeker.fetishes)
+	main_text.text += "\nDesires: " + str(seeker.fetishes)
 	main_text.text += "\n"
 	main_text.text += "\nDescription: " + seeker.description
 	main_text.text += "\n"
@@ -1053,7 +1059,7 @@ func equip_armor(seeker, armori):
 	main_text.text += "\n"
 	main_text.text += "\nSkills: " + str(seeker.skills)
 	main_text.text += "\nQuirks: " + str(seeker.quirks)
-	main_text.text += "\nFetishes: " + str(seeker.fetishes)
+	main_text.text += "\nDesires: " + str(seeker.fetishes)
 	main_text.text += "\n"
 	main_text.text += "\nDescription: " + seeker.description
 	main_text.text += "\n"
@@ -1109,7 +1115,7 @@ func departing_screen():
 		main_text.text += "\n"
 		main_text.text += "\nSkills: " + str(seeker.skills)
 		main_text.text += "\nQuirks: " + str(seeker.quirks)
-		main_text.text += "\nFetishes: " + str(seeker.fetishes)
+		main_text.text += "\nDesires: " + str(seeker.fetishes)
 		main_text.text += "\n"
 		main_text.text += "\nDescription: " + seeker.description
 		main_text.text += "\n"
@@ -1175,7 +1181,7 @@ func _depart():
 			main_text.text += "\n"
 			main_text.text += "\nSkills: " + str(seeker.skills)
 			main_text.text += "\nQuirks: " + str(seeker.quirks)
-			main_text.text += "\nFetishes: " + str(seeker.fetishes)
+			main_text.text += "\nDesires: " + str(seeker.fetishes)
 			main_text.text += "\n"
 			main_text.text += "\nDescription: " + seeker.description
 			main_text.text += "\n"
@@ -1239,7 +1245,7 @@ func _on_unequip_armor_pressed_depart(seeker, unequip_armor_button): #have the w
 		main_text.text += "\n"
 		main_text.text += "\nSkills: " + str(seeker.skills)
 		main_text.text += "\nQuirks: " + str(seeker.quirks)
-		main_text.text += "\nFetishes: " + str(seeker.fetishes)
+		main_text.text += "\nDesires: " + str(seeker.fetishes)
 		main_text.text += "\n"
 		main_text.text += "\nDescription: " + seeker.description
 		main_text.text += "\n"
@@ -1271,7 +1277,7 @@ func _on_unequip_armor_pressed_depart(seeker, unequip_armor_button): #have the w
 		main_text.text += "\n"
 		main_text.text += "\nSkills: " + str(seeker.skills)
 		main_text.text += "\nQuirks: " + str(seeker.quirks)
-		main_text.text += "\nFetishes: " + str(seeker.fetishes)
+		main_text.text += "\nDesires: " + str(seeker.fetishes)
 		main_text.text += "\n"
 		main_text.text += "\nDescription: " + seeker.description
 		main_text.text += "\n"
@@ -1319,7 +1325,7 @@ func _on_unequip_weapon_pressed_depart(seeker, unequip_weapon_button):
 		main_text.text += "\n"
 		main_text.text += "\nSkills: " + str(seeker.skills)
 		main_text.text += "\nQuirks: " + str(seeker.quirks)
-		main_text.text += "\nFetishes: " + str(seeker.fetishes)
+		main_text.text += "\nDesires: " + str(seeker.fetishes)
 		main_text.text += "\n"
 		main_text.text += "\nDescription: " + seeker.description
 		main_text.text += "\n"
@@ -1351,7 +1357,7 @@ func _on_unequip_weapon_pressed_depart(seeker, unequip_weapon_button):
 		main_text.text += "\n"
 		main_text.text += "\nSkills: " + str(seeker.skills)
 		main_text.text += "\nQuirks: " + str(seeker.quirks)
-		main_text.text += "\nFetishes: " + str(seeker.fetishes)
+		main_text.text += "\nDesires: " + str(seeker.fetishes)
 		main_text.text += "\n"
 		main_text.text += "\nDescription: " + seeker.description
 		main_text.text += "\n"
@@ -1385,7 +1391,7 @@ func equip_weapon_departing(seeker, weapun):
 	main_text.text += "\n"
 	main_text.text += "\nSkills: " + str(seeker.skills)
 	main_text.text += "\nQuirks: " + str(seeker.quirks)
-	main_text.text += "\nFetishes: " + str(seeker.fetishes)
+	main_text.text += "\nDesires: " + str(seeker.fetishes)
 	main_text.text += "\n"
 	main_text.text += "\nDescription: " + seeker.description
 	main_text.text += "\n"
@@ -1416,7 +1422,7 @@ func equip_armor_departing(seeker, armori):
 	main_text.text += "\n"
 	main_text.text += "\nSkills: " + str(seeker.skills)
 	main_text.text += "\nQuirks: " + str(seeker.quirks)
-	main_text.text += "\nFetishes: " + str(seeker.fetishes)
+	main_text.text += "\nDesires: " + str(seeker.fetishes)
 	main_text.text += "\n"
 	main_text.text += "\nDescription: " + seeker.description
 	main_text.text += "\n"
