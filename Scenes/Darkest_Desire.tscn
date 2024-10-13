@@ -164,8 +164,8 @@ anchor_left = 0.166667
 anchor_top = 0.0246914
 anchor_right = 0.833333
 anchor_bottom = 1.0
-follow_focus = true
 horizontal_scroll_mode = 0
+vertical_scroll_mode = 2
 metadata/_edit_use_anchors_ = true
 
 [node name="main_text" type="RichTextLabel" parent="ScrollContainer"]
