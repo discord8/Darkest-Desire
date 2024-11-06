@@ -139,7 +139,6 @@ func process_turns():
 			global.main_text.text += str(participant.title) + " acts."
 			active_turn = participant
 			if participant in active_seekers:
-				participant.lust += participant.max_lust * 0.7
 				player_turn(participant)
 			if participant in knocked_down_seekers:
 				knocked_down_seeker_turn(participant)
@@ -213,14 +212,14 @@ func goblin_turn(participant):
 				var location_list = ["left breast", "right breast", "left ass cheek", "right ass cheek", "left ankle", "right ankle", "neck"]
 				var location_index = randi_range(0,location_list.size() - 1)
 				var random_location = location_list[location_index]
-				if random_location == "left ankle" or random_location == "right ankle":
+				if "Warded" in target.status:
+					global.main_text.text += "The Goblin leaps towards " + str(target.title) + " but is blasted back from her crackling ward."
+				elif random_location == "left ankle" or random_location == "right ankle":
 					global.main_text.text += str(participant.title) + " furiously bites " + str(target.title) + " targeting her " + str(random_location) +  " as he attempts to pull her down to his size."
 					if target.durability >= skill_check:
 						var damage = randi_range(1,6)
 						if target.armor == "Fantasy Fullplate":
 							damage = randi_range(1,3)
-						if "Warded" in target.status:
-							damage = 0
 						target.stamina -= damage
 						swarm_stats.heat -= 5
 						if swarm_stats.heat <= 0:
@@ -310,9 +309,11 @@ func goblin_turn(participant):
 					damage = randi_range(1,6)
 				if "Warded" in target.status:
 					damage = 0
-				target.stamina -= damage
-				global.main_text.text += "The " + str(participant.title) + " repeatedly bonk " + str(target.title) + " with their clubs. Dealing [color=red]" + str(damage) + " damage[/color]."
-				update_stamina_lust(target,true,false)
+					global.main_text.text += "The Goblin rears his club attempting to strike " + str(target.title) + " but is blasted back from her crackling ward with a squeal of pain."
+				else:
+					target.stamina -= damage
+					global.main_text.text += "The " + str(participant.title) + " repeatedly bonk " + str(target.title) + " with their clubs. Dealing [color=red]" + str(damage) + " damage[/color]."
+					update_stamina_lust(target,true,false)
 			elif action_choice <= 10:
 				var dodge_roll = randi_range(1,60)
 				var damage = randi_range(4,7)
@@ -320,7 +321,8 @@ func goblin_turn(participant):
 					damage = randi_range(2,5)
 				if "Warded" in target.status:
 					damage = 0
-				if target.agility >= dodge_roll or target.strength >= dodge_roll:
+					global.main_text.text += "The Goblin leaps towards " + str(target.title) + " attempting to pull her to the ground but when the first goblin is sent thrown back violently the goblins decide against grabing her pulsing ward."
+				elif target.agility >= dodge_roll or target.strength >= dodge_roll:
 					if target.agility <= target.strength: #add masochist who can't dodge effect? maybe sadist who throws it back
 						global.main_text.text += "With a triumphant Goblin battle cry the goblins attempt to knock down " + str(target.title) + ". down with force but is instead thrown away easily."
 					else:
@@ -424,7 +426,7 @@ func goblin_turn(participant):
 				global.main_text.text += "the goblins lecherously jack off to " + str(target.title) + " just watching their manhoods get pumped makes her burn with temptation. Gaining [color=hotpink]" + str(lust) + "[/color] lust."
 				update_stamina_lust(target,false,true)
 	if target.stamina <= 0:
-		global.main_text.text = "\n\n" + str(target.title) + " has ran out of stamina and is unable to fight anymore. passing out." 
+		global.main_text.text += "\n\n" + str(target.title) + " has ran out of stamina and is unable to fight anymore. passing out." 
 		if target in active_seekers:
 			knocked_down_seekers.append(target)
 			active_seekers.erase(target)
@@ -823,6 +825,8 @@ func skill_logic(ability, seeker, target):
 	if ability.one_use == true:
 		seeker.cooldown_battle.append(ability)
 		seeker.skill_objects.erase(ability)
+	var main_text_scroll = global.main_text.get_v_scroll_bar()
+	main_text_scroll.value = main_text_scroll.max_value
 	update_ui()
 	process_turns()
 
@@ -872,11 +876,11 @@ func cooldowns(seeker):
 	for skill in seeker.cooldown_1:
 		if skill is String:
 			if skill == "Warded":
-				global.main_text.text += "\n" + str(seeker.title) + " is no longer warded."
+				global.main_text.text += "\n" + str(seeker.title) + " is no longer warded. "
 				seeker.cooldown_1.erase(skill)
 				seeker.status.erase(skill)
 			if skill == "Taunt":
-				global.main_text.text += "\n" + str(seeker.title) + " is no longer taunting."
+				global.main_text.text += "\n" + str(seeker.title) + " is no longer taunting. "
 				global._unequip_item_skills(seeker)
 				global.apply_equipment(seeker)
 				seeker.cooldown_1.erase(skill)
@@ -1113,7 +1117,6 @@ func knocked_down_seeker_turn(seeker):
 						seeker.stamina -=  3
 						#maybe have restraint loving memory and fetish, also rape fantasy. where they don't resist
 						global.main_text.text += "A a bunch goblins dive onto " + str(seeker.title) + " and grab hold and restrain her. She bucks wildly unable to free herself from their grasp as the goblins prepare for the next step."
-						update_stamina_lust(seeker,true,false)
 				"Scramble":
 					if seeker.agility >= skill_check_roll_1 * 1.5:
 						success_points += 2
@@ -1138,7 +1141,6 @@ func knocked_down_seeker_turn(seeker):
 						seeker.lust +=  5
 						#maybe have restraint loving memory and fetish, also rape fantasy. where they don't resist
 						global.main_text.text += str(seeker.title) + " starts kissing and carressing the goblins as they do the same to her, her plan is to tire out the goblins to give herself an opportunity to escape. Unfortunately for her, her plan back fires as she archs her back and squirts to the goblins agressive and energetic forplay."
-						update_stamina_lust(seeker,false,true)
 				"Distract":
 					if seeker.intelligence >= skill_check_roll_1 * 1.5:
 						success_points += 2
@@ -1151,7 +1153,6 @@ func knocked_down_seeker_turn(seeker):
 						seeker.lust +=  5
 						#maybe have restraint loving memory and fetish, also rape fantasy. where they don't resist
 						global.main_text.text += str(seeker.title) + " starts to distract the goblins with her body and eroticism in order to give herself room to atleast stand up. but it backfires she is quickly assualted by the goblins which start rubbing their meat against her, begging her to jerk them off."
-						update_stamina_lust(seeker,false,true)
 				"Cover up":
 					if seeker.intelligence >= skill_check_roll_1 * 1.5:
 						success_points += 2
@@ -1180,7 +1181,6 @@ func knocked_down_seeker_turn(seeker):
 							seeker.stamina +=  3
 							#maybe have restraint loving memory and fetish, also rape fantasy. where they don't resist
 							global.main_text.text += "A a bunch goblins dive onto " + str(seeker.title) + " and grab hold and restrain her. She bucks wildly unable to free herself from their grasp as the goblins prepare for the next step."
-							update_stamina_lust(seeker,true,false)
 					"Scramble":
 						if seeker.agility >= skill_check_roll_1 * 1.5:
 							success_points += 2
@@ -1205,7 +1205,6 @@ func knocked_down_seeker_turn(seeker):
 							seeker.lust +=  5
 							#maybe have restraint loving memory and fetish, also rape fantasy. where they don't resist
 							global.main_text.text += str(seeker.title) + " starts kissing and carressing the goblins as they do the same to her, her plan is to tire out the goblins to give herself an opportunity to escape. Unfortunately for her, her plan back fires as she archs her back and squirts to the goblins agressive and energetic forplay."
-							update_stamina_lust(seeker,false,true)
 					"Distract":
 						if seeker.intelligence >= skill_check_roll_1 * 1.5:
 							success_points += 2
@@ -1218,7 +1217,6 @@ func knocked_down_seeker_turn(seeker):
 							seeker.lust +=  5
 							#maybe have restraint loving memory and fetish, also rape fantasy. where they don't resist
 							global.main_text.text += str(seeker.title) + " starts to distract the goblins with her body and eroticism in order to give herself room to atleast stand up. but it backfires she is quickly assualted by the goblins which start rubbing their meat against her, begging her to jerk them off."
-							update_stamina_lust(seeker,false,true)
 					"Cover up":
 						if seeker.intelligence >= skill_check_roll_1 * 1.5:
 							success_points += 2
@@ -1238,10 +1236,12 @@ func knocked_down_seeker_turn(seeker):
 				active_seekers.append(seeker)
 				knocked_down_seekers.erase(seeker)
 				process_turns()
+				update_stamina_lust(seeker,true,true)
 			else:
 				global.main_text.text += "\n\n" + str(seeker.title) + " is unable to escape from the crowd of Goblins."
 				current_turn += 1
 				global.main_text.text += "\n------------------------\n"
+				update_stamina_lust(seeker,true,true)
 				update_ui()
 				process_turns()
 
@@ -1403,8 +1403,10 @@ func ridden_turn(seeker):
 		var damage = randi_range(4,8)
 		if "Warded" in target_choice.status:
 			damage = 0
-		target_choice.stamina += damage
-		global.main_text.text += "\n" + str(seeker.title) + " follows her rider's commands charging at " + str(target_choice.title) + " the goblin strikes her knee with his solid club. Dealing[color=red] " + str(damage) + "[/color]."
+			global.main_text.text += "\n" + str(seeker.title) + " follows her rider's commands charging at " + str(target_choice.title) + " the goblin swings his club but it is deflected by her ward."
+		else:
+			target_choice.stamina += damage
+			global.main_text.text += "\n" + str(seeker.title) + " follows her rider's commands charging at " + str(target_choice.title) + " the goblin strikes her knee with his solid club. Dealing[color=red] " + str(damage) + "[/color]."
 		update_ui()
 		current_turn += 1
 		process_turns()
@@ -1522,3 +1524,4 @@ func update_stamina_lust(seeker,stamina_changed,lust_changed):
 # memory list: "Superior to Goblins", "Bite Mark", "Spanked", "Erotic Injury", "Breasts toyed with", "Climax", "Ass Gropped"
 # Fetish list: "Pony Fetish", "Submissive Slave", "Spanked Fetish", "Bitten Fetish", "Fuck Meat", "Sadistic Stimulator", "Pain Slut", "Sensitive Ass", "Sensitive Breasts", "Sensitive Pussy", "Sensitive Mouth", "Cum Waster", "Cum Addicted", "Cum Rag", "Handjob Expert", "Dick Drainer", "Cock Worship"
 # APPLY THE FOLLOWING STATUS: Warded: reduces damage to 0. increases lust
+#bug: character 1 faints, character 2 has no options to act. no other text so likely a = somewhere
