@@ -354,7 +354,11 @@ func goblin_turn(participant):
 					if sex_type_choice == "degradation":
 						global.main_text.text += "\nThe goblins surround " + str(target.title) + " and perform foreplay.\n The goblins make sure she knows her place, degrading her, spitting on her, spanking and caressing her robust ass while yanking her hair, despite the bullying " + str(target.title) + " can't help but to get super wet from all the attention."
 					if sex_type_choice == "groping":
-						global.main_text.text += "\nThe goblins surround " + str(target.title) + " they grope he ass and " + str(target.breast_type) + " lecherously causing moans to escape her soft lips, tempted, the goblins groping go from touching to fingering, their digits erotically prying their way into her wet hot holes."
+						var random_text = randi_range(1,5)
+						if random_text == 1:
+							global.main_text.text += "\nThe goblins surround " + str(target.title) + " they grope he ass and " + str(target.breast_type) + " lecherously causing moans to escape her soft lips, tempted, the goblins groping go from touching to fingering, their digits erotically prying their way into her wet hot holes."
+						if random_text == 2:
+							global.main_text.text += "\n" + str(target.title) + " lay on the muddy forest floor, her sweaty body shining in the humid heat. Her large breasts rose and fell with each breath, nipples stiff and inviting.\n\nRough green hands touched Elica's hips, fingers gripping her flesh as they moved up to caress her chest. The goblin squeezed her nipples, eliciting a moan from " + str(target.title) + " as she arched her back.\n\n \"Touch me more, you filthy creatures!\" " + str(target.title) + " gasped, squirming lustfully under the goblins savage digits. \"Pinch my breasts harder! Make them yours!\""
 					if target.lust >= target.max_lust:
 						target.lust = target.max_lust * 0.5
 						target.stamina -= randi_range(10,15)
