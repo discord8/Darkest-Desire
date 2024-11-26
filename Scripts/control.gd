@@ -54,6 +54,12 @@ var cum_milked: int #partially converted to PP
 var PP: int #perversion points, used to determine rank
 var has_cock: bool
 var fucking_intensity: int #1 foreplay, 2 beginner, 3 sex, 4 hardcore
+var Sub_P: int
+var Dom_P: int
+var Kink_P: int #every fetish is one point in it's respective catergories, used for determining personality
+var Perv_P: int
+var Van_P: int
+var personality: String #Highest X_P becomes pesonality. Submissive, Dominant, Kinky, Perverted, Vanilla. Used for some events and actions.
 
 
 #system vars
@@ -68,23 +74,26 @@ var pondering_seekers: Array = []
 var recovery_mission: Array = []
 var max_party_size = 3
 # random lists
+var personalities = ["Submissive", "Dominant", "Kinky", "Perverted", "Vanilla"]
 var armory = []
 var armor_armory = []
 var left_buttons = []
 var right_buttons = []
-var fetishes_list = ["Pain Slut", "Spankable Ass", "Orgasm Denier", "Goonete", "Masturbation Addict", "Degradation Slut", "Slave", "Struggle Fucking", "Corruption", "Trance Fucking", "Hypnotism", "Free Service", "Service Slut", "Voyeur", "Libidinous", "Hair Trigger", "Sadist", "Cock Miller", "Dick Drainer", "Skillful Fingers", "Matchmaker", "Mistress", "Temptress"]
-var submissive_fetishes = ["Pain Slut", "Spankable Ass", "Degradation Slut", "Slave", "Trance Fucking", "Hypnotism", "Free Service", "Service Slut", "Voyeur", "Cock Miller"]
-var bdsm_fetishes = ["Pain Slut", "Spankable Ass", "Degradation Slut", "Slave", "Struggle Fucking", "Free Service", "Service Slut"]
-var dominant_fetishes = ["Orgasm Denier", "Voyeaur", "Libidinous", "Hair Trigger", "Sadist", "Cock Miller", "Dick Drainer", "Skillful Fingers", "Matchmaker", "Mistress", "Temptress"]
-var perverted_fetishes = ["Orgasm Denier", "Goonete", "Corruption", "Trance Fucking", "Hypnotism", "Free Service", "Libidinous", "Hair Trigger", "Temptress", "Cock Miller", "Dick Drainer"]
-var common_fetishes = ["Spankable Ass", "Masturbation Addict", "Struggle Fucking", "Corruption", "Free Service", "Voyeur", "Libidinous", "Temptress", "Skillful Fingers"]
+var fetishes_list = ["Pain Slut", "Being Choked", "Hair Pulled", "Spankable Ass", "Chew Toy", "Orgasm Denier", "Masturbation Addict", "Degradation Slut", "Rape Bait", "Non-Con", "Consenting Slave", "Corruptible", "Trance Fucking", "Hypnotism", "Free Service", "Service Slut", "Voyeur", "Insatiable", "Hair Trigger", "Sadist", "Cock Miller", "Dick Drainer", "Skillful Fingers", "Matchmaker", "Mistress", "Temptress", "Fuck Meat"]
+var submissive_fetishes = ["Pain Slut", "Spankable Ass", "Corruptible", "Degradation Slut", "Consenting Slave", "Easily Hypnotised", "Free Service", "Service Slut", "Voyeur", "Cock Miller", "Chew Toy"]
+var bdsm_fetishes = ["Pain Slut", "Pony Play", "Spankable Ass", "Degradation Slut", "Consenting Slave", "Struggle Fucking", "Free Service", "Service Slut", "Non-Con"]
+var dominant_fetishes = ["Orgasm Denier", "Voyeur", "Hair Trigger", "Sadist", "Cock Miller", "Dick Drainer", "Skillful Fingers", "Matchmaker", "Mistress", "Temptress", "Untouchable"]
+var perverted_fetishes = [ "Trance Fucking", "Insatiable", "Corruptible", "Trance Fucking", "Easily Hypnotised", "Free Service", "Libidinous", "Hair Trigger", "Temptress", "Cock Miller", "Dick Drainer", "Rape Bait"]
+var common_fetishes = ["Spankable Ass", "Masturbation Addict", "Free Service", "Voyeur", "Libidinous", "Temptress", "Skillful Fingers"]
 var dick_fetish = []
+var hand_fetish = []
+var other_fetish = []
 var pussy_fetish = []
 var ass_fetish = []
 var oral_fetish = []
 var breasts_fetish = []
 var paras
-var names = ["Lilica", "Misty", "Echo", "Effie", "Mordred", "Gretel", "Hannah", "Vex", "Lara", "Tilly", "Mili", "Isabell", "Ivy", "Melody", "Melissa", "Anna", "Dorathy", "Jess", "Mika", "Eda", "Stacy", "Trish", "Stephanie", "Linda", "Molly", "Mandy", "Dakota", "Iyo", "Kairi", "Nia", "Peyton", "Yera", "Triena", "Aath", "Miu", "Mikan", "Tsumiki", "Miku", "Fili", "Sage", "Evelyn", "Lucy", "Emma", "Terial", "Lyra", "Titiana", "Nip", "Sarah", "Sara", "Mimi", "Octavia", "Corin", "Gigi", "Mandy", "Rose", "Liv", "Rhea", "Jasmine", "Piper", "Dove", "Jade", "Ingrid", "Umi", "Tori", "Cindy", "Velvet", "Mariah", "Tessa", "Tess", "Daphney", "Dora", "Zelda", "Hitomi", "Seras", "Ava", "Olivia", "Sophie", "Amelia", "Mary", "Isabella", "Victoria", "Charlotte", "Luna", "Mia", "Kalifa", "Lana", "Amber", "Gianna", "Annie", "Nora", "Layla", "Lilly", "Nikki", "Aoi", "Lulu", "Mami", "Hazel", "Madi", "Isla", "Willow", "Zoe", "Grace", "Ivy", "Naomi", "Maya", "Alice", "Sadie", "Hailey", "Aubrey", "Skye", "Vivian", "Eve", "Freya", "Amara", "Chel", "Catalina", "Ashley", "Chloe", "Faith", "Kimberly", "Taylor", "Sutton", "Vera", "Kaia", "Lilly", "Selena", "Aubrey", "Nyla", "Lia", "Kiara", "Elise", "Hope", "Lola", "Lilith", "Ophelia", "Dahlia", "Blair", "Celeste", "Rebecca", "Nina", "Trinity", "Vanessa", "Camilla", "Adrianna", "Celine", "Lucianna", "Reign", "Cali", "Viviana", "Serena", "Destiny", "Elle", "Veronica", "Azaela", "Raya", "Raven", "Scarlet", "Sylvie", "Lexi", "Ryn", "Carmen", "Alison", "Felicity", "Katalina", "Zariah", "Mira", "Jolene", "Emelia", "Bonnie", "Briar", "Leona", "Lina", "Remy", "Mina", "Mili", "Selene", "Angie", "Flora", "Violet", "Aya", "Ramona", "Bridget", "Mercy", "Paula", "Baylor", "Marianna", "Loretta", "Gwen", "Robin", "Katelyn", "Tiffany", "Lexie", "Kahlani"]
+var names = ["Lilica", "Misty", "Echo", "Effie", "Mordred", "Gretel", "Hannah", "Vex", "Elica", "Lara", "Tilly", "Mili", "Isabell", "Ivy", "Melody", "Melissa", "Anna", "Dorathy", "Jess", "Mika", "Eda", "Stacy", "Trish", "Stephanie", "Linda", "Molly", "Mandy", "Dakota", "Iyo", "Kairi", "Nia", "Peyton", "Yera", "Triena", "Aath", "Miu", "Mikan", "Tsumiki", "Miku", "Fili", "Sage", "Evelyn", "Lucy", "Emma", "Terial", "Lyra", "Titiana", "Nip", "Sarah", "Sara", "Mimi", "Octavia", "Corin", "Gigi", "Mandy", "Rose", "Liv", "Rhea", "Jasmine", "Piper", "Dove", "Jade", "Ingrid", "Umi", "Tori", "Cindy", "Velvet", "Mariah", "Tessa", "Tess", "Daphney", "Dora", "Zelda", "Hitomi", "Seras", "Ava", "Olivia", "Sophie", "Amelia", "Mary", "Isabella", "Victoria", "Charlotte", "Luna", "Mia", "Kalifa", "Lana", "Amber", "Gianna", "Annie", "Nora", "Layla", "Lilly", "Nikki", "Aoi", "Lulu", "Mami", "Hazel", "Madi", "Isla", "Willow", "Zoe", "Grace", "Ivy", "Naomi", "Maya", "Alice", "Sadie", "Hailey", "Aubrey", "Skye", "Vivian", "Eve", "Freya", "Amara", "Chel", "Catalina", "Ashley", "Chloe", "Faith", "Kimberly", "Taylor", "Sutton", "Vera", "Kaia", "Lilly", "Selena", "Aubrey", "Nyla", "Lia", "Kiara", "Elise", "Hope", "Lola", "Lilith", "Ophelia", "Dahlia", "Blair", "Celeste", "Rebecca", "Nina", "Trinity", "Vanessa", "Camilla", "Adrianna", "Celine", "Lucianna", "Reign", "Cali", "Viviana", "Serena", "Destiny", "Elle", "Veronica", "Azaela", "Raya", "Raven", "Scarlet", "Sylvie", "Lexi", "Ryn", "Carmen", "Alison", "Felicity", "Katalina", "Zariah", "Mira", "Jolene", "Emelia", "Bonnie", "Briar", "Leona", "Lina", "Remy", "Mina", "Mili", "Selene", "Angie", "Flora", "Violet", "Aya", "Ramona", "Bridget", "Mercy", "Paula", "Baylor", "Marianna", "Loretta", "Gwen", "Robin", "Katelyn", "Tiffany", "Lexie", "Kahlani"]
 var all_weapons =["Twin Daggers", "Crossbow", "Flintlock", "Arcane Wand", "Bound Tome", "Broad Sword", "Battle Axes", "Great Club"]
 var all_armors = ["Graceful Robes", "Bikini Armor", "Dancer's Silk", "Holy Garb", "Fantasy Fullplate", "Skimpy Streetrat"]
 var starter_weapons = ["Twin Daggers", "Crossbow", "Bound Tome", "Great Club"]
@@ -153,6 +162,12 @@ func _init():
 	self.PP = 0 #perversion points, used to determine rank
 	self.has_cock = false
 	self.fucking_intensity = 0
+	self.Sub_P = randi_range(1,3)
+	self.Dom_P = randi_range(1,3)
+	self.Kink_P = randi_range(1,3) #every fetish is one point in it's respective catergories, used for determining personality
+	self.Perv_P = randi_range(1,3)
+	self.Van_P = randi_range(1,3)
+	self.personality = ""
 	generate_quirks()
 	
 	
@@ -184,14 +199,19 @@ func generate_desires(seeker):
 		seeker.fetishes.append(desire_choice[ii])
 		match desire_choice[ii]:
 			"Submit":
+				seeker.Sub_P += 1
 				seeker.desires.append(Skill.new("Submit",false, true, false, false, 1, 0, 0,[""], "Erotic", false, false, 1, ".", 5 + seeker.intelligence * 0.3, 1.5, 0, false, false, false, false, false )) #allow self to be surround regain all stamina
 			"Fantasize":
+				seeker.Van_P += 1
 				seeker.desires.append(Skill.new("Fantasize",false, false, false, true, 1, 0, 0,[""], "Erotic", false, false, 1, ".", 5 + seeker.intelligence * 0.3, 1.5, 0, false, false, false, false, false )) #gain lust and stamina regain stamina
 			"Experiment":
+				seeker.Perv_P += 1
 				seeker.desires.append(Skill.new("Experiment",false, true, false, false, 1, 0, 0,[""], "Erotic", false, false, 1, ".", 5 + seeker.intelligence * 0.3, 1.5, 0, false, false, false, false, false )) #chance to gain or deal damage or lust
 			"Attract Attention":
+				seeker.Kink_P += 1
 				seeker.desires.append(Skill.new("Attract Attention",false, false, false, true, 1, 0, 0,[""], "Erotic", false, false, 1, ".", 5 + seeker.intelligence * 0.3, 1.5, 0, false, false, false, false, false )) # make threat = 50 gain a durability buff
 			"Dominate":
+				seeker.Dom_P += 1
 				seeker.desires.append(Skill.new("Dominate",false, false, true, false, 1, 0, 0,[""], "Erotic", false, false, 1, ".", 5 + seeker.intelligence * 0.3, 1.5, 0, false, false, false, false, false )) #deal damage and lust to an ally give them an durability buff
 #masturbate is perversion, fantasize is submissive, Experiment is common, Attract attention is bdsm, dominate is dominance
 
@@ -574,9 +594,43 @@ func _unequip_item_skills(seeker):
 		"Skimpy Streetrat":
 			seeker.skills.erase("Hideaway")
 
-#func skill_erasing_func(seeker,item_list):
-	#for skill in item_list:
-		#seeker.skill_objects.erase(skill.title)
+
+func apply_personality(seeker):
+	var highest_p = 0
+	var tied = []
+	if highest_p <= seeker.Sub_P:
+		highest_p = seeker.Sub_P
+	if highest_p <= seeker.Dom_P:
+		highest_p = seeker.Dom_P
+	if highest_p <= seeker.Kink_P:
+		highest_p = seeker.Kink_P
+	if highest_p <= seeker.Perv_P:
+		highest_p = seeker.Perv_P
+	if highest_p <= seeker.Van_P:
+		highest_p = seeker.Van_P
+	if highest_p == seeker.Sub_P:
+		tied.append("Submissive")
+		print(tied)
+	if highest_p == seeker.Dom_P:
+		tied.append("Dominant")
+		print(tied)
+	if highest_p == seeker.Kink_P:
+		tied.append("Kinky")
+		print(tied)
+	if highest_p == seeker.Perv_P:
+		tied.append("Perverted")
+		print(tied)
+	if highest_p == seeker.Van_P:
+		tied.append("Vanilla")
+		print(tied)
+	if tied.size() >= 2:
+		var num_choice = randi_range(0, tied.size() - 1)
+		seeker.personality = tied[num_choice]
+	else:
+		print(tied)
+		seeker.personality = tied[0]
+	print(seeker.personality)
+
 #
 var scroll_container: ScrollContainer
 var scroll_bar
@@ -623,6 +677,7 @@ func fill_recruits():
 		#generate_description(seeker)
 		_recalculate_seeker_stats(seeker)
 		seeker.stamina = seeker.max_stamina
+		apply_personality(seeker)
 		for_hire.append(seeker)
 	for starting_weaponss in range(3):
 		var index = randi_range(0,starter_weapons.size() - 1)
@@ -674,6 +729,7 @@ func _on_recruit_show_pressed():
 			main_text.text += "\nSkills: " + str(seeker.skills)
 			main_text.text += "\nQuirks: " + str(seeker.quirks)
 			main_text.text += "\nDesires: " + str(seeker.fetishes)
+			main_text.text += "\nPersonality: " + str(seeker.personality)
 			main_text.text += "\n"
 			main_text.text += "\nDescription: " + seeker.description
 			main_text.text += "\n"
@@ -1510,6 +1566,7 @@ func scroll_to_bottom():
 
 
 #dungeon stuff
+# Use tags for events on obsidian like Pain and Degradation to interact.
 #Pleasure paradise
 #nodes: event, battle, trap, objective
 # make battles unique, coffin seekers and seekers can parry and block each others attacks like a samurai showdown, while goblins hp swarm with their hp representing how many goblins are left. a single blowjob isn't effective but a gangbang sure is, and attacks slay multiple within reason, thralls are entirely focused on sex

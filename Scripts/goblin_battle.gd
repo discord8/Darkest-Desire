@@ -173,17 +173,17 @@ func goblin_turn(participant):
 		if swarm_stats.heat == 0:
 			swarm_stats.heat += 5
 		#make sure to have a general method to free captives, also a loss condition if all seekers are captured, maybe with a special sex scene where the goblins ride there mounts back to their village
-		if "Pony Fetish" in target.fetishes or "Submissive Slave" in target.fetishes or "Spanked Fetish" in target.fetishes:
+		if "Pony Play" in target.fetishes or "Consensual Slave" in target.fetishes or "Spankable Ass" in target.fetishes:
 			var potential_memory = randi_range(1,2) #1/4?
 			knocked_down_seekers.erase(target)
 			ridden_seekers.append(target)
 			var gained_lust = randi_range(15,25)
 			target.lust += gained_lust
 			global.main_text.text += str(participant.title) + " turns " + str(target.title) + " onto all fours, realising where this is going " + str(target.title) + " and shakes her ripe ass back and forth begging the goblin to discipline her. A series of rough spanks causes her arousal to spike and claim her total obedience. The goblin then claws his way up onto her back and whips a bar gag into her mouth that is connected by reigns controling her like a mount in battle. Her heart flutters and her pussy wettens unable to disobey with every spank and excited jerk of the gag she bends to her master's whim gaining [color=hotpink]" + str(gained_lust) + " Lust [/color]."
-			if "Spanked Fetish" not in target.fetishes and potential_memory == 1 and "Spanked" not in target.memories:
+			if "Spankable Ass" not in target.fetishes and potential_memory == 1 and "Spanked" not in target.memories:
 				target.memories.append("Spanked")
 				global.main_text.text += "[color=orchid]" + str(target.title) + " dwells on her reddened sore cheeks, feeling the numbing pain radiate through her body, she starts unpacking her opinions. " + str(target.title) + " gained the memory \"Spanked\".[/color]"
-			elif "Pony Fetish" not in target.fetishes and potential_memory == 2 and "Ridden like a pony" not in target.memories:
+			elif "Pony Play" not in target.fetishes and potential_memory == 2 and "Ridden like a pony" not in target.memories:
 				target.memories.append("Ridden like a pony")
 				global.main_text.text += "\n\n[color=orchid]" + str(target.title) + " through her embarrasment she can't believe shes letting a goblin ride her like an inferior animal. " + str(target.title) + " gained the memory \"Ridden like a pony\".[/color]"
 		if target.will <= skill_check:
@@ -194,10 +194,10 @@ func goblin_turn(participant):
 			var potential_memory = randi_range(1,2)
 			global.main_text.text += str(participant.title) + " turns " + str(target.title) + " onto all fours and thunderously spanks her thick ass causing a shrill shriek followed by lustful recovery breaths. The goblin claws his way up onto her back while shes subdued and whips a bar gag into her mouth that is connected by reigns to control her like a mount in battle. Her heart flutters and her pussy wettens unable to disobey with every spank and excited jerk of the gag she bends to her master's whim gaining [color=hotpink]" + str(gained_lust) + " Lust [/color]."
 			update_stamina_lust(target,false,true)
-			if "Spanked Fetish" not in target.fetishes and potential_memory == 1 and "Spanked" not in target.memories:
+			if "Spankable Ass" not in target.fetishes and potential_memory == 1 and "Spanked" not in target.memories:
 				target.memories.append("Spanked")
 				global.main_text.text += "\n\n[color=orchid]" + str(target.title) + " dwells on her reddened sore cheeks, feeling the numbing pain radiate through her body, she starts unpacking her opinions. " + str(target.title) + " gained the memory \"Spanked\".[/color]"
-			elif "Pony Fetish" not in target.fetishes and potential_memory == 2 and "Ridden like a pony" not in target.memories:
+			elif "Pony Play" not in target.fetishes and potential_memory == 2 and "Ridden like a pony" not in target.memories:
 				target.memories.append("Ridden like a pony")
 				global.main_text.text += "\n\n[color=orchid]" + str(target.title) + " through her embarrasment she can't believe shes letting a goblin ride her like an inferior animal. " + str(target.title) + " gained the memory \"Ridden like a pony\".[/color]"
 		if target.will >= skill_check:
@@ -298,18 +298,23 @@ func goblin_turn(participant):
 						target.stamina -= damage
 						global.main_text.text += " a mixture of pain and pleasure stimulates her mind, dealing [color=red]" + str(damage) + "[/color] damage and causing her to gain [color=hotpink]" + str(lust_gain) + "[/color] lust."
 						update_stamina_lust(target,true,true)
-					if "Bitten Fetish" not in target.fetishes and potential_memory == 1 and "Bite Mark" not in target.memories:
+					if "Chew Toy" not in target.fetishes and potential_memory == 1 and "Bite Mark" not in target.memories:
 						target.memories.append("Bite Mark")
 						global.main_text.text += "\n\n[color=orchid]As the goblin is flung off " + str(target.title) + " can't help but to feel the not entirely unpleasant sensation of the stinging mark. " + str(target.title) + " gained the memory \"Bite Mark\".[/color]"
 					elif "Pain Slut" not in target.fetishes and "Fuck Meat" not in target.fetishes and "Sadistic Stimulator" not in target.fetishes and pain_memory == 1 and "Erotic Injury" not in target.memories: #maybe add not true if sadist
-						global.main_text.text += "\n\n[color=orchid]" + str(target.title) + " focuses on the pain mixed with the buzzing lust within her heart and she thinks to herself, that wasn't that bad. " + str(target.title) + " gained the memory \"Erotic injury\".[/color]"
+						target.memories.append("Erotic Injury")
+						global.main_text.text += "\n\n[color=orchid]" + str(target.title) + " focuses on the pain mixed with the buzzing lust within her heart and she thinks to herself, that wasn't that bad. " + str(target.title) + " gained the memory \"Erotic Injury\".[/color]"
 			elif action_choice <= 5:
 				var damage = randi_range(3,8)
 				if target.armor == "Fantasy Fullplate":
 					damage = randi_range(1,6)
 				if "Warded" in target.status:
+					var roll = randi_range(1,3)
 					damage = 0
-					global.main_text.text += "The Goblin rears his club attempting to strike " + str(target.title) + " but is blasted back from her crackling ward with a squeal of pain."
+					if roll == 1:
+						global.main_text.text += "The Goblin rears his club attempting to strike " + str(target.title) + " but is blasted back from her crackling ward with a squeal of pain."
+					if roll == 2:
+						global.main_text.text += "The Goblin rears his club attempting to strike " + str(target.title) + " but is blasted back from her crackling ward with a squeal of pain."
 				else:
 					target.stamina -= damage
 					global.main_text.text += "The " + str(participant.title) + " repeatedly bonk " + str(target.title) + " with their clubs. Dealing [color=red]" + str(damage) + " damage[/color]."
@@ -1526,6 +1531,6 @@ func update_stamina_lust(seeker,stamina_changed,lust_changed):
 # look into button errors, it works for now but output is not liking it
 #have unlocks behind fetishes like anal slut being after likes anal or something
 # memory list: "Superior to Goblins", "Bite Mark", "Spanked", "Erotic Injury", "Breasts toyed with", "Climax", "Ass Gropped"
-# Fetish list: "Pony Fetish", "Submissive Slave", "Spanked Fetish", "Bitten Fetish", "Fuck Meat", "Sadistic Stimulator", "Pain Slut", "Sensitive Ass", "Sensitive Breasts", "Sensitive Pussy", "Sensitive Mouth", "Cum Waster", "Cum Addicted", "Cum Rag", "Handjob Expert", "Dick Drainer", "Cock Worship"
+# Fetish list: "Fuck Meat", "Sadistic Stimulator", "Pain Slut", "Sensitive Ass", "Sensitive Breasts", "Sensitive Pussy", "Sensitive Mouth", "Cum Waster", "Cum Addicted", "Cum Rag", "Handjob Expert", "Dick Drainer", "Cock Worship"
 # APPLY THE FOLLOWING STATUS: Warded: reduces damage to 0. increases lust
 #bug: character 1 faints, character 2 has no options to act. no other text so likely a = somewhere
